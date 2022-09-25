@@ -26,7 +26,6 @@ catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES irobot_msgs
   CATKIN_DEPENDS roscpp quadrotor_msgs uav_utils
-  DEPENDS Eigen3 system_lib
 )
 
 include_directories(include)

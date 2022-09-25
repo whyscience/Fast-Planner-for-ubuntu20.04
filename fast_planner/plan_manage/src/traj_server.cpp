@@ -207,8 +207,8 @@ void cmdCallback(const ros::TimerEvent& e) {
   ros::Time time_now = ros::Time::now();
   double t_cur = (time_now - start_time_).toSec();
 
-  Eigen::Vector3d pos, vel, acc, pos_f;
-  double yaw, yawdot;
+  Eigen::Vector3d pos{0,0,0}, vel{0,0,0}, acc{0,0,0}, pos_f{0,0,0};
+  double yaw{}, yawdot{};
 
   if (t_cur < traj_duration_ && t_cur >= 0.0) {
     pos = traj_[0].evaluateDeBoorT(t_cur);

@@ -553,7 +553,7 @@ void FastPlannerManager::findCollisionRange(vector<Eigen::Vector3d>& colli_start
   initial_traj->getTimeSpan(t_m, t_mp);
 
   /* find range of collision */
-  double t_s = -1.0, t_e;
+  double t_s = -1.0, t_e{};
   for (double tc = t_m; tc <= t_mp + 1e-4; tc += 0.05) {
 
     Eigen::Vector3d ptc = initial_traj->evaluateDeBoor(tc);

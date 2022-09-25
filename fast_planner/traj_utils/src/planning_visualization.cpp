@@ -389,7 +389,7 @@ Eigen::Vector4d PlanningVisualization::getColor(double h, double alpha) {
     h = 0.0;
   }
 
-  double          lambda;
+  double          lambda{};
   Eigen::Vector4d color1, color2;
   if (h >= -1e-4 && h < 1.0 / 6) {
     lambda = (h - 0.0) * 6;

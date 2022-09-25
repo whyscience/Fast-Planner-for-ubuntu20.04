@@ -13,8 +13,7 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES irobot_msgs
   CATKIN_DEPENDS multi_map_server
-  DEPENDS system_lib
-          message_runtime
+  DEPENDS message_runtime
 )
 
 ###########

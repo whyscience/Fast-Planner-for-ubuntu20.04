@@ -224,6 +224,8 @@ void KinoReplanFSM::execFSMCallback(const ros::TimerEvent& e) {
       }
       break;
     }
+    default:
+        break;
   }
 }
 

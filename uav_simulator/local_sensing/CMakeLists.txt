@@ -67,7 +67,6 @@ else(ENABLE_CUDA)
       roscpp roslib cmake_modules pcl_ros sensor_msgs geometry_msgs nav_msgs quadrotor_msgs)
   
   catkin_package(
-      DEPENDS Eigen
       CATKIN_DEPENDS roscpp roslib pcl_ros
   )
 

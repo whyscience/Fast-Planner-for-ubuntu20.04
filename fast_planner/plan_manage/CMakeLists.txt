@@ -3,7 +3,7 @@ project(plan_manage)
 
 set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-but-set-variable")
 
 find_package(Eigen3 REQUIRED)
 find_package(PCL 1.7 REQUIRED)

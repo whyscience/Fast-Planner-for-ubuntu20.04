@@ -29,7 +29,7 @@ include_directories(
     ${PCL_INCLUDE_DIRS}
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-but-set-variable")
 
 add_library( bspline_opt 
     src/bspline_optimizer.cpp 

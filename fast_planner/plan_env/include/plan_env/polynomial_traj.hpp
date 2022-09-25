@@ -63,7 +63,7 @@ public:
   void init() {
     num_seg = times.size();
     time_sum = 0.0;
-    for (int i = 0; i < times.size(); ++i) {
+    for (int i = 0; i < (int)times.size(); ++i) {
       time_sum += times[i];
     }
   }
@@ -165,7 +165,7 @@ public:
     length = 0.0;
 
     Eigen::Vector3d p_l = traj_vec3d[0], p_n;
-    for (int i = 1; i < traj_vec3d.size(); ++i) {
+    for (int i = 1; i < (int)traj_vec3d.size(); ++i) {
       p_n = traj_vec3d[i];
       length += (p_n - p_l).norm();
       p_l = p_n;
@@ -175,13 +175,14 @@ public:
 
   double getMeanVel() {
     double mean_vel = length / time_sum;
+    return mean_vel;
   }
 
   double getAccCost() {
     double cost = 0.0;
     int order = cxs[0].size();
 
-    for (int s = 0; s < times.size(); ++s) {
+    for (int s = 0; s < (int)times.size(); ++s) {
       Eigen::Vector3d um;
       um(0) = 2 * cxs[s][order - 3], um(1) = 2 * cys[s][order - 3], um(2) = 2 * czs[s][order - 3];
       cost += um.squaredNorm() * times[s];
@@ -194,7 +195,7 @@ public:
     double jerk = 0.0;
 
     /* evaluate jerk */
-    for (int s = 0; s < times.size(); ++s) {
+    for (int s = 0; s < (int)times.size(); ++s) {
       Eigen::VectorXd cxv(cxs[s].size()), cyv(cys[s].size()), czv(czs[s].size());
       /* convert coefficient */
       int order = cxs[s].size();
@@ -223,7 +224,7 @@ public:
   void getMeanAndMaxVel(double& mean_v, double& max_v) {
     int num = 0;
     mean_v = 0.0, max_v = -1.0;
-    for (int s = 0; s < times.size(); ++s) {
+    for (int s = 0; s < (int)times.size(); ++s) {
       int order = cxs[s].size();
       Eigen::VectorXd vx(order - 1), vy(order - 1), vz(order - 1);
 
@@ -257,7 +258,7 @@ public:
   void getMeanAndMaxAcc(double& mean_a, double& max_a) {
     int num = 0;
     mean_a = 0.0, max_a = -1.0;
-    for (int s = 0; s < times.size(); ++s) {
+    for (int s = 0; s < (int)times.size(); ++s) {
       int order = cxs[s].size();
       Eigen::VectorXd ax(order - 2), ay(order - 2), az(order - 2);
 

@@ -238,7 +238,7 @@ double Astar::getDiagHeu(Eigen::Vector3d x1, Eigen::Vector3d x2) {
   double dy = fabs(x1(1) - x2(1));
   double dz = fabs(x1(2) - x2(2));
 
-  double h;
+  double h{};
   int diag = min(min(dx, dy), dz);
   dx -= diag;
   dy -= diag;
@@ -326,6 +326,7 @@ Eigen::Vector3i Astar::posToIndex(Eigen::Vector3d pt) {
 
 int Astar::timeToIndex(double time) {
   int idx = floor((time - time_origin_) * inv_time_resolution_);
+  return idx;
 }
 
 }  // namespace fast_planner
