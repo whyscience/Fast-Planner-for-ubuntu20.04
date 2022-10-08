@@ -39,7 +39,7 @@ generate_messages(
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES plan_manage
- CATKIN_DEPENDS plan_env path_searching bspline bspline_opt traj_utils message_runtime
+ CATKIN_DEPENDS quadrotor_msgs plan_env path_searching bspline bspline_opt traj_utils message_runtime
 #  DEPENDS system_lib
 )
 
