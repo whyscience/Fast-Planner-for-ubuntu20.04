@@ -28,11 +28,11 @@
 
 #include <Eigen/Eigen>
 #include <algorithm>
-#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <iostream>
 #include <list>
 #include <ros/ros.h>
-#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/msg/marker.hpp>
 
 using std::cout;
 using std::endl;
@@ -48,17 +48,17 @@ typedef shared_ptr<vector<Eigen::Vector3d>> ObjScale;
 
 /* ========== prediction polynomial ========== */
 class PolynomialPrediction {
-private:
+ private:
   vector<Eigen::Matrix<double, 6, 1>> polys;
   double t1, t2;  // start / end
 
-public:
+ public:
   PolynomialPrediction(/* args */) {
   }
   ~PolynomialPrediction() {
   }
 
-  void setPolynomial(vector<Eigen::Matrix<double, 6, 1>>& pls) {
+  void setPolynomial(vector<Eigen::Matrix<double, 6, 1>> &pls) {
     polys = pls;
   }
   void setTime(double t1, double t2) {
@@ -94,7 +94,7 @@ public:
 
 /* ========== subscribe and record object history ========== */
 class ObjHistory {
-public:
+ public:
   static int skip_num_;
   static int queue_size_;
   static ros::Time global_start_time_;
@@ -106,17 +106,17 @@ public:
 
   void init(int id);
 
-  void poseCallback(const geometry_msgs::PoseStampedConstPtr& msg);
+  void poseCallback(const geometry_msgs::PoseStampedConstPtr &msg);
 
   void clear() {
     history_.clear();
   }
 
-  void getHistory(list<Eigen::Vector4d>& his) {
+  void getHistory(list<Eigen::Vector4d> &his) {
     his = history_;
   }
 
-private:
+ private:
   list<Eigen::Vector4d> history_;  // x,y,z;t
   int skip_;
   int obj_idx_;
@@ -125,7 +125,7 @@ private:
 
 /* ========== predict future trajectory using history ========== */
 class ObjPredictor {
-private:
+ private:
   ros::NodeHandle node_handle_;
 
   int obj_num_;
@@ -142,15 +142,15 @@ private:
   ObjScale obj_scale_;
   vector<bool> scale_init_;
 
-  void markerCallback(const visualization_msgs::MarkerConstPtr& msg);
+  void markerCallback(const visualization_msgs::MarkerConstPtr &msg);
 
-  void predictCallback(const ros::TimerEvent& e);
+  void predictCallback(const ros::TimerEvent &e);
   void predictPolyFit();
   void predictConstVel();
 
-public:
+ public:
   ObjPredictor(/* args */);
-  ObjPredictor(ros::NodeHandle& node);
+  ObjPredictor(ros::NodeHandle &node);
   ~ObjPredictor();
 
   void init();

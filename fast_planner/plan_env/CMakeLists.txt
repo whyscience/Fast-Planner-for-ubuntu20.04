@@ -1,55 +1,61 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(plan_env)
 set(CMAKE_CXX_STANDARD 14)
 
-find_package(OpenCV REQUIRED)
+cmake_minimum_required(VERSION 3.5)
+project(plan_env)
 
+# Default to C++14
+if (NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 14)
+endif ()
 
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  std_msgs
-  visualization_msgs
-  cv_bridge
-  message_filters
-)
-
-find_package(Eigen3 REQUIRED)
-find_package(PCL 1.7 REQUIRED)
-
-catkin_package(
- INCLUDE_DIRS include
- LIBRARIES plan_env
- CATKIN_DEPENDS roscpp std_msgs
-#  DEPENDS system_lib
-)
-
-include_directories( 
-    SYSTEM 
-    include 
-    ${catkin_INCLUDE_DIRS}
-    ${Eigen3_INCLUDE_DIRS} 
-    ${PCL_INCLUDE_DIRS}
-    ${OpenCV_INCLUDE_DIRS}
-)
-
-link_directories(${PCL_LIBRARY_DIRS})
-
+if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(-Wall -Wextra -Wpedantic)
+endif ()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-but-set-variable")
 
-add_library( plan_env 
-    src/sdf_map.cpp 
-    src/obj_predictor.cpp 
-    src/edt_environment.cpp 
-    src/raycast.cpp
-    )
-target_link_libraries( plan_env
-    ${catkin_LIBRARIES} 
-    ${PCL_LIBRARIES}
-    )  
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(message_filters REQUIRED)
+
+find_package(Eigen3 REQUIRED)
+find_package(PCL REQUIRED)
+
+include_directories(include
+        ${EIGEN3_INCLUDE_DIR}
+        ${PCL_INCLUDE_DIRS})
+
+add_library(plan_env
+        src/sdf_map.cpp
+        src/obj_predictor.cpp
+        src/edt_environment.cpp
+        src/raycast.cpp
+        )
+ament_target_dependencies(plan_env rclcpp visualization_msgs cv_bridge message_filters geometry_msgs)
+target_link_libraries(plan_env ${PCL_LIBRARIES})
 
 add_executable(obj_generator
-    src/obj_generator.cpp 
-    )
-target_link_libraries(obj_generator 
-    ${catkin_LIBRARIES})
+        src/obj_generator.cpp
+        )
+target_link_libraries(obj_generator
+        plan_env
+        ${PCL_LIBRARIES})
+
+install(TARGETS
+        plan_env
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
+
+install(TARGETS
+        obj_generator
+        DESTINATION lib/${PROJECT_NAME})
+
+ament_export_include_directories(include)
+ament_export_libraries(plan_env)
+ament_export_dependencies(rclcpp visualization_msgs cv_bridge message_filters geometry_msgs)
+ament_package()

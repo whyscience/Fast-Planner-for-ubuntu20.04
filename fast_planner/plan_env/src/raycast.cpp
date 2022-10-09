@@ -47,8 +47,8 @@ double intbound(double s, double ds) {
   }
 }
 
-void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eigen::Vector3d& min,
-             const Eigen::Vector3d& max, int& output_points_cnt, Eigen::Vector3d* output) {
+void Raycast(const Eigen::Vector3d &start, const Eigen::Vector3d &end, const Eigen::Vector3d &min,
+             const Eigen::Vector3d &max, int &output_points_cnt, Eigen::Vector3d *output) {
   //    std::cout << start << ' ' << end << std::endl;
   // From "A Fast Voxel Traversal Algorithm for Ray Tracing"
   // by John Amanatides and Andrew Woo, 1987
@@ -69,12 +69,12 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
   // tMaxX, tMaxY, and tMaxZ.
 
   // Cube containing origin point.
-  int x = (int)std::floor(start.x());
-  int y = (int)std::floor(start.y());
-  int z = (int)std::floor(start.z());
-  int endX = (int)std::floor(end.x());
-  int endY = (int)std::floor(end.y());
-  int endZ = (int)std::floor(end.z());
+  int x = (int) std::floor(start.x());
+  int y = (int) std::floor(start.y());
+  int z = (int) std::floor(start.z());
+  int endX = (int) std::floor(end.x());
+  int endY = (int) std::floor(end.y());
+  int endZ = (int) std::floor(end.z());
   Eigen::Vector3d direction = (end - start);
   double maxDist = direction.squaredNorm();
 
@@ -84,9 +84,9 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
   double dz = endZ - z;
 
   // Direction to increment x,y,z when stepping.
-  int stepX = (int)signum((int)dx);
-  int stepY = (int)signum((int)dy);
-  int stepZ = (int)signum((int)dz);
+  int stepX = (int) signum((int) dx);
+  int stepY = (int) signum((int) dy);
+  int stepZ = (int) signum((int) dz);
 
   // See description above. The initial values depend on the fractional
   // part of the origin.
@@ -95,9 +95,9 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
   double tMaxZ = intbound(start.z(), dz);
 
   // The change in t when taking a step (always positive).
-  double tDeltaX = ((double)stepX) / dx;
-  double tDeltaY = ((double)stepY) / dy;
-  double tDeltaZ = ((double)stepZ) / dz;
+  double tDeltaX = ((double) stepX) / dx;
+  double tDeltaY = ((double) stepY) / dy;
+  double tDeltaZ = ((double) stepZ) / dz;
 
   // Avoids an infinite loop.
   if (stepX == 0 && stepY == 0 && stepZ == 0) return;
@@ -111,7 +111,7 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
 
       output_points_cnt++;
       dist = sqrt((x - start(0)) * (x - start(0)) + (y - start(1)) * (y - start(1)) +
-                  (z - start(2)) * (z - start(2)));
+          (z - start(2)) * (z - start(2)));
 
       if (dist > maxDist) return;
 
@@ -150,8 +150,8 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
   }
 }
 
-void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eigen::Vector3d& min,
-             const Eigen::Vector3d& max, std::vector<Eigen::Vector3d>* output) {
+void Raycast(const Eigen::Vector3d &start, const Eigen::Vector3d &end, const Eigen::Vector3d &min,
+             const Eigen::Vector3d &max, std::vector<Eigen::Vector3d> *output) {
   //    std::cout << start << ' ' << end << std::endl;
   // From "A Fast Voxel Traversal Algorithm for Ray Tracing"
   // by John Amanatides and Andrew Woo, 1987
@@ -172,12 +172,12 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
   // tMaxX, tMaxY, and tMaxZ.
 
   // Cube containing origin point.
-  int x = (int)std::floor(start.x());
-  int y = (int)std::floor(start.y());
-  int z = (int)std::floor(start.z());
-  int endX = (int)std::floor(end.x());
-  int endY = (int)std::floor(end.y());
-  int endZ = (int)std::floor(end.z());
+  int x = (int) std::floor(start.x());
+  int y = (int) std::floor(start.y());
+  int z = (int) std::floor(start.z());
+  int endX = (int) std::floor(end.x());
+  int endY = (int) std::floor(end.y());
+  int endZ = (int) std::floor(end.z());
   Eigen::Vector3d direction = (end - start);
   double maxDist = direction.squaredNorm();
 
@@ -187,9 +187,9 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
   double dz = endZ - z;
 
   // Direction to increment x,y,z when stepping.
-  int stepX = (int)signum((int)dx);
-  int stepY = (int)signum((int)dy);
-  int stepZ = (int)signum((int)dz);
+  int stepX = (int) signum((int) dx);
+  int stepY = (int) signum((int) dy);
+  int stepZ = (int) signum((int) dz);
 
   // See description above. The initial values depend on the fractional
   // part of the origin.
@@ -198,9 +198,9 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
   double tMaxZ = intbound(start.z(), dz);
 
   // The change in t when taking a step (always positive).
-  double tDeltaX = ((double)stepX) / dx;
-  double tDeltaY = ((double)stepY) / dy;
-  double tDeltaZ = ((double)stepZ) / dz;
+  double tDeltaX = ((double) stepX) / dx;
+  double tDeltaY = ((double) stepY) / dy;
+  double tDeltaZ = ((double) stepZ) / dz;
 
   output->clear();
 
@@ -250,20 +250,20 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
   }
 }
 
-bool RayCaster::setInput(const Eigen::Vector3d& start,
-                         const Eigen::Vector3d& end /* , const Eigen::Vector3d& min,
+bool RayCaster::setInput(const Eigen::Vector3d &start,
+                         const Eigen::Vector3d &end /* , const Eigen::Vector3d& min,
                          const Eigen::Vector3d& max */) {
   start_ = start;
   end_ = end;
   // max_ = max;
   // min_ = min;
 
-  x_ = (int)std::floor(start_.x());
-  y_ = (int)std::floor(start_.y());
-  z_ = (int)std::floor(start_.z());
-  endX_ = (int)std::floor(end_.x());
-  endY_ = (int)std::floor(end_.y());
-  endZ_ = (int)std::floor(end_.z());
+  x_ = (int) std::floor(start_.x());
+  y_ = (int) std::floor(start_.y());
+  z_ = (int) std::floor(start_.z());
+  endX_ = (int) std::floor(end_.x());
+  endY_ = (int) std::floor(end_.y());
+  endZ_ = (int) std::floor(end_.z());
   direction_ = (end_ - start_);
   maxDist_ = direction_.squaredNorm();
 
@@ -273,9 +273,9 @@ bool RayCaster::setInput(const Eigen::Vector3d& start,
   dz_ = endZ_ - z_;
 
   // Direction to increment x,y,z when stepping.
-  stepX_ = (int)signum((int)dx_);
-  stepY_ = (int)signum((int)dy_);
-  stepZ_ = (int)signum((int)dz_);
+  stepX_ = (int) signum((int) dx_);
+  stepY_ = (int) signum((int) dy_);
+  stepZ_ = (int) signum((int) dz_);
 
   // See description above. The initial values depend on the fractional
   // part of the origin.
@@ -284,9 +284,9 @@ bool RayCaster::setInput(const Eigen::Vector3d& start,
   tMaxZ_ = intbound(start_.z(), dz_);
 
   // The change in t when taking a step (always positive).
-  tDeltaX_ = ((double)stepX_) / dx_;
-  tDeltaY_ = ((double)stepY_) / dy_;
-  tDeltaZ_ = ((double)stepZ_) / dz_;
+  tDeltaX_ = ((double) stepX_) / dx_;
+  tDeltaY_ = ((double) stepY_) / dy_;
+  tDeltaZ_ = ((double) stepZ_) / dz_;
 
   dist_ = 0;
 
@@ -299,7 +299,7 @@ bool RayCaster::setInput(const Eigen::Vector3d& start,
     return true;
 }
 
-bool RayCaster::step(Eigen::Vector3d& ray_pt) {
+bool RayCaster::step(Eigen::Vector3d &ray_pt) {
   // if (x_ >= min_.x() && x_ < max_.x() && y_ >= min_.y() && y_ < max_.y() &&
   // z_ >= min_.z() && z_ <
   // max_.z())

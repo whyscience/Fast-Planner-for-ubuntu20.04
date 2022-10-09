@@ -28,7 +28,7 @@
 // #define current_img_ md_.depth_image_[image_cnt_ & 1]
 // #define last_img_ md_.depth_image_[!(image_cnt_ & 1)]
 
-void SDFMap::initMap(ros::NodeHandle& nh) {
+void SDFMap::initMap(ros::NodeHandle &nh) {
   node_ = nh;
 
   /* get parameter */
@@ -213,7 +213,7 @@ void SDFMap::resetBuffer(Eigen::Vector3d min_pos, Eigen::Vector3d max_pos) {
       }
 }
 
-template <typename F_get_val, typename F_set_val>
+template<typename F_get_val, typename F_set_val>
 void SDFMap::fillESDF(F_get_val f_get_val, F_set_val f_set_val, int start, int end, int dim) {
   int v[mp_.map_voxel_num_(dim)];
   double z[mp_.map_voxel_num_(dim) + 1];
@@ -259,8 +259,8 @@ void SDFMap::updateESDF3d() {
       fillESDF(
           [&](int z) {
             return md_.occupancy_buffer_inflate_[toAddress(x, y, z)] == 1 ?
-                0 :
-                std::numeric_limits<double>::max();
+                   0 :
+                   std::numeric_limits<double>::max();
           },
           [&](int z, double val) { md_.tmp_buffer1_[toAddress(x, y, z)] = val; }, min_esdf[2],
           max_esdf[2], 2);
@@ -310,9 +310,9 @@ void SDFMap::updateESDF3d() {
       fillESDF(
           [&](int z) {
             return md_.occupancy_buffer_neg[x * mp_.map_voxel_num_(1) * mp_.map_voxel_num_(2) +
-                                            y * mp_.map_voxel_num_(2) + z] == 1 ?
-                0 :
-                std::numeric_limits<double>::max();
+                y * mp_.map_voxel_num_(2) + z] == 1 ?
+                   0 :
+                   std::numeric_limits<double>::max();
           },
           [&](int z, double val) { md_.tmp_buffer1_[toAddress(x, y, z)] = val; }, min_esdf[2],
           max_esdf[2], 2);
@@ -372,7 +372,7 @@ void SDFMap::projectDepthImage() {
   // md_.proj_points_.clear();
   md_.proj_points_cnt = 0;
 
-  uint16_t* row_ptr;
+  uint16_t *row_ptr;
   // int cols = current_img_.cols, rows = current_img_.rows;
   int cols = md_.depth_image_.cols;
   int rows = md_.depth_image_.rows;
@@ -403,7 +403,7 @@ void SDFMap::projectDepthImage() {
       }
     }
   }
-  /* use depth filter */
+    /* use depth filter */
   else {
 
     if (!md_.has_first_depth_)
@@ -455,8 +455,8 @@ void SDFMap::projectDepthImage() {
             double vv = pt_reproj.y() * mp_.fy_ / pt_reproj.z() + mp_.cy_;
 
             if (uu >= 0 && uu < cols && vv >= 0 && vv < rows) {
-              if (fabs(md_.last_depth_image_.at<uint16_t>((int)vv, (int)uu) * inv_factor -
-                       pt_reproj.z()) < mp_.depth_filter_tolerance_) {
+              if (fabs(md_.last_depth_image_.at<uint16_t>((int) vv, (int) uu) * inv_factor -
+                  pt_reproj.z()) < mp_.depth_filter_tolerance_) {
                 md_.proj_points_[md_.proj_points_cnt++] = pt_world;
               }
             } else {
@@ -627,7 +627,7 @@ void SDFMap::raycastProcess() {
   }
 }
 
-Eigen::Vector3d SDFMap::closetPointInMap(const Eigen::Vector3d& pt, const Eigen::Vector3d& camera_pt) {
+Eigen::Vector3d SDFMap::closetPointInMap(const Eigen::Vector3d &pt, const Eigen::Vector3d &camera_pt) {
   Eigen::Vector3d diff = pt - camera_pt;
   Eigen::Vector3d max_tc = mp_.map_max_boundary_ - camera_pt;
   Eigen::Vector3d min_tc = mp_.map_min_boundary_ - camera_pt;
@@ -740,7 +740,7 @@ void SDFMap::clearAndInflateLocalMap() {
         if (md_.occupancy_buffer_[toAddress(x, y, z)] > mp_.min_occupancy_log_) {
           inflatePoint(Eigen::Vector3i(x, y, z), inf_step, inf_pts);
 
-          for (int k = 0; k < (int)inf_pts.size(); ++k) {
+          for (int k = 0; k < (int) inf_pts.size(); ++k) {
             inf_pt = inf_pts[k];
             int idx_inf = toAddress(inf_pt);
             if (idx_inf < 0 ||
@@ -762,7 +762,7 @@ void SDFMap::clearAndInflateLocalMap() {
   }
 }
 
-void SDFMap::visCallback(const ros::TimerEvent& /*event*/) {
+void SDFMap::visCallback(const ros::TimerEvent & /*event*/) {
   publishMap();
   publishMapInflate(false);
   // publishUpdateRange();
@@ -772,7 +772,7 @@ void SDFMap::visCallback(const ros::TimerEvent& /*event*/) {
   // publishDepth();
 }
 
-void SDFMap::updateOccupancyCallback(const ros::TimerEvent& /*event*/) {
+void SDFMap::updateOccupancyCallback(const ros::TimerEvent & /*event*/) {
   if (!md_.occ_need_update_) return;
 
   /* update occupancy */
@@ -798,7 +798,7 @@ void SDFMap::updateOccupancyCallback(const ros::TimerEvent& /*event*/) {
   md_.local_updated_ = false;
 }
 
-void SDFMap::updateESDFCallback(const ros::TimerEvent& /*event*/) {
+void SDFMap::updateESDFCallback(const ros::TimerEvent & /*event*/) {
   if (!md_.esdf_need_update_) return;
 
   /* esdf */
@@ -819,8 +819,8 @@ void SDFMap::updateESDFCallback(const ros::TimerEvent& /*event*/) {
   md_.esdf_need_update_ = false;
 }
 
-void SDFMap::depthPoseCallback(const sensor_msgs::ImageConstPtr& img,
-                               const geometry_msgs::PoseStampedConstPtr& pose) {
+void SDFMap::depthPoseCallback(const sensor_msgs::ImageConstPtr &img,
+                               const geometry_msgs::PoseStampedConstPtr &pose) {
   /* get depth image */
   cv_bridge::CvImagePtr cv_ptr;
   cv_ptr = cv_bridge::toCvCopy(img, img->encoding);
@@ -847,7 +847,7 @@ void SDFMap::depthPoseCallback(const sensor_msgs::ImageConstPtr& img,
   }
 }
 
-void SDFMap::odomCallback(const nav_msgs::OdometryConstPtr& odom) {
+void SDFMap::odomCallback(const nav_msgs::OdometryConstPtr &odom) {
   if (md_.has_first_depth_) return;
 
   md_.camera_pos_(0) = odom->pose.pose.position.x;
@@ -857,7 +857,7 @@ void SDFMap::odomCallback(const nav_msgs::OdometryConstPtr& odom) {
   md_.has_odom_ = true;
 }
 
-void SDFMap::cloudCallback(const sensor_msgs::PointCloud2ConstPtr& img) {
+void SDFMap::cloudCallback(const sensor_msgs::PointCloud2ConstPtr &img) {
 
   pcl::PointCloud<pcl::PointXYZ> latest_cloud;
   pcl::fromROSMsg(*img, latest_cloud);
@@ -1211,8 +1211,8 @@ void SDFMap::publishESDF() {
   // ROS_INFO("pub esdf");
 }
 
-void SDFMap::getSliceESDF(const double height, const double res, const Eigen::Vector4d& range,
-                          vector<Eigen::Vector3d>& slice, vector<Eigen::Vector3d>& grad, int sign) {
+void SDFMap::getSliceESDF(const double height, const double res, const Eigen::Vector4d &range,
+                          vector<Eigen::Vector3d> &slice, vector<Eigen::Vector3d> &grad, int sign) {
   double dist;
   Eigen::Vector3d gd;
   for (double x = range(0); x <= range(1); x += res)
@@ -1251,12 +1251,12 @@ int SDFMap::getVoxelNum() {
   return mp_.map_voxel_num_[0] * mp_.map_voxel_num_[1] * mp_.map_voxel_num_[2];
 }
 
-void SDFMap::getRegion(Eigen::Vector3d& ori, Eigen::Vector3d& size) {
+void SDFMap::getRegion(Eigen::Vector3d &ori, Eigen::Vector3d &size) {
   ori = mp_.map_origin_, size = mp_.map_size_;
 }
 
-void SDFMap::getSurroundPts(const Eigen::Vector3d& pos, Eigen::Vector3d pts[2][2][2],
-                            Eigen::Vector3d& diff) {
+void SDFMap::getSurroundPts(const Eigen::Vector3d &pos, Eigen::Vector3d pts[2][2][2],
+                            Eigen::Vector3d &diff) {
   if (!isInMap(pos)) {
     // cout << "pos invalid for interpolation." << endl;
   }
@@ -1282,8 +1282,8 @@ void SDFMap::getSurroundPts(const Eigen::Vector3d& pos, Eigen::Vector3d pts[2][2
   }
 }
 
-void SDFMap::depthOdomCallback(const sensor_msgs::ImageConstPtr& img,
-                               const nav_msgs::OdometryConstPtr& odom) {
+void SDFMap::depthOdomCallback(const sensor_msgs::ImageConstPtr &img,
+                               const nav_msgs::OdometryConstPtr &odom) {
   /* get pose */
   md_.camera_pos_(0) = odom->pose.pose.position.x;
   md_.camera_pos_(1) = odom->pose.pose.position.y;
@@ -1302,11 +1302,11 @@ void SDFMap::depthOdomCallback(const sensor_msgs::ImageConstPtr& img,
   md_.occ_need_update_ = true;
 }
 
-void SDFMap::depthCallback(const sensor_msgs::ImageConstPtr& img) {
+void SDFMap::depthCallback(const sensor_msgs::ImageConstPtr &img) {
   std::cout << "depth: " << img->header.stamp << std::endl;
 }
 
-void SDFMap::poseCallback(const geometry_msgs::PoseStampedConstPtr& pose) {
+void SDFMap::poseCallback(const geometry_msgs::PoseStampedConstPtr &pose) {
   std::cout << "pose: " << pose->header.stamp << std::endl;
 
   md_.camera_pos_(0) = pose->pose.position.x;

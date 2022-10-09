@@ -39,7 +39,7 @@ void ObjHistory::init(int id) {
   obj_idx_ = id;
 }
 
-void ObjHistory::poseCallback(const geometry_msgs::PoseStampedConstPtr& msg) {
+void ObjHistory::poseCallback(const geometry_msgs::PoseStampedConstPtr &msg) {
   ++skip_;
   if (skip_ < ObjHistory::skip_num_) return;
 
@@ -61,7 +61,7 @@ void ObjHistory::poseCallback(const geometry_msgs::PoseStampedConstPtr& msg) {
 ObjPredictor::ObjPredictor(/* args */) {
 }
 
-ObjPredictor::ObjPredictor(ros::NodeHandle& node) {
+ObjPredictor::ObjPredictor(ros::NodeHandle &node) {
   this->node_handle_ = node;
 }
 
@@ -173,12 +173,12 @@ void ObjPredictor::predictPolyFit() {
   }
 }
 
-void ObjPredictor::predictCallback(const ros::TimerEvent& e) {
+void ObjPredictor::predictCallback(const ros::TimerEvent &e) {
   // predictPolyFit();
   predictConstVel();
 }
 
-void ObjPredictor::markerCallback(const visualization_msgs::MarkerConstPtr& msg) {
+void ObjPredictor::markerCallback(const visualization_msgs::MarkerConstPtr &msg) {
   int idx = msg->id;
   (*obj_scale_)[idx](0) = msg->scale.x;
   (*obj_scale_)[idx](1) = msg->scale.y;

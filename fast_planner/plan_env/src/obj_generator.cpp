@@ -60,10 +60,10 @@ uniform_real_distribution<double> rand_yaw;
 
 ros::Time time_update, time_change;
 
-void updateCallback(const ros::TimerEvent& e);
+void updateCallback(const ros::TimerEvent &e);
 void visualizeObj(int id);
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   ros::init(argc, argv, "dynamic_obj");
   ros::NodeHandle node("~");
 
@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-void updateCallback(const ros::TimerEvent& e) {
+void updateCallback(const ros::TimerEvent &e) {
   ros::Time time_now = ros::Time::now();
 
   /* ---------- change input ---------- */

@@ -31,9 +31,9 @@
 #include <iostream>
 
 class LinearObjModel {
-private:
+ private:
   /* data */
-public:
+ public:
   LinearObjModel(/* args */);
   ~LinearObjModel();
 
@@ -44,7 +44,7 @@ public:
 
   void update(double dt);  // linear trippler integrator model
 
-  static bool collide(LinearObjModel& obj1, LinearObjModel& obj2);
+  static bool collide(LinearObjModel &obj1, LinearObjModel &obj2);
 
   // void setInput(Eigen::Vector3d acc) { acc_ = acc; }
   void setInput(Eigen::Vector3d vel) {
@@ -81,7 +81,7 @@ public:
     return yaw_;
   }
 
-private:
+ private:
   Eigen::Vector3d pos_, vel_, acc_;
   Eigen::Vector3d color_, scale_;
   double yaw_, yaw_dot_;
@@ -181,7 +181,7 @@ void LinearObjModel::update(double dt) {
   }
 }
 
-bool LinearObjModel::collide(LinearObjModel& obj1, LinearObjModel& obj2) {
+bool LinearObjModel::collide(LinearObjModel &obj1, LinearObjModel &obj2) {
   Eigen::Vector3d pos1, pos2, vel1, vel2, scale1, scale2;
   pos1 = obj1.getPosition();
   vel1 = obj1.getVelocity();

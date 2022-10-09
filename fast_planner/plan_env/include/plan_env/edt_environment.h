@@ -27,7 +27,7 @@
 #define _EDT_ENVIRONMENT_H_
 
 #include <Eigen/Eigen>
-#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/msg/point_stamped.hpp>
 #include <iostream>
 #include <ros/ros.h>
 #include <utility>
@@ -45,15 +45,15 @@ using std::vector;
 
 namespace fast_planner {
 class EDTEnvironment {
-private:
+ private:
   /* data */
   ObjPrediction obj_prediction_;
   ObjScale obj_scale_;
   double resolution_inv_;
-  double distToBox(int idx, const Eigen::Vector3d& pos, const double& time);
-  double minDistToAllBox(const Eigen::Vector3d& pos, const double& time);
+  double distToBox(int idx, const Eigen::Vector3d &pos, const double &time);
+  double minDistToAllBox(const Eigen::Vector3d &pos, const double &time);
 
-public:
+ public:
   EDTEnvironment(/* args */) {
   }
   ~EDTEnvironment() {
@@ -66,12 +66,12 @@ public:
   void setObjPrediction(ObjPrediction prediction);
   void setObjScale(ObjScale scale);
   void getSurroundDistance(Eigen::Vector3d pts[2][2][2], double dists[2][2][2]);
-  /*pair<double, Eigen::Vector3d>*/void interpolateTrilinear(double values[2][2][2], const Eigen::Vector3d& diff,
-                                                     double& value, Eigen::Vector3d& grad);
-  /*pair<double, Eigen::Vector3d>*/void evaluateEDTWithGrad(const Eigen::Vector3d& pos, double time,
-                                                    double& dist, Eigen::Vector3d& grad);
-  double evaluateCoarseEDT(Eigen::Vector3d& pos, double time);
-  void getMapRegion(Eigen::Vector3d& ori, Eigen::Vector3d& size) {
+  /*pair<double, Eigen::Vector3d>*/void interpolateTrilinear(double values[2][2][2], const Eigen::Vector3d &diff,
+                                                             double &value, Eigen::Vector3d &grad);
+  /*pair<double, Eigen::Vector3d>*/void evaluateEDTWithGrad(const Eigen::Vector3d &pos, double time,
+                                                            double &dist, Eigen::Vector3d &grad);
+  double evaluateCoarseEDT(Eigen::Vector3d &pos, double time);
+  void getMapRegion(Eigen::Vector3d &ori, Eigen::Vector3d &size) {
     sdf_map_->getRegion(ori, size);
   }
 
