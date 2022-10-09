@@ -37,8 +37,8 @@ backward::SignalHandling sh;
 using namespace fast_planner;
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "fast_planner_node");
-  ros::NodeHandle nh("~");
+  rclcpp::init(argc, argv, "fast_planner_node");
+  rclcpp::NodeHandle nh("~");
 
   int planner;
   nh.param("planner_node/planner", planner, -1);
@@ -52,8 +52,8 @@ int main(int argc, char** argv) {
     topo_replan.init(nh);
   }
 
-  ros::Duration(1.0).sleep();
-  ros::spin();
+  rclcpp::Duration(1.0).sleep();
+  rclcpp::spin();
 
   return 0;
 }

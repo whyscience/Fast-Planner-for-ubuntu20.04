@@ -5,13 +5,13 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <iostream>
 
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/Vector3.h>
+#include <geometry_msgs/msg/point_stamped.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 #include <math.h>
-#include <nav_msgs/Odometry.h>
+#include <nav_msgs/msg/odometry.hpp>
 #include <ros/console.h>
-#include <ros/ros.h>
-#include <sensor_msgs/PointCloud2.h>
+#include "rclcpp/rclcpp.hpp"
+#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <Eigen/Eigen>
 #include <random>
 
@@ -29,10 +29,10 @@ uniform_real_distribution<double> rand_y;
 uniform_real_distribution<double> rand_w;
 uniform_real_distribution<double> rand_h;
 
-ros::Publisher _local_map_pub;
-ros::Publisher _all_map_pub;
-ros::Publisher click_map_pub_;
-ros::Subscriber _odom_sub;
+rclcpp::Publisher _local_map_pub;
+rclcpp::Publisher _all_map_pub;
+rclcpp::Publisher click_map_pub_;
+rclcpp::Subscriber _odom_sub;
 
 vector<double> _state;
 
@@ -171,7 +171,7 @@ void RandomMapGenerate() {
   _map_ok = true;
 }
 
-void rcvOdometryCallbck(const nav_msgs::Odometry odom) {
+void rcvOdometryCallbck(const nav_msgs::msg::Odometry odom) {
   if (odom.child_frame_id == "X" || odom.child_frame_id == "O") return;
   _has_odom = true;
 
@@ -231,7 +231,7 @@ void pubSensedPoints() {
   _local_map_pub.publish(localMap_pcd);
 }
 
-void clickCallback(const geometry_msgs::PoseStamped& msg) {
+void clickCallback(const geometry_msgs::msg::PoseStamped& msg) {
   double x = msg.pose.position.x;
   double y = msg.pose.position.y;
   double w = rand_w(eng);
@@ -269,8 +269,8 @@ void clickCallback(const geometry_msgs::PoseStamped& msg) {
 }
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "random_map_sensing");
-  ros::NodeHandle n("~");
+  rclcpp::init(argc, argv, "random_map_sensing");
+  rclcpp::NodeHandle n("~");
 
   _local_map_pub = n.advertise<sensor_msgs::PointCloud2>("/map_generator/local_cloud", 1);
   _all_map_pub = n.advertise<sensor_msgs::PointCloud2>("/map_generator/global_cloud", 1);
@@ -279,7 +279,7 @@ int main(int argc, char** argv) {
 
   click_map_pub_ =
       n.advertise<sensor_msgs::PointCloud2>("/pcl_render_node/local_map", 1);
-  // ros::Subscriber click_sub = n.subscribe("/goal", 10, clickCallback);
+  // rclcpp::Subscriber click_sub = n.subscribe("/goal", 10, clickCallback);
 
   n.param("init_state_x", _init_x, 0.0);
   n.param("init_state_y", _init_y, 0.0);
@@ -314,15 +314,15 @@ int main(int argc, char** argv) {
   _obs_num = min(_obs_num, (int)_x_size * 10);
   _z_limit = _z_size;
 
-  ros::Duration(0.5).sleep();
+  rclcpp::Duration(0.5).sleep();
 
   RandomMapGenerate();
 
-  ros::Rate loop_rate(_sense_rate);
+  rclcpp::Rate loop_rate(_sense_rate);
 
-  while (ros::ok()) {
+  while (rclcpp::ok()) {
     pubSensedPoints();
-    ros::spinOnce();
+    rclcpp::spinOnce();
     loop_rate.sleep();
   }
 }

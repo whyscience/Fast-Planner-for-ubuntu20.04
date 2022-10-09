@@ -1,10 +1,10 @@
 #ifndef __UAVUTILS_CONVERTERS_H
 #define __UAVUTILS_CONVERTERS_H
 
-#include <nav_msgs/Odometry.h>
-#include <geometry_msgs/Vector3.h>
-#include <geometry_msgs/Point.h>
-#include <geometry_msgs/Quaternion.h>
+#include <nav_msgs/msg/odometry.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
+#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/quaternion.hpp>
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
@@ -12,7 +12,7 @@
 
 namespace uav_utils {
 
-inline void extract_odometry(nav_msgs::OdometryConstPtr msg, Eigen::Vector3d& p,
+inline void extract_odometry(nav_msgs::msg::Odometry::SharedPtr msg, Eigen::Vector3d& p,
                       Eigen::Vector3d& v, Eigen::Quaterniond& q)
 {
     p(0) = msg->pose.pose.position.x;
@@ -29,7 +29,7 @@ inline void extract_odometry(nav_msgs::OdometryConstPtr msg, Eigen::Vector3d& p,
     q.z() = msg->pose.pose.orientation.z;
 }
 
-inline void extract_odometry(nav_msgs::OdometryConstPtr msg, Eigen::Vector3d& p,
+inline void extract_odometry(nav_msgs::msg::Odometry::SharedPtr msg, Eigen::Vector3d& p,
                       Eigen::Vector3d& v, Eigen::Quaterniond& q, Eigen::Vector3d& w)
 {
     extract_odometry(msg, p, v, q);

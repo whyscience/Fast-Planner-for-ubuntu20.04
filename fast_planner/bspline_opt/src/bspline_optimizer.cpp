@@ -40,7 +40,7 @@ const int BsplineOptimizer::GUIDE_PHASE = BsplineOptimizer::SMOOTHNESS | Bspline
 const int BsplineOptimizer::NORMAL_PHASE =
     BsplineOptimizer::SMOOTHNESS | BsplineOptimizer::DISTANCE | BsplineOptimizer::FEASIBILITY;
 
-void BsplineOptimizer::setParam(ros::NodeHandle &nh) {
+void BsplineOptimizer::setParam(rclcpp::NodeHandle &nh) {
   nh.param("optimization/lambda1", lambda1_, -1.0);
   nh.param("optimization/lambda2", lambda2_, -1.0);
   nh.param("optimization/lambda3", lambda3_, -1.0);
@@ -175,7 +175,7 @@ void BsplineOptimizer::optimize() {
     // cout << fixed << setprecision(7);
     // vec_time_.clear();
     // vec_cost_.clear();
-    // time_start_ = ros::Time::now();
+    // time_start_ = rclcpp::Time::now();
 
     double final_cost;
     nlopt::result result = opt.optimize(q, final_cost);
@@ -463,7 +463,7 @@ double BsplineOptimizer::costFunction(const std::vector<double> &x, std::vector<
   return cost;
 
   // /* evaluation */
-  // ros::Time te1 = ros::Time::now();
+  // rclcpp::Time te1 = rclcpp::Time::now();
   // double time_now = (te1 - opt->time_start_).toSec();
   // opt->vec_time_.push_back(time_now);
   // if (opt->vec_cost_.size() == 0)

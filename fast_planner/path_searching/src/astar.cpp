@@ -202,7 +202,7 @@ int Astar::search(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt, bool dynamic
   return NO_PATH;
 }
 
-void Astar::setParam(ros::NodeHandle& nh) {
+void Astar::setParam(rclcpp::NodeHandle& nh) {
   nh.param("astar/resolution_astar", resolution_, -1.0);
   nh.param("astar/time_resolution", time_resolution_, -1.0);
   nh.param("astar/lambda_heu", lambda_heu_, -1.0);

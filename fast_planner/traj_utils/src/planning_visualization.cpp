@@ -28,7 +28,7 @@
 using std::cout;
 using std::endl;
 namespace fast_planner {
-PlanningVisualization::PlanningVisualization(ros::NodeHandle& nh) {
+PlanningVisualization::PlanningVisualization(rclcpp::NodeHandle& nh) {
   node = nh;
 
   traj_pub_ = node.advertise<visualization_msgs::Marker>("/planning_vis/trajectory", 20);
@@ -60,7 +60,7 @@ void PlanningVisualization::displaySphereList(const vector<Eigen::Vector3d>& lis
                                               const Eigen::Vector4d& color, int id, int pub_id) {
   visualization_msgs::Marker mk;
   mk.header.frame_id = "world";
-  mk.header.stamp    = ros::Time::now();
+  mk.header.stamp    = rclcpp::Time::now();
   mk.type            = visualization_msgs::Marker::SPHERE_LIST;
   mk.action          = visualization_msgs::Marker::DELETE;
   mk.id              = id;
@@ -89,14 +89,14 @@ void PlanningVisualization::displaySphereList(const vector<Eigen::Vector3d>& lis
     mk.points.push_back(pt);
   }
   pubs_[pub_id].publish(mk);
-  ros::Duration(0.001).sleep();
+  rclcpp::Duration(0.001).sleep();
 }
 
 void PlanningVisualization::displayCubeList(const vector<Eigen::Vector3d>& list, double resolution,
                                             const Eigen::Vector4d& color, int id, int pub_id) {
   visualization_msgs::Marker mk;
   mk.header.frame_id = "world";
-  mk.header.stamp    = ros::Time::now();
+  mk.header.stamp    = rclcpp::Time::now();
   mk.type            = visualization_msgs::Marker::CUBE_LIST;
   mk.action          = visualization_msgs::Marker::DELETE;
   mk.id              = id;
@@ -126,7 +126,7 @@ void PlanningVisualization::displayCubeList(const vector<Eigen::Vector3d>& list,
   }
   pubs_[pub_id].publish(mk);
 
-  ros::Duration(0.001).sleep();
+  rclcpp::Duration(0.001).sleep();
 }
 
 void PlanningVisualization::displayLineList(const vector<Eigen::Vector3d>& list1,
@@ -134,7 +134,7 @@ void PlanningVisualization::displayLineList(const vector<Eigen::Vector3d>& list1
                                             const Eigen::Vector4d& color, int id, int pub_id) {
   visualization_msgs::Marker mk;
   mk.header.frame_id = "world";
-  mk.header.stamp    = ros::Time::now();
+  mk.header.stamp    = rclcpp::Time::now();
   mk.type            = visualization_msgs::Marker::LINE_LIST;
   mk.action          = visualization_msgs::Marker::DELETE;
   mk.id              = id;
@@ -166,7 +166,7 @@ void PlanningVisualization::displayLineList(const vector<Eigen::Vector3d>& list1
   }
   pubs_[pub_id].publish(mk);
 
-  ros::Duration(0.001).sleep();
+  rclcpp::Duration(0.001).sleep();
 }
 
 void PlanningVisualization::drawBsplinesPhase1(vector<NonUniformBspline>& bsplines, double size) {
@@ -333,7 +333,7 @@ void PlanningVisualization::drawPolynomialTraj(PolynomialTraj poly_traj, double 
 
 void PlanningVisualization::drawPrediction(ObjPrediction pred, double resolution,
                                            const Eigen::Vector4d& color, int id) {
-  ros::Time    time_now   = ros::Time::now();
+  rclcpp::Time    time_now   = rclcpp::Time::now();
   double       start_time = (time_now - ObjHistory::global_start_time_).toSec();
   const double range      = 5.6;
 

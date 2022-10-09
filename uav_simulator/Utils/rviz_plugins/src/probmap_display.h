@@ -93,7 +93,7 @@ protected:
   virtual void subscribe();
   virtual void unsubscribe();
 
-  void incomingMap(const nav_msgs::OccupancyGrid::ConstPtr& msg);
+  void incomingMap(const nav_msgs::OccupancyGrid::SharedPtr  msg);
 
   void clear();
 
@@ -112,7 +112,7 @@ protected:
   Ogre::Quaternion orientation_;
   std::string frame_;
 
-  ros::Subscriber map_sub_;
+  rclcpp::Subscriber map_sub_;
 
   RosTopicProperty* topic_property_;
   FloatProperty* resolution_property_;

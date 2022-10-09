@@ -35,7 +35,7 @@
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreTextureManager.h>
 
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 
 #include <tf/transform_listener.h>
 
@@ -61,7 +61,7 @@ MultiProbMapDisplay::MultiProbMapDisplay()
   , new_map_(false)
 {
   topic_property_ = new RosTopicProperty( "Topic", "",
-                                          QString::fromStdString( ros::message_traits::datatype<multi_map_server::MultiOccupancyGrid>() ),
+                                          QString::fromStdString( rclcpp::message_traits::datatype<multi_map_server::MultiOccupancyGrid>() ),
                                           "multi_map_server::MultiOccupancyGrid topic to subscribe to.",
                                           this, SLOT( updateTopic() ));
 
@@ -106,7 +106,7 @@ void MultiProbMapDisplay::subscribe()
       map_sub_ = update_nh_.subscribe( topic_property_->getTopicStd(), 1, &MultiProbMapDisplay::incomingMap, this );
       setStatus( StatusProperty::Ok, "Topic", "OK" );
     }
-    catch( ros::Exception& e )
+    catch( rclcpp::Exception& e )
     {
       setStatus( StatusProperty::Error, "Topic", QString( "Error subscribing: " ) + e.what() );
     }
@@ -179,7 +179,7 @@ void MultiProbMapDisplay::update( float wall_dt, float ros_dt )
 
   clear();
   
-  //ros::Time t[5];
+  //rclcpp::Time t[5];
   //double dt[4] = {0,0,0,0};
   for (unsigned int k = 0; k < current_map_->maps.size(); k++)
   {
@@ -193,7 +193,7 @@ void MultiProbMapDisplay::update( float wall_dt, float ros_dt )
     int   height     = current_map_->maps[k].info.height;    
     
     // Load pixel
-    //t[0] = ros::Time::now(); 
+    //t[0] = rclcpp::Time::now();
     unsigned int pixels_size = width * height;
     unsigned char* pixels = new unsigned char[pixels_size];
     memset(pixels, 255, pixels_size);
@@ -219,21 +219,21 @@ void MultiProbMapDisplay::update( float wall_dt, float ros_dt )
     memcpy(pixels, &current_map_->maps[k].data[0], pixels_size);
 */
     // Set texture
-    //t[1] = ros::Time::now();
+    //t[1] = rclcpp::Time::now();
     Ogre::DataStreamPtr pixel_stream;
     pixel_stream.bind( new Ogre::MemoryDataStream( pixels, pixels_size ));
     static int tex_count = 0;
     std::stringstream ss1;
     ss1 << "MultiMapTexture" << tex_count++;
     Ogre::TexturePtr _texture_;
-    //t[2] = ros::Time::now();            
+    //t[2] = rclcpp::Time::now();
     _texture_ = Ogre::TextureManager::getSingleton().loadRawData( ss1.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                                   pixel_stream, width, height, Ogre::PF_L8, Ogre::TEX_TYPE_2D, 0);   
-    //t[3] = ros::Time::now();                                                                                                                                                                                   
+    //t[3] = rclcpp::Time::now();
     texture_.push_back(_texture_);                                                
     delete [] pixels;     
     setStatus( StatusProperty::Ok, "Map", "Map OK" );      
-    //t[4] = ros::Time::now();     
+    //t[4] = rclcpp::Time::now();
     
     // Set material
     static int material_count = 0;
@@ -345,7 +345,7 @@ void MultiProbMapDisplay::update( float wall_dt, float ros_dt )
 
 // ***********************************************************************************************************************************
 
-void MultiProbMapDisplay::incomingMap(const multi_map_server::MultiOccupancyGrid::ConstPtr& msg)
+void MultiProbMapDisplay::incomingMap(const multi_map_server::MultiOccupancyGrid::SharedPtr  msg)
 {
   updated_map_ = msg;
   boost::mutex::scoped_lock lock(mutex_);

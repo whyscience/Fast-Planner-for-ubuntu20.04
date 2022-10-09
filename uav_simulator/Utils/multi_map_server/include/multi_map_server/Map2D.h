@@ -2,7 +2,7 @@
 #define MAP2D_H
 
 #include <iostream>
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 #include <tf/tf.h>
 #include <nav_msgs/OccupancyGrid.h>
 
@@ -231,8 +231,8 @@ public:
 
   const nav_msgs::OccupancyGrid& GetMap()
   {
-    map.header.stamp       = ros::Time::now();
-    map.info.map_load_time = ros::Time::now();
+    map.header.stamp       = rclcpp::Time::now();
+    map.info.map_load_time = rclcpp::Time::now();
     map.header.frame_id    = string("/map");
     updated = false;
     return map;

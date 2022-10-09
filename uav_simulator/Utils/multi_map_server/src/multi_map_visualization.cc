@@ -1,5 +1,5 @@
 #include <iostream>
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 #include <sensor_msgs/PointCloud.h>
 #include <pose_utils.h>
 #include <multi_map_server/MultiOccupancyGrid.h>
@@ -7,13 +7,13 @@
 #include <multi_map_server/Map2D.h>
 #include <multi_map_server/Map3D.h>
 
-ros::Publisher pub1;
-ros::Publisher pub2;
+rclcpp::Publisher pub1;
+rclcpp::Publisher pub2;
 
 vector<Map2D> maps2d;
-vector<geometry_msgs::Pose> origins2d;
+vector<geometry_msgs::msg::Pose> origins2d;
 vector<Map3D> maps3d;
-vector<geometry_msgs::Pose> origins3d;
+vector<geometry_msgs::msg::Pose> origins3d;
 
 void maps2d_callback(const multi_map_server::MultiOccupancyGrid::ConstPtr &msg)
 {
@@ -69,22 +69,22 @@ void maps3d_callback(const multi_map_server::MultiSparseMap3D::ConstPtr &msg)
     }
   }
   // Publish
-  m.header.stamp    = ros::Time::now();
+  m.header.stamp    = rclcpp::Time::now();
   m.header.frame_id = string("/map");
   pub2.publish(m);
 }
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "multi_map_visualization");
-  ros::NodeHandle n("~");
+  rclcpp::init(argc, argv, "multi_map_visualization");
+  rclcpp::NodeHandle n("~");
 
-  ros::Subscriber sub1 = n.subscribe("dmaps2d", 1, maps2d_callback);
-  ros::Subscriber sub2 = n.subscribe("dmaps3d", 1, maps3d_callback);
+  rclcpp::Subscriber sub1 = n.subscribe("dmaps2d", 1, maps2d_callback);
+  rclcpp::Subscriber sub2 = n.subscribe("dmaps3d", 1, maps3d_callback);
   pub1 = n.advertise<multi_map_server::MultiOccupancyGrid>("maps2d", 1, true);
   pub2 = n.advertise<sensor_msgs::PointCloud>("map3d", 1, true);
 
-  ros::spin();
+  rclcpp::spin();
   return 0;
 }
 

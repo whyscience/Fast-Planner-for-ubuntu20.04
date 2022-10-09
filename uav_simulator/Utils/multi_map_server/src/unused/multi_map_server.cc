@@ -1,5 +1,5 @@
 #include <iostream>
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/PointCloud.h>
 #include <geometry_msgs/PoseArray.h>
@@ -14,8 +14,8 @@ using namespace arma;
 using namespace std;
 #define MAX_MAP_CNT 25
 
-ros::Publisher pub1;
-ros::Publisher pub2;
+rclcpp::Publisher pub1;
+rclcpp::Publisher pub2;
 
 // 2D Map
 int maps2dCnt = 0;
@@ -25,7 +25,7 @@ map_server_3d_new::MultiOccupancyGrid grids2d;
 int maps3dCnt = 0;
 Map3D maps3d[MAX_MAP_CNT];
 // Map origin from UKF
-vector<geometry_msgs::Pose> maps_origin;   
+vector<geometry_msgs::msg::Pose> maps_origin;
 
 void map2d_callback(const nav_msgs::OccupancyGrid::ConstPtr &msg)
 {
@@ -149,23 +149,23 @@ void scan_callback(const sensor_msgs::LaserScan::ConstPtr &msg)
   maps3d[maps3dCnt-1].SetFloor(currFloor);
 }
 
-void maps_origin_callback(const geometry_msgs::PoseArray::ConstPtr &msg)
+void maps_origin_callback(const geometry_msgs::msg::PoseArray::ConstPtr &msg)
 {
   maps_origin = msg->poses;
 }
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "multi_map_server_3d");
-  ros::NodeHandle n("~");
+  rclcpp::init(argc, argv, "multi_map_server_3d");
+  rclcpp::NodeHandle n("~");
 
-  ros::Subscriber sub1 = n.subscribe("dmap2d",       100, map2d_callback);
-  ros::Subscriber sub2 = n.subscribe("scan",         100, scan_callback);
-  ros::Subscriber sub3 = n.subscribe("/maps_origin", 100, maps_origin_callback);
+  rclcpp::Subscriber sub1 = n.subscribe("dmap2d",       100, map2d_callback);
+  rclcpp::Subscriber sub2 = n.subscribe("scan",         100, scan_callback);
+  rclcpp::Subscriber sub3 = n.subscribe("/maps_origin", 100, maps_origin_callback);
   pub1 = n.advertise<multi_map_server::MultiOccupancyGrid>("dmaps2d", 10, true); 
   pub2 = n.advertise<multi_map_server::MultiSparseMap3D>(  "dmaps3d", 10, true); 
 
-  ros::Rate r(100.0);  
+  rclcpp::Rate r(100.0);
   int cnt = 0;
   while (n.ok())
   {
@@ -185,7 +185,7 @@ int main(int argc, char **argv)
       }
       pub2.publish(msg);
     }
-    ros::spinOnce();
+    rclcpp::spinOnce();
     r.sleep();
   }
   return 0;

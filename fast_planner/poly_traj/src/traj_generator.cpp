@@ -32,7 +32,7 @@
 
 using namespace std;
 
-ros::Publisher state_pub, pos_cmd_pub, traj_pub;
+rclcpp::Publisher state_pub, pos_cmd_pub, traj_pub;
 
 nav_msgs::msg::Odometry odom;
 bool have_odom;
@@ -41,7 +41,7 @@ void displayPathWithColor(vector<Eigen::Vector3d> path, double resolution, Eigen
                           int id) {
   visualization_msgs::Marker mk;
   mk.header.frame_id = "world";
-  mk.header.stamp = ros::Time::now();
+  mk.header.stamp = rclcpp::Time::now();
   mk.type = visualization_msgs::Marker::SPHERE_LIST;
   mk.action = visualization_msgs::Marker::DELETE;
   mk.id = id;
@@ -71,13 +71,13 @@ void displayPathWithColor(vector<Eigen::Vector3d> path, double resolution, Eigen
     mk.points.push_back(pt);
   }
   traj_pub.publish(mk);
-  ros::Duration(0.001).sleep();
+  rclcpp::Duration(0.001).sleep();
 }
 
 void drawState(Eigen::Vector3d pos, Eigen::Vector3d vec, int id, Eigen::Vector4d color) {
   visualization_msgs::Marker mk_state;
   mk_state.header.frame_id = "world";
-  mk_state.header.stamp = ros::Time::now();
+  mk_state.header.stamp = rclcpp::Time::now();
   mk_state.id = id;
   mk_state.type = visualization_msgs::Marker::ARROW;
   mk_state.action = visualization_msgs::Marker::ADD;
@@ -110,10 +110,10 @@ void odomCallbck(const nav_msgs::msg::Odometry& msg) {
 
 int main(int argc, char** argv) {
   /* ---------- initialize ---------- */
-  ros::init(argc, argv, "traj_generator");
-  ros::NodeHandle node;
+  rclcpp::init(argc, argv, "traj_generator");
+  rclcpp::NodeHandle node;
 
-  ros::Subscriber odom_sub = node.subscribe("/uwb_vicon_odom", 50, odomCallbck);
+  rclcpp::Subscriber odom_sub = node.subscribe("/uwb_vicon_odom", 50, odomCallbck);
 
   traj_pub = node.advertise<visualization_msgs::Marker>("/traj_generator/traj_vis", 10);
   state_pub = node.advertise<visualization_msgs::Marker>("/traj_generator/cmd_vis", 10);
@@ -125,14 +125,14 @@ int main(int argc, char** argv) {
   pos_cmd_pub =
       node.advertise<swarmtal_msgs::drone_onboard_command>("/drone_commander/onboard_command", 10);
 
-  ros::Duration(1.0).sleep();
+  rclcpp::Duration(1.0).sleep();
 
   /* ---------- wait for odom ready ---------- */
   have_odom = false;
-  while (!have_odom && ros::ok()) {
+  while (!have_odom && rclcpp::ok()) {
     cout << "no odomeetry." << endl;
-    ros::Duration(0.5).sleep();
-    ros::spinOnce();
+    rclcpp::Duration(0.5).sleep();
+    rclcpp::spinOnce();
   }
 
   /* ---------- generate trajectory using close-form minimum jerk ---------- */
@@ -189,10 +189,10 @@ int main(int argc, char** argv) {
   displayPathWithColor(traj_vis, 0.05, Eigen::Vector4d(1, 0, 0, 1), 1);
 
   /* ---------- publish command ---------- */
-  ros::Time start_time = ros::Time::now();
-  ros::Time time_now;
+  rclcpp::Time start_time = rclcpp::Time::now();
+  rclcpp::Time time_now;
 
-  ros::Duration(0.1).sleep();
+  rclcpp::Duration(0.1).sleep();
 
   swarmtal_msgs::drone_onboard_command cmd;
   cmd.command_type = swarmtal_msgs::drone_onboard_command::CTRL_POS_COMMAND;
@@ -207,8 +207,8 @@ int main(int argc, char** argv) {
   cmd.param9 = 0;
   cmd.param10 = 0;
 
-  while (ros::ok()) {
-    time_now = ros::Time::now();
+  while (rclcpp::ok()) {
+    time_now = rclcpp::Time::now();
     double tn = (time_now - start_time).toSec();
     Eigen::Vector3d pt = poly_traj.evaluate(tn);
     Eigen::Vector3d vel = poly_traj.evaluateVel(tn);
@@ -229,9 +229,9 @@ int main(int argc, char** argv) {
 
     drawState(pt, vel, 0, Eigen::Vector4d(0, 1, 0, 1));
     drawState(pt, acc, 1, Eigen::Vector4d(0, 0, 1, 1));
-    ros::Duration(0.01).sleep();
+    rclcpp::Duration(0.01).sleep();
   }
 
-  ros::spin();
+  rclcpp::spin();
   return 0;
 }

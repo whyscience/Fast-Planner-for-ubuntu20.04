@@ -1,14 +1,14 @@
 #ifndef SAMPLE_WAYPOINTS_H
 #define SAMPLE_WAYPOINTS_H
 
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 #include <tf/tf.h>
-#include <nav_msgs/msg/Path.hpp>
+#include <nav_msgs/msg/path.hpp>
 
-nav_msgs::Path point()
+nav_msgs::msg::Path point()
 {
     // Circle parameters
-    nav_msgs::Path waypoints;
+    nav_msgs::msg::Path waypoints;
     geometry_msgs::msg::PoseStamped pt;
     pt.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
     
@@ -59,11 +59,11 @@ nav_msgs::Path point()
 }
 
 // Circle trajectory
-nav_msgs::Path circle()
+nav_msgs::msg::Path circle()
 {
     double h = 1.0;
     double scale = 5.0;
-    nav_msgs::Path waypoints;
+    nav_msgs::msg::Path waypoints;
     geometry_msgs::msg::PoseStamped pt;
     pt.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
     
@@ -128,14 +128,14 @@ nav_msgs::Path circle()
 }
 
 // Figure 8 trajectory
-nav_msgs::Path eight()
+nav_msgs::msg::Path eight()
 {
     // Circle parameters
     double offset_x = 0.0;
     double offset_y = 0.0;
     double r = 10.0;
     double h = 2.0;
-    nav_msgs::Path waypoints;
+    nav_msgs::msg::Path waypoints;
     geometry_msgs::msg::PoseStamped pt;
     pt.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);    
 

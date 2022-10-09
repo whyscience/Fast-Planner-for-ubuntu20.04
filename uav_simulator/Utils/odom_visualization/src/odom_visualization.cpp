@@ -2,9 +2,9 @@
 #include <string.h>
 #include "ros/ros.h"
 #include "tf/transform_broadcaster.h"
-#include "nav_msgs/Odometry.h"
+#include "nav_msgs/msg/odometry.hpp"
 #include "geometry_msgs/PoseWithCovarianceStamped.h"
-#include "geometry_msgs/PoseStamped.h"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 #include "nav_msgs/Path.h"
 #include "sensor_msgs/Range.h"
 #include "visualization_msgs/Marker.h"
@@ -26,18 +26,18 @@ bool   cov_color  = false;
 bool   origin       = false;
 bool   isOriginSet  = false;
 colvec poseOrigin(6);
-ros::Publisher posePub;
-ros::Publisher pathPub;
-ros::Publisher velPub;
-ros::Publisher covPub;
-ros::Publisher covVelPub;
-ros::Publisher trajPub;
-ros::Publisher sensorPub;
-ros::Publisher meshPub;
-ros::Publisher heightPub;
+rclcpp::Publisher posePub;
+rclcpp::Publisher pathPub;
+rclcpp::Publisher velPub;
+rclcpp::Publisher covPub;
+rclcpp::Publisher covVelPub;
+rclcpp::Publisher trajPub;
+rclcpp::Publisher sensorPub;
+rclcpp::Publisher meshPub;
+rclcpp::Publisher heightPub;
 tf::TransformBroadcaster* broadcaster;
-geometry_msgs::PoseStamped poseROS;
-nav_msgs::Path             pathROS;
+geometry_msgs::msg::PoseStamped poseROS;
+nav_msgs::msg::Path             pathROS;
 visualization_msgs::Marker velROS;
 visualization_msgs::Marker covROS;
 visualization_msgs::Marker covVelROS;
@@ -47,7 +47,7 @@ visualization_msgs::Marker meshROS;
 sensor_msgs::Range         heightROS;
 string _frame_id;
 
-void odom_callback(const nav_msgs::Odometry::ConstPtr& msg)
+void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
 {
   if (msg->header.frame_id == string("null"))
     return;
@@ -121,7 +121,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr& msg)
   velPub.publish(velROS);
 
   // Path
-  static ros::Time prevt = msg->header.stamp;
+  static rclcpp::Time prevt = msg->header.stamp;
   if ((msg->header.stamp - prevt).toSec() > 0.1)
   {
     prevt = msg->header.stamp;
@@ -242,12 +242,12 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr& msg)
 
   // Color Coded Trajectory
   static colvec ppose = pose;
-  static ros::Time pt = msg->header.stamp;
-  ros::Time t = msg->header.stamp;
+  static rclcpp::Time pt = msg->header.stamp;
+  rclcpp::Time t = msg->header.stamp;
   if ((t - pt).toSec() > 0.5)
   {
     trajROS.header.frame_id = string("world");
-    trajROS.header.stamp    = ros::Time::now();
+    trajROS.header.stamp    = rclcpp::Time::now();
     trajROS.ns              = string("trajectory");
     trajROS.type            = visualization_msgs::Marker::LINE_LIST;
     trajROS.action          = visualization_msgs::Marker::ADD;  
@@ -433,8 +433,8 @@ void cmd_callback(const quadrotor_msgs::PositionCommand cmd)
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "odom_visualization");
-  ros::NodeHandle n("~");
+  rclcpp::init(argc, argv, "odom_visualization");
+  rclcpp::NodeHandle n("~");
 
   n.param("mesh_resource", mesh_resource, std::string("package://odom_visualization/meshes/hummingbird.mesh"));
   n.param("color/r", color_r, 1.0);
@@ -452,10 +452,10 @@ int main(int argc, char** argv)
   n.param("covariance_velocity", cov_vel,    false);    
   n.param("covariance_color",    cov_color,  false);    
   
-  ros::Subscriber sub_odom = n.subscribe("odom", 100,  odom_callback);
-  ros::Subscriber sub_cmd  = n.subscribe("cmd",  100,  cmd_callback);
-  posePub   = n.advertise<geometry_msgs::PoseStamped>("pose",                100, true);
-  pathPub   = n.advertise<nav_msgs::Path>(            "path",                100, true);
+  rclcpp::Subscriber sub_odom = n.subscribe("odom", 100,  odom_callback);
+  rclcpp::Subscriber sub_cmd  = n.subscribe("cmd",  100,  cmd_callback);
+  posePub   = n.advertise<geometry_msgs::msg::PoseStamped>("pose",                100, true);
+  pathPub   = n.advertise<nav_msgs::msg::Path>(            "path",                100, true);
   velPub    = n.advertise<visualization_msgs::Marker>("velocity",            100, true);
   covPub    = n.advertise<visualization_msgs::Marker>("covariance",          100, true);
   covVelPub = n.advertise<visualization_msgs::Marker>("covariance_velocity", 100, true);
@@ -466,7 +466,7 @@ int main(int argc, char** argv)
   tf::TransformBroadcaster b;
   broadcaster = &b;
 
-  ros::spin();
+  rclcpp::spin();
 
   return 0;
 }

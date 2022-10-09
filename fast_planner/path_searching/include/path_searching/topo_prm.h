@@ -187,7 +187,7 @@ public:
   TopologyPRM(/* args */);
   ~TopologyPRM();
 
-  void init(ros::NodeHandle& nh);
+  void init(rclcpp::NodeHandle& nh);
 
   void setEnvironment(const EDTEnvironment::Ptr& env);
 

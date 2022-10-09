@@ -21,14 +21,11 @@
 * along with Fast-Planner. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
-
 #include <plan_manage/kino_replan_fsm.h>
 
 namespace fast_planner {
 
-void KinoReplanFSM::init(ros::NodeHandle& nh) {
+void KinoReplanFSM::init(rclcpp::NodeHandle& nh) {
   current_wp_  = 0;
   exec_state_  = FSM_EXEC_STATE::INIT;
   have_target_ = false;
@@ -52,8 +49,8 @@ void KinoReplanFSM::init(ros::NodeHandle& nh) {
   visualization_.reset(new PlanningVisualization(nh));
 
   /* callback */
-  exec_timer_   = nh.createTimer(ros::Duration(0.01), &KinoReplanFSM::execFSMCallback, this);
-  safety_timer_ = nh.createTimer(ros::Duration(0.05), &KinoReplanFSM::checkCollisionCallback, this);
+  exec_timer_   = nh.createTimer(rclcpp::Duration(0.01), &KinoReplanFSM::execFSMCallback, this);
+  safety_timer_ = nh.createTimer(rclcpp::Duration(0.05), &KinoReplanFSM::checkCollisionCallback, this);
 
   waypoint_sub_ =
       nh.subscribe("/waypoint_generator/waypoints", 1, &KinoReplanFSM::waypointCallback, this);
@@ -64,7 +61,7 @@ void KinoReplanFSM::init(ros::NodeHandle& nh) {
   bspline_pub_ = nh.advertise<plan_manage::Bspline>("/planning/bspline", 10);
 }
 
-void KinoReplanFSM::waypointCallback(const nav_msgs::PathConstPtr& msg) {
+void KinoReplanFSM::waypointCallback(const nav_msgs::msg::Path::SharedPtr msg) {
   if (msg->poses[0].pose.position.z < -0.1) return;
 
   cout << "Triggered!" << endl;
@@ -90,7 +87,7 @@ void KinoReplanFSM::waypointCallback(const nav_msgs::PathConstPtr& msg) {
     changeFSMExecState(REPLAN_TRAJ, "TRIG");
 }
 
-void KinoReplanFSM::odometryCallback(const nav_msgs::msg::OdometryConstPtr& msg) {
+void KinoReplanFSM::odometryCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
   odom_pos_(0) = msg->pose.pose.position.x;
   odom_pos_(1) = msg->pose.pose.position.y;
   odom_pos_(2) = msg->pose.pose.position.z;
@@ -120,7 +117,7 @@ void KinoReplanFSM::printFSMExecState() {
   cout << "[FSM]: state: " + state_str[int(exec_state_)] << endl;
 }
 
-void KinoReplanFSM::execFSMCallback(const ros::TimerEvent& e) {
+void KinoReplanFSM::execFSMCallback( ) {
   static int fsm_num = 0;
   fsm_num++;
   if (fsm_num == 100) {
@@ -174,7 +171,7 @@ void KinoReplanFSM::execFSMCallback(const ros::TimerEvent& e) {
     case EXEC_TRAJ: {
       /* determine if need to replan */
       LocalTrajData* info     = &planner_manager_->local_data_;
-      ros::Time      time_now = ros::Time::now();
+      rclcpp::Time      time_now = rclcpp::Time::now();
       double         t_cur    = (time_now - info->start_time_).toSec();
       t_cur                   = min(info->duration_, t_cur);
 
@@ -202,7 +199,7 @@ void KinoReplanFSM::execFSMCallback(const ros::TimerEvent& e) {
 
     case REPLAN_TRAJ: {
       LocalTrajData* info     = &planner_manager_->local_data_;
-      ros::Time      time_now = ros::Time::now();
+      rclcpp::Time      time_now = rclcpp::Time::now();
       double         t_cur    = (time_now - info->start_time_).toSec();
 
       start_pt_  = info->position_traj_.evaluateDeBoorT(t_cur);
@@ -229,7 +226,7 @@ void KinoReplanFSM::execFSMCallback(const ros::TimerEvent& e) {
   }
 }
 
-void KinoReplanFSM::checkCollisionCallback(const ros::TimerEvent& e) {
+void KinoReplanFSM::checkCollisionCallback( ) {
   LocalTrajData* info = &planner_manager_->local_data_;
 
   if (have_target_) {
@@ -347,7 +344,7 @@ bool KinoReplanFSM::callKinodynamicReplan() {
 
     bspline_pub_.publish(bspline);
 
-    /* visulization */
+    /* visualization */
     auto plan_data = &planner_manager_->plan_data_;
     visualization_->drawGeometricPath(plan_data->kino_path_, 0.075, Eigen::Vector4d(1, 1, 0, 0.4));
     visualization_->drawBspline(info->position_traj_, 0.1, Eigen::Vector4d(1.0, 0, 0.0, 1), true, 0.2,

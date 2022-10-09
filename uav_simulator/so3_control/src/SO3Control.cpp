@@ -1,7 +1,7 @@
 #include <iostream>
 #include <so3_control/SO3Control.h>
 
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 
 SO3Control::SO3Control()
   : mass_(0.5)

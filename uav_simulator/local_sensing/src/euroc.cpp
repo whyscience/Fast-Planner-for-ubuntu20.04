@@ -2,12 +2,12 @@
 #include <fstream>
 #include <vector>
 
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/exact_time.h>
 #include <message_filters/sync_policies/approximate_time.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/TransformStamped.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
@@ -41,16 +41,16 @@ cv::Mat undist_map1, undist_map2;
 bool is_distorted(false);
 
 DepthRender depthrender;
-ros::Publisher pub_depth;
-ros::Publisher pub_color;
-ros::Publisher pub_posedimage;
+rclcpp::Publisher pub_depth;
+rclcpp::Publisher pub_color;
+rclcpp::Publisher pub_posedimage;
 
 Matrix4d vicon2body;
 Matrix4d cam02body;
 Matrix4d cam2world;
 Matrix4d vicon2leica;
 
-ros::Time receive_stamp;
+rclcpp::Time receive_stamp;
 
 cv::Mat undistorted_image;
 
@@ -231,7 +231,7 @@ void render_currentpose()
 {
   solve_pnp();
 
-  double this_time = ros::Time::now().toSec();
+  double this_time = rclcpp::Time::now().toSec();
 
   Matrix4d cam_pose = cam2world.inverse();
 
@@ -248,7 +248,7 @@ void render_currentpose()
   		max = depth > max ? depth : max;
   		depth_mat.at<float>(i,j) = depth;
   	}
-  ROS_INFO("render cost %lf ms.", (ros::Time::now().toSec() - this_time) * 1000.0f);
+  ROS_INFO("render cost %lf ms.", (rclcpp::Time::now().toSec() - this_time) * 1000.0f);
   printf("max_depth %lf.\n", max);
 
   cv_bridge::CvImage out_msg;
@@ -276,8 +276,8 @@ void render_currentpose()
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "cloud_banchmark");
-  ros::NodeHandle nh("~");
+  rclcpp::init(argc, argv, "cloud_banchmark");
+  rclcpp::NodeHandle nh("~");
 
   nh.getParam("cam_width", width);
   nh.getParam("cam_height", height);
@@ -370,9 +370,9 @@ int main(int argc, char **argv)
   setMouseCallback("depth_image", depthBackFunc, NULL);
   vicon2leica = Matrix4d::Identity();
 
-  while(ros::ok())
+  while(rclcpp::ok())
   {
-    ros::spinOnce();
+    rclcpp::spinOnce();
     cv::waitKey(30);
   }
 }

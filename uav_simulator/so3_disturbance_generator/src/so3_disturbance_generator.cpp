@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string.h>
-#include <ros/ros.h>
-#include <geometry_msgs/Vector3.h>
-#include <nav_msgs/Odometry.h>
-#include <geometry_msgs/PoseStamped.h>
+#include "rclcpp/rclcpp.hpp"
+#include <geometry_msgs/msg/vector3.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <dynamic_reconfigure/server.h>
 #include <so3_disturbance_generator/DisturbanceUIConfig.h>
 #include "pose_utils.h"
@@ -13,15 +13,15 @@ using namespace std;
 
 #define CORRECTION_RATE 1
 
-ros::Publisher pubo;
-ros::Publisher pubc;
-ros::Publisher pubf;
-ros::Publisher pubm;
+rclcpp::Publisher pubo;
+rclcpp::Publisher pubc;
+rclcpp::Publisher pubf;
+rclcpp::Publisher pubm;
 so3_disturbance_generator::DisturbanceUIConfig config;
-nav_msgs::Odometry noisy_odom;
-geometry_msgs::PoseStamped correction;
+nav_msgs::msg::Odometry noisy_odom;
+geometry_msgs::msg::PoseStamped correction;
 
-void odom_callback(const nav_msgs::Odometry::ConstPtr& msg)
+void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
 {
   noisy_odom.header = msg->header;  
   correction.header = msg->header;  
@@ -45,7 +45,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr& msg)
   static colvec drift_vel       = vel;   
   static colvec correction_pose = zeros<colvec>(6);  
   static colvec prev_pose       = pose;
-  static ros::Time prev_pose_t  = msg->header.stamp;  
+  static rclcpp::Time prev_pose_t  = msg->header.stamp;
   if (config.enable_drift_odom)
   {
     double dt       = (msg->header.stamp - prev_pose_t).toSec();
@@ -122,7 +122,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr& msg)
   noisy_odom.pose.pose.orientation.z = noisy_q(3);    
   pubo.publish(noisy_odom);
   // Check time interval and publish correction
-  static ros::Time prev_correction_t = msg->header.stamp;
+  static rclcpp::Time prev_correction_t = msg->header.stamp;
   if ((msg->header.stamp - prev_correction_t).toSec() > 1.0 / CORRECTION_RATE)
   {
     prev_correction_t             = msg->header.stamp;
@@ -159,12 +159,12 @@ void set_disturbance()
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "so3_disturbance_generator");
-  ros::NodeHandle n("~");
+  rclcpp::init(argc, argv, "so3_disturbance_generator");
+  rclcpp::NodeHandle n("~");
 
-  ros::Subscriber sub1 = n.subscribe("odom", 10, odom_callback);
-  pubo = n.advertise<nav_msgs::Odometry>(        "noisy_odom",         10);    
-  pubc = n.advertise<geometry_msgs::PoseStamped>("correction",         10);      
+  rclcpp::Subscriber sub1 = n.subscribe("odom", 10, odom_callback);
+  pubo = n.advertise<nav_msgs::msg::Odometry>(        "noisy_odom",         10);
+  pubc = n.advertise<geometry_msgs::msg::PoseStamped>("correction",         10);
   pubf = n.advertise<geometry_msgs::Vector3>(    "force_disturbance" , 10);
   pubm = n.advertise<geometry_msgs::Vector3>(    "moment_disturbance", 10);  
   
@@ -174,10 +174,10 @@ int main(int argc, char** argv)
   ff = boost::bind(&config_callback, _1, _2);
   server.setCallback(ff);   
 
-  ros::Rate r(100.0);
+  rclcpp::Rate r(100.0);
   while(n.ok())
   {
-    ros::spinOnce();
+    rclcpp::spinOnce();
     set_disturbance();
     r.sleep();
   }

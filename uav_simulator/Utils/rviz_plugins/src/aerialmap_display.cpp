@@ -35,7 +35,7 @@
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreTextureManager.h>
 
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 
 #include <tf/transform_listener.h>
 
@@ -69,7 +69,7 @@ AerialMapDisplay::AerialMapDisplay()
 {
   topic_property_ = new RosTopicProperty(
     "Topic", "", QString::fromStdString(
-                   ros::message_traits::datatype<nav_msgs::OccupancyGrid>()),
+                   rclcpp::message_traits::datatype<nav_msgs::OccupancyGrid>()),
     "nav_msgs::OccupancyGrid topic to subscribe to.", this,
     SLOT(updateTopic()));
 
@@ -162,7 +162,7 @@ AerialMapDisplay::subscribe()
                              &AerialMapDisplay::incomingAerialMap, this);
       setStatus(StatusProperty::Ok, "Topic", "OK");
     }
-    catch (ros::Exception& e)
+    catch (rclcpp::Exception& e)
     {
       setStatus(StatusProperty::Error, "Topic",
                 QString("Error subscribing: ") + e.what());
@@ -514,7 +514,7 @@ AerialMapDisplay::update(float wall_dt, float ros_dt)
 
 void
 AerialMapDisplay::incomingAerialMap(
-  const nav_msgs::OccupancyGrid::ConstPtr& msg)
+  const nav_msgs::OccupancyGrid::SharedPtr  msg)
 {
 
   updated_map_ = msg;
@@ -533,7 +533,7 @@ AerialMapDisplay::transformAerialMap()
   Ogre::Vector3    position;
   Ogre::Quaternion orientation;
   if (!context_->getFrameManager()->transform(
-        frame_, ros::Time(), current_map_->info.origin, position, orientation))
+        frame_, rclcpp::Time(), current_map_->info.origin, position, orientation))
   {
     ROS_DEBUG("Error transforming map '%s' from frame '%s' to frame '%s'",
               qPrintable(getName()), frame_.c_str(), qPrintable(fixed_frame_));

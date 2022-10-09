@@ -1,4 +1,4 @@
-#include <nav_msgs/Odometry.h>
+#include <nav_msgs/msg/odometry.hpp>
 #include <nav_msgs/Path.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/kdtree/kdtree_flann.h>
@@ -6,7 +6,7 @@
 #include <pcl/point_types.h>
 #include <pcl/search/kdtree.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 #include <sensor_msgs/PointCloud2.h>
 #include <Eigen/Dense>
 #include <fstream>
@@ -17,21 +17,21 @@
 using namespace std;
 using namespace Eigen;
 
-ros::Publisher pub_cloud;
+rclcpp::Publisher pub_cloud;
 
 sensor_msgs::PointCloud2 local_map_pcl;
 sensor_msgs::PointCloud2 local_depth_pcl;
 
-ros::Subscriber odom_sub;
-ros::Subscriber global_map_sub, local_map_sub;
+rclcpp::Subscriber odom_sub;
+rclcpp::Subscriber global_map_sub, local_map_sub;
 
-ros::Timer local_sensing_timer;
+rclcpp::Timer local_sensing_timer;
 
 bool has_global_map(false);
 bool has_local_map(false);
 bool has_odom(false);
 
-nav_msgs::Odometry _odom;
+nav_msgs::msg::Odometry _odom;
 
 double sensing_horizon, sensing_rate, estimation_rate;
 double _x_size, _y_size, _z_size;
@@ -39,7 +39,7 @@ double _gl_xl, _gl_yl, _gl_zl;
 double _resolution, _inv_resolution;
 int _GLX_SIZE, _GLY_SIZE, _GLZ_SIZE;
 
-ros::Time last_odom_stamp = ros::TIME_MAX;
+rclcpp::Time last_odom_stamp = rclcpp::TIME_MAX;
 
 inline Eigen::Vector3d gridIndex2coord(const Eigen::Vector3i& index) {
   Eigen::Vector3d pt;
@@ -62,7 +62,7 @@ inline Eigen::Vector3i coord2gridIndex(const Eigen::Vector3d& pt) {
   return idx;
 };
 
-void rcvOdometryCallbck(const nav_msgs::Odometry& odom) {
+void rcvOdometryCallbck(const nav_msgs::msg::Odometry& odom) {
   /*if(!has_global_map)
     return;*/
   has_odom = true;
@@ -95,7 +95,7 @@ void rcvGlobalPointCloudCallBack(
   has_global_map = true;
 }
 
-void renderSensedPoints(const ros::TimerEvent& event) {
+void renderSensedPoints( vent) {
   if (!has_global_map || !has_odom) return;
 
   Eigen::Quaterniond q;
@@ -154,8 +154,8 @@ void rcvLocalPointCloudCallBack(
 }
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "pcl_render");
-  ros::NodeHandle nh("~");
+  rclcpp::init(argc, argv, "pcl_render");
+  rclcpp::NodeHandle nh("~");
 
   nh.getParam("sensing_horizon", sensing_horizon);
   nh.getParam("sensing_rate", sensing_rate);
@@ -177,7 +177,7 @@ int main(int argc, char** argv) {
   double sensing_duration = 1.0 / sensing_rate * 2.5;
 
   local_sensing_timer =
-      nh.createTimer(ros::Duration(sensing_duration), renderSensedPoints);
+      nh.createTimer(rclcpp::Duration(sensing_duration), renderSensedPoints);
 
   _inv_resolution = 1.0 / _resolution;
 
@@ -189,11 +189,11 @@ int main(int argc, char** argv) {
   _GLY_SIZE = (int)(_y_size * _inv_resolution);
   _GLZ_SIZE = (int)(_z_size * _inv_resolution);
 
-  ros::Rate rate(100);
-  bool status = ros::ok();
+  rclcpp::Rate rate(100);
+  bool status = rclcpp::ok();
   while (status) {
-    ros::spinOnce();
-    status = ros::ok();
+    rclcpp::spinOnce();
+    status = rclcpp::ok();
     rate.sleep();
   }
 }

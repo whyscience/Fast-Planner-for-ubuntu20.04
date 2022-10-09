@@ -53,13 +53,13 @@ private:
   /* data */
   int test_;
   std::vector<int> test_vec_;
-  ros::NodeHandle nh_;
+  rclcpp::NodeHandle nh_;
 
 public:
   Test(const int& v) {
     test_ = v;
   }
-  Test(ros::NodeHandle& node) {
+  Test(rclcpp::NodeHandle& node) {
     nh_ = node;
   }
   ~Test() {
@@ -98,10 +98,10 @@ private:
   int current_wp_;
 
   /* ROS utils */
-  ros::NodeHandle node_;
-  ros::Timer exec_timer_, safety_timer_, vis_timer_, test_something_timer_;
-  ros::Subscriber waypoint_sub_, odom_sub_;
-  ros::Publisher replan_pub_, new_pub_, bspline_pub_;
+  rclcpp::NodeHandle node_;
+  rclcpp::Timer exec_timer_, safety_timer_, vis_timer_, test_something_timer_;
+  rclcpp::Subscriber waypoint_sub_, odom_sub_;
+  rclcpp::Publisher replan_pub_, new_pub_, bspline_pub_;
 
   /* helper functions */
   bool callKinodynamicReplan();        // front-end and back-end method
@@ -111,10 +111,10 @@ private:
   void printFSMExecState();
 
   /* ROS functions */
-  void execFSMCallback(const ros::TimerEvent& e);
-  void checkCollisionCallback(const ros::TimerEvent& e);
-  void waypointCallback(const nav_msgs::PathConstPtr& msg);
-  void odometryCallback(const nav_msgs::msg::OdometryConstPtr& msg);
+  void execFSMCallback( );
+  void checkCollisionCallback( );
+  void waypointCallback(const nav_msgs::msg::Path::SharedPtr msg);
+  void odometryCallback(const nav_msgs::msg::Odometry::SharedPtr msg);
 
 public:
   KinoReplanFSM(/* args */) {
@@ -122,7 +122,7 @@ public:
   ~KinoReplanFSM() {
   }
 
-  void init(ros::NodeHandle& nh);
+  void init(rclcpp::NodeHandle& nh);
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };

@@ -31,7 +31,7 @@ TopologyPRM::TopologyPRM(/* args */) {}
 
 TopologyPRM::~TopologyPRM() {}
 
-void TopologyPRM::init(ros::NodeHandle& nh) {
+void TopologyPRM::init(rclcpp::NodeHandle& nh) {
   graph_.clear();
   eng_ = default_random_engine(rd_());
   rand_pos_ = uniform_real_distribution<double>(-1.0, 1.0);
@@ -62,48 +62,48 @@ void TopologyPRM::findTopoPaths(Eigen::Vector3d start, Eigen::Vector3d end,
                                 list<GraphNode::Ptr>& graph, vector<vector<Eigen::Vector3d>>& raw_paths,
                                 vector<vector<Eigen::Vector3d>>& filtered_paths,
                                 vector<vector<Eigen::Vector3d>>& select_paths) {
-  ros::Time t1, t2;
+  rclcpp::Time t1, t2;
 
   double graph_time, search_time, short_time, prune_time, select_time;
   /* ---------- create the topo graph ---------- */
-  t1 = ros::Time::now();
+  t1 = rclcpp::Time::now();
 
   start_pts_ = start_pts;
   end_pts_ = end_pts;
 
   graph = createGraph(start, end);
 
-  graph_time = (ros::Time::now() - t1).toSec();
+  graph_time = (rclcpp::Time::now() - t1).toSec();
 
   /* ---------- search paths in the graph ---------- */
-  t1 = ros::Time::now();
+  t1 = rclcpp::Time::now();
 
   raw_paths = searchPaths();
 
-  search_time = (ros::Time::now() - t1).toSec();
+  search_time = (rclcpp::Time::now() - t1).toSec();
 
   /* ---------- path shortening ---------- */
   // for parallel, save result in short_paths_
-  t1 = ros::Time::now();
+  t1 = rclcpp::Time::now();
 
   shortcutPaths();
 
-  short_time = (ros::Time::now() - t1).toSec();
+  short_time = (rclcpp::Time::now() - t1).toSec();
 
   /* ---------- prune equivalent paths ---------- */
-  t1 = ros::Time::now();
+  t1 = rclcpp::Time::now();
 
   filtered_paths = pruneEquivalent(short_paths_);
 
-  prune_time = (ros::Time::now() - t1).toSec();
+  prune_time = (rclcpp::Time::now() - t1).toSec();
   // cout << "prune: " << (t2 - t1).toSec() << endl;
 
   /* ---------- select N shortest paths ---------- */
-  t1 = ros::Time::now();
+  t1 = rclcpp::Time::now();
 
   select_paths = selectShortPaths(filtered_paths, 1);
 
-  select_time = (ros::Time::now() - t1).toSec();
+  select_time = (rclcpp::Time::now() - t1).toSec();
 
   final_paths_ = select_paths;
 
@@ -150,9 +150,9 @@ list<GraphNode::Ptr> TopologyPRM::createGraph(Eigen::Vector3d start, Eigen::Vect
   int sample_num = 0;
   double sample_time = 0.0;
   Eigen::Vector3d pt;
-  ros::Time t1, t2;
+  rclcpp::Time t1, t2;
   while (sample_time < max_sample_time_ && sample_num < max_sample_num_) {
-    t1 = ros::Time::now();
+    t1 = rclcpp::Time::now();
 
     pt = getSample();
     ++sample_num;
@@ -161,7 +161,7 @@ list<GraphNode::Ptr> TopologyPRM::createGraph(Eigen::Vector3d start, Eigen::Vect
     // edt_environment_->evaluateEDTWithGrad(pt, -1.0, dist, grad);
     dist = edt_environment_->evaluateCoarseEDT(pt, -1.0);
     if (dist <= clearance_) {
-      sample_time += (ros::Time::now() - t1).toSec();
+      sample_time += (rclcpp::Time::now() - t1).toSec();
       continue;
     }
 
@@ -176,7 +176,7 @@ list<GraphNode::Ptr> TopologyPRM::createGraph(Eigen::Vector3d start, Eigen::Vect
       // sortVisibGuard(visib_guards);
       bool need_connect = needConnection(visib_guards[0], visib_guards[1], pt);
       if (!need_connect) {
-        sample_time += (ros::Time::now() - t1).toSec();
+        sample_time += (rclcpp::Time::now() - t1).toSec();
         continue;
       }
       // new useful connection needed, add new connector
@@ -191,7 +191,7 @@ list<GraphNode::Ptr> TopologyPRM::createGraph(Eigen::Vector3d start, Eigen::Vect
       connector->neighbors_.push_back(visib_guards[1]);
     }
 
-    sample_time += (ros::Time::now() - t1).toSec();
+    sample_time += (rclcpp::Time::now() - t1).toSec();
   }
 
   /* print record */

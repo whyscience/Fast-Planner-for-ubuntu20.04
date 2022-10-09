@@ -85,7 +85,7 @@ protected:
   virtual void subscribe();
   virtual void unsubscribe();
 
-  void incomingMap(const multi_map_server::MultiOccupancyGrid::ConstPtr& msg);
+  void incomingMap(const multi_map_server::MultiOccupancyGrid::SharedPtr  msg);
 
   void clear();
 
@@ -97,7 +97,7 @@ protected:
 
   std::string topic_;
 
-  ros::Subscriber map_sub_;
+  rclcpp::Subscriber map_sub_;
 
   RosTopicProperty* topic_property_;
   Property*         draw_under_property_;
