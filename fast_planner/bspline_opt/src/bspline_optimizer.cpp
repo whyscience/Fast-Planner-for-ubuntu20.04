@@ -99,7 +99,7 @@ void BsplineOptimizer::setCostFunction(const int &cost_code) {
   if (cost_function_ & GUIDE) cost_str += " guide |";
   if (cost_function_ & WAYPOINTS) cost_str += " waypt |";
 
-  ROS_INFO_STREAM("cost func: " << cost_str);
+  RCLCPP_INFO_STREAM("cost func: " << cost_str);
 }
 
 void BsplineOptimizer::setGuidePath(const vector<Eigen::Vector3d> &guide_pt) { guide_pts_ = guide_pt; }
@@ -175,7 +175,7 @@ void BsplineOptimizer::optimize() {
     // cout << fixed << setprecision(7);
     // vec_time_.clear();
     // vec_cost_.clear();
-    // time_start_ = rclcpp::Time::now();
+    // time_start_ = rclcpp::Clock().now();
 
     double final_cost;
     nlopt::result result = opt.optimize(q, final_cost);
@@ -183,7 +183,7 @@ void BsplineOptimizer::optimize() {
     /* retrieve the optimization result */
     // cout << "Min cost:" << min_cost_ << endl;
   } catch (std::exception &e) {
-    ROS_WARN("[Optimization]: nlopt exception");
+    RCLCPP_WARN("[Optimization]: nlopt exception");
     cout << e.what() << endl;
   }
 
@@ -194,7 +194,7 @@ void BsplineOptimizer::optimize() {
     }
   }
 
-  if (!(cost_function_ & GUIDE)) ROS_INFO_STREAM("iter num: " << iter_num_);
+  if (!(cost_function_ & GUIDE)) RCLCPP_INFO_STREAM("iter num: " << iter_num_);
 }
 
 void BsplineOptimizer::calcSmoothnessCost(const vector<Eigen::Vector3d> &q, double &cost,
@@ -463,8 +463,8 @@ double BsplineOptimizer::costFunction(const std::vector<double> &x, std::vector<
   return cost;
 
   // /* evaluation */
-  // rclcpp::Time te1 = rclcpp::Time::now();
-  // double time_now = (te1 - opt->time_start_).toSec();
+  // rclcpp::Time te1 = rclcpp::Clock().now();
+  // double time_now = (te1 - opt->time_start_).seconds();
   // opt->vec_time_.push_back(time_now);
   // if (opt->vec_cost_.size() == 0)
   // {

@@ -37,6 +37,6 @@ if __name__ == "__main__":
 	while not rospy.is_shutdown():
 		counter += 1
 		msg.header.stamp = rospy.Time.now()-rospy.Duration(0.2)
-		pub.publish(msg)
+		pub->publish(msg)
 		rospy.loginfo("Send %3d msg(s)."%counter)
 		r.sleep()

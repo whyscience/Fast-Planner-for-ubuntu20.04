@@ -164,7 +164,7 @@ void RandomMapGenerate() {
   cloudMap.height = 1;
   cloudMap.is_dense = true;
 
-  ROS_WARN("Finished generate random map ");
+  RCLCPP_WARN("Finished generate random map ");
 
   kdtreeLocalMap.setInputCloud(cloudMap.makeShared());
 
@@ -191,7 +191,7 @@ void pubSensedPoints() {
   // if (i < 10) {
   pcl::toROSMsg(cloudMap, globalMap_pcd);
   globalMap_pcd.header.frame_id = "world";
-  _all_map_pub.publish(globalMap_pcd);
+  _all_map_pub->publish(globalMap_pcd);
   // }
 
   return;
@@ -218,7 +218,7 @@ void pubSensedPoints() {
       localMap.points.push_back(pt);
     }
   } else {
-    ROS_ERROR("[Map server] No obstacles .");
+    RCLCPP_ERROR("[Map server] No obstacles .");
     return;
   }
 
@@ -228,7 +228,7 @@ void pubSensedPoints() {
 
   pcl::toROSMsg(localMap, localMap_pcd);
   localMap_pcd.header.frame_id = "world";
-  _local_map_pub.publish(localMap_pcd);
+  _local_map_pub->publish(localMap_pcd);
 }
 
 void clickCallback(const geometry_msgs::msg::PoseStamped& msg) {
@@ -261,7 +261,7 @@ void clickCallback(const geometry_msgs::msg::PoseStamped& msg) {
 
   pcl::toROSMsg(clicked_cloud_, localMap_pcd);
   localMap_pcd.header.frame_id = "world";
-  click_map_pub_.publish(localMap_pcd);
+  click_map_pub_->publish(localMap_pcd);
 
   cloudMap.width = cloudMap.points.size();
 

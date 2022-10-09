@@ -264,7 +264,7 @@ main(int argc, char** argv)
   command.kOm[2] = 0.15;
   */
 
-  rclcpp::Time next_odom_pub_time = rclcpp::Time::now();
+  rclcpp::Time next_odom_pub_time = rclcpp::Clock().now();
   while (n.ok())
   {
     rclcpp::spinOnce();
@@ -283,7 +283,7 @@ main(int argc, char** argv)
     quad.setExternalMoment(disturbance.m);
     quad.step(dt);
 
-    rclcpp::Time tnow = rclcpp::Time::now();
+    rclcpp::Time tnow = rclcpp::Clock().now();
 
     if (tnow >= next_odom_pub_time)
     {
@@ -292,8 +292,8 @@ main(int argc, char** argv)
       state                 = quad.getState();
       stateToOdomMsg(state, odom_msg);
       quadToImuMsg(quad, imu);
-      odom_pub.publish(odom_msg);
-      imu_pub.publish(imu);
+      odom_pub->publish(odom_msg);
+      imu_pub->publish(imu);
     }
 
     r.sleep();

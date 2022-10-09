@@ -37,7 +37,7 @@ void ObjHistory::init(int id) {
   obj_idx_ = id;
 }
 
-void ObjHistory::poseCallback(const geometry_msgs::msg::PoseStamped::ConstSharedPtr msg) {
+void ObjHistory::poseCallback(geometry_msgs::msg::PoseStamped::SharedPtr msg) {
   ++skip_;
   if (skip_ < ObjHistory::skip_num_) return;
 

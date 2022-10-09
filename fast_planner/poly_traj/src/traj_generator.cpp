@@ -39,16 +39,16 @@ bool have_odom;
 
 void displayPathWithColor(vector<Eigen::Vector3d> path, double resolution, Eigen::Vector4d color,
                           int id) {
-  visualization_msgs::Marker mk;
+  visualization_msgs::msg::Marker mk;
   mk.header.frame_id = "world";
-  mk.header.stamp = rclcpp::Time::now();
-  mk.type = visualization_msgs::Marker::SPHERE_LIST;
-  mk.action = visualization_msgs::Marker::DELETE;
+  mk.header.stamp = rclcpp::Clock().now();
+  mk.type = visualization_msgs::msg::Marker::SPHERE_LIST;
+  mk.action = visualization_msgs::msg::Marker::DELETE;
   mk.id = id;
 
-  traj_pub.publish(mk);
+  traj_pub->publish(mk);
 
-  mk.action = visualization_msgs::Marker::ADD;
+  mk.action = visualization_msgs::msg::Marker::ADD;
   mk.pose.orientation.x = 0.0;
   mk.pose.orientation.y = 0.0;
   mk.pose.orientation.z = 0.0;
@@ -70,17 +70,17 @@ void displayPathWithColor(vector<Eigen::Vector3d> path, double resolution, Eigen
     pt.z = path[i](2);
     mk.points.push_back(pt);
   }
-  traj_pub.publish(mk);
+  traj_pub->publish(mk);
   rclcpp::Duration(0.001).sleep();
 }
 
 void drawState(Eigen::Vector3d pos, Eigen::Vector3d vec, int id, Eigen::Vector4d color) {
-  visualization_msgs::Marker mk_state;
+  visualization_msgs::msg::Marker mk_state;
   mk_state.header.frame_id = "world";
-  mk_state.header.stamp = rclcpp::Time::now();
+  mk_state.header.stamp = rclcpp::Clock().now();
   mk_state.id = id;
-  mk_state.type = visualization_msgs::Marker::ARROW;
-  mk_state.action = visualization_msgs::Marker::ADD;
+  mk_state.type = visualization_msgs::msg::Marker::ARROW;
+  mk_state.action = visualization_msgs::msg::Marker::ADD;
   mk_state.pose.orientation.w = 1.0;
   mk_state.scale.x = 0.1;
   mk_state.scale.y = 0.2;
@@ -98,7 +98,7 @@ void drawState(Eigen::Vector3d pos, Eigen::Vector3d vec, int id, Eigen::Vector4d
   mk_state.color.g = color(1);
   mk_state.color.b = color(2);
   mk_state.color.a = color(3);
-  state_pub.publish(mk_state);
+  state_pub->publish(mk_state);
 }
 
 void odomCallbck(const nav_msgs::msg::Odometry& msg) {
@@ -115,8 +115,8 @@ int main(int argc, char** argv) {
 
   rclcpp::Subscriber odom_sub = node.subscribe("/uwb_vicon_odom", 50, odomCallbck);
 
-  traj_pub = node.advertise<visualization_msgs::Marker>("/traj_generator/traj_vis", 10);
-  state_pub = node.advertise<visualization_msgs::Marker>("/traj_generator/cmd_vis", 10);
+  traj_pub = node.advertise<visualization_msgs::msg::Marker>("/traj_generator/traj_vis", 10);
+  state_pub = node.advertise<visualization_msgs::msg::Marker>("/traj_generator/cmd_vis", 10);
 
   // pos_cmd_pub =
   // node.advertise<quadrotor_msgs::PositionCommand>("/traj_generator/position_cmd",
@@ -189,7 +189,7 @@ int main(int argc, char** argv) {
   displayPathWithColor(traj_vis, 0.05, Eigen::Vector4d(1, 0, 0, 1), 1);
 
   /* ---------- publish command ---------- */
-  rclcpp::Time start_time = rclcpp::Time::now();
+  rclcpp::Time start_time = rclcpp::Clock().now();
   rclcpp::Time time_now;
 
   rclcpp::Duration(0.1).sleep();
@@ -208,8 +208,8 @@ int main(int argc, char** argv) {
   cmd.param10 = 0;
 
   while (rclcpp::ok()) {
-    time_now = rclcpp::Time::now();
-    double tn = (time_now - start_time).toSec();
+    time_now = rclcpp::Clock().now();
+    double tn = (time_now - start_time).seconds();
     Eigen::Vector3d pt = poly_traj.evaluate(tn);
     Eigen::Vector3d vel = poly_traj.evaluateVel(tn);
     Eigen::Vector3d acc = poly_traj.evaluateAcc(tn);
@@ -225,7 +225,7 @@ int main(int argc, char** argv) {
     cmd.param8 = int(acc(0) * 10000);
     cmd.param9 = int(acc(1) * 10000);
 
-    pos_cmd_pub.publish(cmd);
+    pos_cmd_pub->publish(cmd);
 
     drawState(pt, vel, 0, Eigen::Vector4d(0, 1, 0, 1));
     drawState(pt, acc, 1, Eigen::Vector4d(0, 0, 1, 1));

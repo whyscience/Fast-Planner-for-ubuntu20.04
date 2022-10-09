@@ -57,16 +57,16 @@ vector<Eigen::Vector3d> traj_cmd_, traj_real_;
 
 void displayTrajWithColor(vector<Eigen::Vector3d> path, double resolution, Eigen::Vector4d color,
                           int id) {
-  visualization_msgs::Marker mk;
+  visualization_msgs::msg::Marker mk;
   mk.header.frame_id = "world";
-  mk.header.stamp = rclcpp::Time::now();
-  mk.type = visualization_msgs::Marker::SPHERE_LIST;
-  mk.action = visualization_msgs::Marker::DELETE;
+  mk.header.stamp = rclcpp::Clock().now();
+  mk.type = visualization_msgs::msg::Marker::SPHERE_LIST;
+  mk.action = visualization_msgs::msg::Marker::DELETE;
   mk.id = id;
 
-  traj_pub.publish(mk);
+  traj_pub->publish(mk);
 
-  mk.action = visualization_msgs::Marker::ADD;
+  mk.action = visualization_msgs::msg::Marker::ADD;
   mk.pose.orientation.x = 0.0;
   mk.pose.orientation.y = 0.0;
   mk.pose.orientation.z = 0.0;
@@ -88,18 +88,18 @@ void displayTrajWithColor(vector<Eigen::Vector3d> path, double resolution, Eigen
     pt.z = path[i](2);
     mk.points.push_back(pt);
   }
-  traj_pub.publish(mk);
+  traj_pub->publish(mk);
   rclcpp::Duration(0.001).sleep();
 }
 
 void drawCmd(const Eigen::Vector3d& pos, const Eigen::Vector3d& vec, const int& id,
              const Eigen::Vector4d& color) {
-  visualization_msgs::Marker mk_state;
+  visualization_msgs::msg::Marker mk_state;
   mk_state.header.frame_id = "world";
-  mk_state.header.stamp = rclcpp::Time::now();
+  mk_state.header.stamp = rclcpp::Clock().now();
   mk_state.id = id;
-  mk_state.type = visualization_msgs::Marker::ARROW;
-  mk_state.action = visualization_msgs::Marker::ADD;
+  mk_state.type = visualization_msgs::msg::Marker::ARROW;
+  mk_state.action = visualization_msgs::msg::Marker::ADD;
 
   mk_state.pose.orientation.w = 1.0;
   mk_state.scale.x = 0.1;
@@ -122,7 +122,7 @@ void drawCmd(const Eigen::Vector3d& pos, const Eigen::Vector3d& vec, const int& 
   mk_state.color.b = color(2);
   mk_state.color.a = color(3);
 
-  cmd_vis_pub.publish(mk_state);
+  cmd_vis_pub->publish(mk_state);
 }
 
 void bsplineCallback(plan_manage::Bspline::SharedPtr msg) {
@@ -171,8 +171,8 @@ void bsplineCallback(plan_manage::Bspline::SharedPtr msg) {
 void replanCallback(std_msgs::Empty msg) {
   /* reset duration */
   const double time_out = 0.01;
-  rclcpp::Time time_now = rclcpp::Time::now();
-  double t_stop = (time_now - start_time_).toSec() + time_out;
+  rclcpp::Time time_now = rclcpp::Clock().now();
+  double t_stop = (time_now - start_time_).seconds() + time_out;
   traj_duration_ = min(t_stop, traj_duration_);
 }
 
@@ -204,8 +204,8 @@ void cmdCallback( ) {
   /* no publishing before receive traj_ */
   if (!receive_traj_) return;
 
-  rclcpp::Time time_now = rclcpp::Time::now();
-  double t_cur = (time_now - start_time_).toSec();
+  rclcpp::Time time_now = rclcpp::Clock().now();
+  double t_cur = (time_now - start_time_).seconds();
 
   Eigen::Vector3d pos{0,0,0}, vel{0,0,0}, acc{0,0,0}, pos_f{0,0,0};
   double yaw{}, yawdot{};
@@ -264,7 +264,7 @@ void cmdCallback( ) {
 
   last_yaw_ = cmd.yaw;
 
-  pos_cmd_pub.publish(cmd);
+  pos_cmd_pub->publish(cmd);
 
   // draw cmd
 
@@ -289,9 +289,9 @@ int main(int argc, char** argv) {
   rclcpp::Subscriber new_sub = node.subscribe("planning/new", 10, newCallback);
   rclcpp::Subscriber odom_sub = node.subscribe("/odom_world", 50, odomCallbck);
 
-  cmd_vis_pub = node.advertise<visualization_msgs::Marker>("planning/position_cmd_vis", 10);
+  cmd_vis_pub = node.advertise<visualization_msgs::msg::Marker>("planning/position_cmd_vis", 10);
   pos_cmd_pub = node.advertise<quadrotor_msgs::PositionCommand>("/position_cmd", 50);
-  traj_pub = node.advertise<visualization_msgs::Marker>("planning/travel_traj", 10);
+  traj_pub = node.advertise<visualization_msgs::msg::Marker>("planning/travel_traj", 10);
 
   rclcpp::Timer cmd_timer = node.createTimer(rclcpp::Duration(0.01), cmdCallback);
   rclcpp::Timer vis_timer = node.createTimer(rclcpp::Duration(0.25), visCallback);
@@ -310,7 +310,7 @@ int main(int argc, char** argv) {
 
   rclcpp::Duration(1.0).sleep();
 
-  ROS_WARN("[Traj server]: ready.");
+  RCLCPP_WARN("[Traj server]: ready.");
 
   rclcpp::spin();
 

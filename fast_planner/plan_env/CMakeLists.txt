@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
 project(plan_env)
-set(CMAKE_CXX_STANDARD 14)
-
-cmake_minimum_required(VERSION 3.5)
-project(plan_env)
 
 # Default to C++14
 if (NOT CMAKE_CXX_STANDARD)
@@ -13,7 +9,7 @@ endif ()
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wall -Wextra -Wpedantic)
 endif ()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wno-vla -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable")
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)

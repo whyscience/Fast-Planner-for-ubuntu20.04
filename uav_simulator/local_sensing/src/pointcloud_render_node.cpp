@@ -81,7 +81,7 @@ void rcvGlobalPointCloudCallBack(
     const sensor_msgs::PointCloud2& pointcloud_map) {
   if (has_global_map) return;
 
-  ROS_WARN("Global Pointcloud received..");
+  RCLCPP_WARN("Global Pointcloud received..");
 
   pcl::PointCloud<pcl::PointXYZ> cloud_input;
   pcl::fromROSMsg(pointcloud_map, cloud_input);
@@ -145,7 +145,7 @@ void renderSensedPoints( vent) {
   pcl::toROSMsg(_local_map, _local_map_pcd);
   _local_map_pcd.header.frame_id = "map";
 
-  pub_cloud.publish(_local_map_pcd);
+  pub_cloud->publish(_local_map_pcd);
 }
 
 void rcvLocalPointCloudCallBack(

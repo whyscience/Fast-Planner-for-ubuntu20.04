@@ -48,7 +48,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
   static rclcpp::Time prev_pose_t  = msg->header.stamp;
   if (config.enable_drift_odom)
   {
-    double dt       = (msg->header.stamp - prev_pose_t).toSec();
+    double dt       = (msg->header.stamp - prev_pose_t).seconds();
     prev_pose_t     = msg->header.stamp;    
     colvec d        = pose_update(pose_inverse(prev_pose), pose);
     prev_pose       = pose;
@@ -120,10 +120,10 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
   noisy_odom.pose.pose.orientation.x = noisy_q(1);
   noisy_odom.pose.pose.orientation.y = noisy_q(2);
   noisy_odom.pose.pose.orientation.z = noisy_q(3);    
-  pubo.publish(noisy_odom);
+  pubo->publish(noisy_odom);
   // Check time interval and publish correction
   static rclcpp::Time prev_correction_t = msg->header.stamp;
-  if ((msg->header.stamp - prev_correction_t).toSec() > 1.0 / CORRECTION_RATE)
+  if ((msg->header.stamp - prev_correction_t).seconds() > 1.0 / CORRECTION_RATE)
   {
     prev_correction_t             = msg->header.stamp;
     correction.pose.position.x    = correction_pose(0);
@@ -134,7 +134,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
     correction.pose.orientation.x = correction_q(1);
     correction.pose.orientation.y = correction_q(2);
     correction.pose.orientation.z = correction_q(3);   
-    pubc.publish(correction);         
+    pubc->publish(correction);
   }
 }    
 
@@ -153,8 +153,8 @@ void set_disturbance()
   m.x = config.mrp  + config.stdmrp  * as_scalar(randn(1));    
   m.y = config.mrp  + config.stdmrp  * as_scalar(randn(1));    
   m.z = config.myaw + config.stdmyaw * as_scalar(randn(1));        
-  pubf.publish(f);
-  pubm.publish(m);
+  pubf->publish(f);
+  pubm->publish(m);
 }
 
 int main(int argc, char** argv)
@@ -171,7 +171,7 @@ int main(int argc, char** argv)
   // Dynamic Reconfig
   dynamic_reconfigure::Server<so3_disturbance_generator::DisturbanceUIConfig> server;
   dynamic_reconfigure::Server<so3_disturbance_generator::DisturbanceUIConfig>::CallbackType ff;
-  ff = boost::bind(&config_callback, _1, _2);
+  ff = std::bind(&config_callback, _1, _2);
   server.setCallback(ff);   
 
   rclcpp::Rate r(100.0);

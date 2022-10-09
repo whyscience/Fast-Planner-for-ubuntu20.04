@@ -211,7 +211,7 @@ GameLikeInput::sendMessage()
   arrow_->getSceneNode()->setVisible(false);
 
   path.header.frame_id = "map";
-  path.header.stamp    = rclcpp::Time::now();
+  path.header.stamp    = rclcpp::Clock().now();
 
   std::sort(array.data.begin(), array.data.end());
 
@@ -219,23 +219,23 @@ GameLikeInput::sendMessage()
   swarm.plan      = path;
   swarm.selection = array.data;
 
-  pub_selection.publish(array);
-  pub_pointlist.publish(path);
-  pub_swarm.publish(swarm);
+  pub_selection->publish(array);
+  pub_pointlist->publish(path);
+  pub_swarm->publish(swarm);
 }
 
 void
 GameLikeInput::onPoseSet(double x, double y, double z, double theta)
 {
-  ROS_WARN("3D Goal Set");
+  RCLCPP_WARN("3D Goal Set");
   std::string    fixed_frame = context_->getFixedFrame().toStdString();
   tf::Quaternion quat;
   quat.setRPY(0.0, 0.0, theta);
   tf::Stamped<tf::Pose> p = tf::Stamped<tf::Pose>(
-    tf::Pose(quat, tf::Point(x, y, z)), rclcpp::Time::now(), fixed_frame);
+    tf::Pose(quat, tf::Point(x, y, z)), rclcpp::Clock().now(), fixed_frame);
   geometry_msgs::msg::PoseStamped goal;
   tf::poseStampedTFToMsg(p, goal);
-  ROS_INFO("Setting goal: Frame:%s, Position(%.3f, %.3f, %.3f), "
+  RCLCPP_INFO("Setting goal: Frame:%s, Position(%.3f, %.3f, %.3f), "
            "Orientation(%.3f, %.3f, %.3f, %.3f) = Angle: %.3f\n",
            fixed_frame.c_str(), goal.pose.position.x, goal.pose.position.y,
            goal.pose.position.z, goal.pose.orientation.x,

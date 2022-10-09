@@ -231,8 +231,8 @@ public:
 
   const nav_msgs::OccupancyGrid& GetMap()
   {
-    map.header.stamp       = rclcpp::Time::now();
-    map.info.map_load_time = rclcpp::Time::now();
+    map.header.stamp       = rclcpp::Clock().now();
+    map.info.map_load_time = rclcpp::Clock().now();
     map.header.frame_id    = string("/map");
     updated = false;
     return map;

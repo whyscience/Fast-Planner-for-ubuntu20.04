@@ -156,7 +156,7 @@ void pubCameraPose(const rclcpp::TimerEvent & event)
   camera_pose.pose.orientation.x = cam2world_quat.x();
   camera_pose.pose.orientation.y = cam2world_quat.y();
   camera_pose.pose.orientation.z = cam2world_quat.z();
-  pub_pose.publish(camera_pose);
+  pub_pose->publish(camera_pose);
 }
 
 void renderSensedPoints(const rclcpp::TimerEvent & event)
@@ -175,7 +175,7 @@ void rcvGlobalPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map
   if(has_global_map)
     return;
 
-  ROS_WARN("Global Pointcloud received..");
+  RCLCPP_WARN("Global Pointcloud received..");
   //load global map
   pcl::PointCloud<pcl::PointXYZ> cloudIn;
   pcl::PointXYZ pt_in;
@@ -197,7 +197,7 @@ void rcvGlobalPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map
 
 void rcvLocalPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map )
 {
-  //ROS_WARN("Local Pointcloud received..");
+  //RCLCPP_WARN("Local Pointcloud received..");
   //load local map
   pcl::PointCloud<pcl::PointXYZ> cloudIn;
   pcl::PointXYZ pt_in;
@@ -265,12 +265,12 @@ void render_pcl_world()
   local_map_pcl.header.frame_id  = "/map";
   local_map_pcl.header.stamp     = last_odom_stamp;
 
-  pub_pcl_wolrd.publish(local_map_pcl);
+  pub_pcl_wolrd->publish(local_map_pcl);
 }
 
 void render_currentpose()
 {
-  double this_time = rclcpp::Time::now().toSec();
+  double this_time = rclcpp::Clock().now().seconds();
 
   Matrix4d cam_pose = cam2world.inverse();
 
@@ -294,7 +294,7 @@ void render_currentpose()
   		max = depth > max ? depth : max;
   		depth_mat.at<float>(i,j) = depth;
   	}
-  //ROS_INFO("render cost %lf ms.", (rclcpp::Time::now().toSec() - this_time) * 1000.0f);
+  //RCLCPP_INFO("render cost %lf ms.", (rclcpp::Clock().now().seconds() - this_time) * 1000.0f);
   //printf("max_depth %lf.\n", max);
 
   cv_bridge::CvImage out_msg;
@@ -302,7 +302,7 @@ void render_currentpose()
   out_msg.header.frame_id = "camera";
   out_msg.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
   out_msg.image = depth_mat.clone();
-  pub_depth.publish(out_msg.toImageMsg());
+  pub_depth->publish(out_msg.toImageMsg());
 
   cv::Mat adjMap;
   // depth_mat.convertTo(adjMap,CV_8UC1, 255 / (max-min), -min);
@@ -314,7 +314,7 @@ void render_currentpose()
   cv_image_colored.header.stamp = last_odom_stamp;
   cv_image_colored.encoding = sensor_msgs::image_encodings::BGR8;
   cv_image_colored.image = falseColorsMap;
-  pub_color.publish(cv_image_colored.toImageMsg());
+  pub_color->publish(cv_image_colored.toImageMsg());
   //cv::imshow("depth_image", adjMap);
 }
 

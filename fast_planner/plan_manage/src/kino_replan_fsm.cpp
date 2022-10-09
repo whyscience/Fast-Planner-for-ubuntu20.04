@@ -171,8 +171,8 @@ void KinoReplanFSM::execFSMCallback( ) {
     case EXEC_TRAJ: {
       /* determine if need to replan */
       LocalTrajData* info     = &planner_manager_->local_data_;
-      rclcpp::Time      time_now = rclcpp::Time::now();
-      double         t_cur    = (time_now - info->start_time_).toSec();
+      rclcpp::Time      time_now = rclcpp::Clock().now();
+      double         t_cur    = (time_now - info->start_time_).seconds();
       t_cur                   = min(info->duration_, t_cur);
 
       Eigen::Vector3d pos = info->position_traj_.evaluateDeBoorT(t_cur);
@@ -199,8 +199,8 @@ void KinoReplanFSM::execFSMCallback( ) {
 
     case REPLAN_TRAJ: {
       LocalTrajData* info     = &planner_manager_->local_data_;
-      rclcpp::Time      time_now = rclcpp::Time::now();
-      double         t_cur    = (time_now - info->start_time_).toSec();
+      rclcpp::Time      time_now = rclcpp::Clock().now();
+      double         t_cur    = (time_now - info->start_time_).seconds();
 
       start_pt_  = info->position_traj_.evaluateDeBoorT(t_cur);
       start_vel_ = info->velocity_traj_.evaluateDeBoorT(t_cur);
@@ -211,7 +211,7 @@ void KinoReplanFSM::execFSMCallback( ) {
       start_yaw_(2) = info->yawdotdot_traj_.evaluateDeBoorT(t_cur)[0];
 
       std_msgs::Empty replan_msg;
-      replan_pub_.publish(replan_msg);
+      replan_pub_->publish(replan_msg);
 
       bool success = callKinodynamicReplan();
       if (success) {
@@ -286,7 +286,7 @@ void KinoReplanFSM::checkCollisionCallback( ) {
         changeFSMExecState(REPLAN_TRAJ, "FSM");
 
         std_msgs::Empty emt;
-        replan_pub_.publish(emt);
+        replan_pub_->publish(emt);
       }
     }
   }
@@ -298,7 +298,7 @@ void KinoReplanFSM::checkCollisionCallback( ) {
 
     if (!safe) {
       // cout << "current traj in collision." << endl;
-      ROS_WARN("current traj in collision.");
+      RCLCPP_WARN("current traj in collision.");
       changeFSMExecState(REPLAN_TRAJ, "SAFETY");
     }
   }
@@ -342,7 +342,7 @@ bool KinoReplanFSM::callKinodynamicReplan() {
     }
     bspline.yaw_dt = info->yaw_traj_.getInterval();
 
-    bspline_pub_.publish(bspline);
+    bspline_pub_->publish(bspline);
 
     /* visualization */
     auto plan_data = &planner_manager_->plan_data_;

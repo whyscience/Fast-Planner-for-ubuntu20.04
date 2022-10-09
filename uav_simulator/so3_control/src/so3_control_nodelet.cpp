@@ -68,7 +68,7 @@ SO3ControlNodelet::publishSO3Command(void)
 
   quadrotor_msgs::SO3Command::Ptr so3_command(
     new quadrotor_msgs::SO3Command); //! @note memory leak?
-  so3_command->header.stamp    = rclcpp::Time::now();
+  so3_command->header.stamp    = rclcpp::Clock().now();
   so3_command->header.frame_id = frame_id_;
   so3_command->force.x         = force(0);
   so3_command->force.y         = force(1);
@@ -88,7 +88,7 @@ SO3ControlNodelet::publishSO3Command(void)
   so3_command->aux.angle_corrections[1] = corrections_[2];
   so3_command->aux.enable_motors        = enable_motors_;
   so3_command->aux.use_external_yaw     = use_external_yaw_;
-  so3_command_pub_.publish(so3_command);
+  so3_command_pub_->publish(so3_command);
 }
 
 void
@@ -143,9 +143,9 @@ void
 SO3ControlNodelet::enable_motors_callback(const std_msgs::Bool::SharedPtr  msg)
 {
   if (msg->data)
-    ROS_INFO("Enabling motors");
+    RCLCPP_INFO("Enabling motors");
   else
-    ROS_INFO("Disabling motors");
+    RCLCPP_INFO("Disabling motors");
 
   enable_motors_ = msg->data;
 }

@@ -58,7 +58,7 @@ class OdometryConverter(object):
         assert(in_odom_msg.header.frame_id == self.frame_id_in)
         odom_msg.header.frame_id = self.frame_id_out
         odom_msg.child_frame_id = ""
-        self.out_odom_pub.publish(odom_msg)
+        self.out_odom_pub->publish(odom_msg)
 
         #### tf ####
         if self.broadcast_tf and self.tf_pub_flag:
@@ -106,7 +106,7 @@ class OdometryConverter(object):
             path = Path()
             path.header = self.path[-1].header
             path.poses = self.path[-30000::1]
-            self.out_path_pub.publish(path)
+            self.out_path_pub->publish(path)
 
     def tf_pub_callback(self, event):
         self.tf_pub_flag = True

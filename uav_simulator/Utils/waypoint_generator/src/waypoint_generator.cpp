@@ -31,7 +31,7 @@ void load_seg(rclcpp::NodeHandle& nh, int segid, const rclcpp::Time& time_base) 
     std::string seg_str = boost::str(bfmt("seg%d/") % segid);
     double yaw;
     double time_from_start;
-    ROS_INFO("Getting segment %d", segid);
+    RCLCPP_INFO("Getting segment %d", segid);
     ROS_ASSERT(nh.getParam(seg_str + "yaw", yaw));
     ROS_ASSERT_MSG((yaw > -3.1499999) && (yaw < 3.14999999), "yaw=%.3f", yaw);
     ROS_ASSERT(nh.getParam(seg_str + "time_from_start", time_from_start));
@@ -80,18 +80,18 @@ void load_waypoints(rclcpp::NodeHandle& nh, const rclcpp::Time& time_base) {
             ROS_ASSERT(waypointSegments[i - 1].header.stamp < waypointSegments[i].header.stamp);
         }
     }
-    ROS_INFO("Overall load %zu segments", waypointSegments.size());
+    RCLCPP_INFO("Overall load %zu segments", waypointSegments.size());
 }
 
 void publish_waypoints() {
     waypoints.header.frame_id = std::string("world");
-    waypoints.header.stamp = rclcpp::Time::now();
-    pub1.publish(waypoints);
+    waypoints.header.stamp = rclcpp::Clock().now();
+    pub1->publish(waypoints);
     geometry_msgs::msg::PoseStamped init_pose;
     init_pose.header = odom.header;
     init_pose.pose = odom.pose.pose;
     waypoints.poses.insert(waypoints.poses.begin(), init_pose);
-    // pub2.publish(waypoints);
+    // pub2->publish(waypoints);
     waypoints.poses.clear();
 }
 
@@ -99,7 +99,7 @@ void publish_waypoints_vis() {
     nav_msgs::msg::Path wp_vis = waypoints;
     geometry_msgs::msg::PoseArray poseArray;
     poseArray.header.frame_id = std::string("world");
-    poseArray.header.stamp = rclcpp::Time::now();
+    poseArray.header.stamp = rclcpp::Clock().now();
 
     {
         geometry_msgs::msg::Pose init_pose;
@@ -112,7 +112,7 @@ void publish_waypoints_vis() {
         p = it->pose;
         poseArray.poses.push_back(p);
     }
-    pub2.publish(poseArray);
+    pub2->publish(poseArray);
 }
 
 void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg) {
@@ -125,7 +125,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg) {
             waypoints = waypointSegments.front();
 
             std::stringstream ss;
-            ss << bfmt("Series send %.3f from start:\n") % trigged_time.toSec();
+            ss << bfmt("Series send %.3f from start:\n") % trigged_time.seconds();
             for (auto& pose_stamped : waypoints.poses) {
                 ss << bfmt("P[%.2f, %.2f, %.2f] q(%.2f,%.2f,%.2f,%.2f)") %
                           pose_stamped.pose.position.x % pose_stamped.pose.position.y %
@@ -133,7 +133,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg) {
                           pose_stamped.pose.orientation.x % pose_stamped.pose.orientation.y %
                           pose_stamped.pose.orientation.z << std::endl;
             }
-            ROS_INFO_STREAM(ss.str());
+            RCLCPP_INFO_STREAM(ss.str());
 
             publish_waypoints_vis();
             publish_waypoints();
@@ -145,11 +145,11 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg) {
 
 void goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
 /*    if (!is_odom_ready) {
-        ROS_ERROR("[waypoint_generator] No odom!");
+        RCLCPP_ERROR("[waypoint_generator] No odom!");
         return;
     }*/
 
-    trigged_time = rclcpp::Time::now(); //odom.header.stamp;
+    trigged_time = rclcpp::Clock().now(); //odom.header.stamp;
     //ROS_ASSERT(trigged_time > rclcpp::Time(0));
 
     rclcpp::NodeHandle n("~");
@@ -178,7 +178,7 @@ void goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
             publish_waypoints_vis();
             publish_waypoints();
         } else {
-            ROS_WARN("[waypoint_generator] invalid goal in manual-lonely-waypoint mode.");
+            RCLCPP_WARN("[waypoint_generator] invalid goal in manual-lonely-waypoint mode.");
         }
     } else {
         if (msg->pose.position.z > 0) {
@@ -208,18 +208,18 @@ void goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
 
 void traj_start_trigger_callback(const geometry_msgs::msg::PoseStamped& msg) {
     if (!is_odom_ready) {
-        ROS_ERROR("[waypoint_generator] No odom!");
+        RCLCPP_ERROR("[waypoint_generator] No odom!");
         return;
     }
 
-    ROS_WARN("[waypoint_generator] Trigger!");
+    RCLCPP_WARN("[waypoint_generator] Trigger!");
     trigged_time = odom.header.stamp;
     ROS_ASSERT(trigged_time > rclcpp::Time(0));
 
     rclcpp::NodeHandle n("~");
     n.param("waypoint_type", waypoint_type, string("manual"));
 
-    ROS_ERROR_STREAM("Pattern " << waypoint_type << " generated!");
+    RCLCPP_ERROR_STREAM("Pattern " << waypoint_type << " generated!");
     if (waypoint_type == string("free")) {
         waypoints = point();
         publish_waypoints_vis();

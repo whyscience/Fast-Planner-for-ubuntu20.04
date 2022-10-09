@@ -28,13 +28,14 @@
 
 #include <Eigen/Eigen>
 #include <Eigen/StdVector>
-#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <iostream>
 #include <random>
-#include <nav_msgs/msg/odometry.hpp>
 #include <queue>
 #include "rclcpp/rclcpp.hpp"
 #include <tuple>
+
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <nav_msgs/msg/odometry.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <pcl/point_cloud.h>
@@ -48,6 +49,7 @@
 
 #include <plan_env/raycast.h>
 #include <opencv2/opencv.hpp>
+#include <cv_bridge/cv_bridge.h>
 
 #define logit(x) (log((x) / (1 - (x))))
 
@@ -166,8 +168,8 @@ struct MappingData {
 
 class SDFMap {
  public:
-  SDFMap() {}
-  ~SDFMap() {}
+  SDFMap() = default;
+  ~SDFMap() = default;
 
   enum { POSE_STAMPED = 1, ODOMETRY = 2, INVALID_IDX = -10000 };
 
@@ -203,7 +205,7 @@ class SDFMap {
   // max_pos);
 
   void updateESDF3d();
-  void getSliceESDF(const double height, const double res, const Eigen::Vector4d &range,
+  void getSliceESDF(double height, double res, const Eigen::Vector4d &range,
                     vector<Eigen::Vector3d> &slice, vector<Eigen::Vector3d> &grad,
                     int sign = 1);  // 1 pos, 2 neg, 3 combined
   void initMap(rclcpp::Node::SharedPtr &nh);
@@ -236,13 +238,13 @@ class SDFMap {
   void fillESDF(F_get_val f_get_val, F_set_val f_set_val, int start, int end, int dim);
 
   // get depth image and camera pose
-  void depthPoseCallback(const sensor_msgs::msg::Image::SharedPtr img,
+  void depthPoseCallback(sensor_msgs::msg::Image::SharedPtr img,
                          const geometry_msgs::msg::PoseStamped::ConstSharedPtr &pose);
-  void depthOdomCallback(const sensor_msgs::msg::Image::SharedPtr img, const nav_msgs::msg::Odometry::SharedPtr odom);
-  void depthCallback(const sensor_msgs::msg::Image::SharedPtr img);
-  void cloudCallback(const sensor_msgs::msg::PointCloud2::SharedPtr img);
-  void poseCallback(const geometry_msgs::msg::PoseStamped::ConstSharedPtr &pose);
-  void odomCallback(const nav_msgs::msg::Odometry::SharedPtr odom);
+  void depthOdomCallback(sensor_msgs::msg::Image::SharedPtr img, nav_msgs::msg::Odometry::SharedPtr odom);
+  void depthCallback(sensor_msgs::msg::Image::SharedPtr img);
+  void cloudCallback(sensor_msgs::msg::PointCloud2::SharedPtr img);
+  void poseCallback(geometry_msgs::msg::PoseStamped::SharedPtr pose);
+  void odomCallback(nav_msgs::msg::Odometry::SharedPtr odom);
 
   // update occupancy by raycasting, and update ESDF
   void updateOccupancyCallback();

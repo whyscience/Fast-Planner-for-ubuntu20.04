@@ -167,7 +167,7 @@ void image_pose_callback(
     const geometry_msgs::TransformStampedConstPtr &pose_input)
 {
   //time diff
-  double time_diff = fabs(image_input->header.stamp.toSec() - pose_input->header.stamp.toSec()) * 1000.0;
+  double time_diff = fabs(image_input->header.stamp.seconds() - pose_input->header.stamp.seconds()) * 1000.0;
   printf("time diff is %lf ms.\n", time_diff);
 
   //pose
@@ -189,7 +189,7 @@ void image_pose_callback(
   // Pose_receive(2,3) = request_position(2);
 
   //using ground truth
-  double image_time = image_input->header.stamp.toSec();
+  double image_time = image_input->header.stamp.seconds();
   double min_time_diff = 999.9;
   int min_time_index = 0;
   for(int i = 1; i < gt_pose_vect.size(); i++)
@@ -231,7 +231,7 @@ void render_currentpose()
 {
   solve_pnp();
 
-  double this_time = rclcpp::Time::now().toSec();
+  double this_time = rclcpp::Clock().now().seconds();
 
   Matrix4d cam_pose = cam2world.inverse();
 
@@ -248,14 +248,14 @@ void render_currentpose()
   		max = depth > max ? depth : max;
   		depth_mat.at<float>(i,j) = depth;
   	}
-  ROS_INFO("render cost %lf ms.", (rclcpp::Time::now().toSec() - this_time) * 1000.0f);
+  RCLCPP_INFO("render cost %lf ms.", (rclcpp::Clock().now().seconds() - this_time) * 1000.0f);
   printf("max_depth %lf.\n", max);
 
   cv_bridge::CvImage out_msg;
   out_msg.header.stamp = receive_stamp;
   out_msg.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
   out_msg.image = depth_mat.clone();
-  pub_depth.publish(out_msg.toImageMsg());
+  pub_depth->publish(out_msg.toImageMsg());
 
   cv::Mat adjMap;
   depth_mat.convertTo(adjMap,CV_8UC1, 255 / (max-min), -min);
@@ -268,7 +268,7 @@ void render_currentpose()
   cv_image_colored.header.frame_id = "depthmap";
   cv_image_colored.encoding = sensor_msgs::image_encodings::BGR8;
   cv_image_colored.image = falseColorsMap;
-  pub_color.publish(cv_image_colored.toImageMsg());
+  pub_color->publish(cv_image_colored.toImageMsg());
 
   cv::imshow("bluefox_image", bgr_image);
   cv::imshow("depth_image", adjMap);
@@ -355,7 +355,7 @@ int main(int argc, char **argv)
   message_filters::Subscriber<sensor_msgs::Image> image_sub(nh, "/cam0/image_raw", 30);
   message_filters::Subscriber<geometry_msgs::TransformStamped> pose_sub(nh, "/vicon/firefly_sbx/firefly_sbx", 30);
   message_filters::Synchronizer<approx_policy> sync2(approx_policy(100), image_sub, pose_sub);
-  sync2.registerCallback(boost::bind(image_pose_callback, _1, _2));
+  sync2.registerCallback(std::bind(image_pose_callback, _1, _2));
 
   //publisher depth image and color image
   pub_depth = nh.advertise<sensor_msgs::Image>("depth",1000);

@@ -187,7 +187,7 @@ double NonUniformBspline::checkRatio() {
   }
   double ratio = max(max_vel / limit_vel_, sqrt(fabs(max_acc) / limit_acc_));
   if (ratio > 2.0) printf("max vel: %lf, max acc: %lf.", max_vel, max_acc);
-  //ROS_ERROR_COND(ratio > 2.0, "max vel: %lf, max acc: %lf.", max_vel, max_acc);
+  //RCLCPP_ERROR_COND(ratio > 2.0, "max vel: %lf, max acc: %lf.", max_vel, max_acc);
 
   return ratio;
 }

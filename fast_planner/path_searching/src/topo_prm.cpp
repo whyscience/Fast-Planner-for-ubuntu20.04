@@ -66,44 +66,44 @@ void TopologyPRM::findTopoPaths(Eigen::Vector3d start, Eigen::Vector3d end,
 
   double graph_time, search_time, short_time, prune_time, select_time;
   /* ---------- create the topo graph ---------- */
-  t1 = rclcpp::Time::now();
+  t1 = rclcpp::Clock().now();
 
   start_pts_ = start_pts;
   end_pts_ = end_pts;
 
   graph = createGraph(start, end);
 
-  graph_time = (rclcpp::Time::now() - t1).toSec();
+  graph_time = (rclcpp::Clock().now() - t1).seconds();
 
   /* ---------- search paths in the graph ---------- */
-  t1 = rclcpp::Time::now();
+  t1 = rclcpp::Clock().now();
 
   raw_paths = searchPaths();
 
-  search_time = (rclcpp::Time::now() - t1).toSec();
+  search_time = (rclcpp::Clock().now() - t1).seconds();
 
   /* ---------- path shortening ---------- */
   // for parallel, save result in short_paths_
-  t1 = rclcpp::Time::now();
+  t1 = rclcpp::Clock().now();
 
   shortcutPaths();
 
-  short_time = (rclcpp::Time::now() - t1).toSec();
+  short_time = (rclcpp::Clock().now() - t1).seconds();
 
   /* ---------- prune equivalent paths ---------- */
-  t1 = rclcpp::Time::now();
+  t1 = rclcpp::Clock().now();
 
   filtered_paths = pruneEquivalent(short_paths_);
 
-  prune_time = (rclcpp::Time::now() - t1).toSec();
-  // cout << "prune: " << (t2 - t1).toSec() << endl;
+  prune_time = (rclcpp::Clock().now() - t1).seconds();
+  // cout << "prune: " << (t2 - t1).seconds() << endl;
 
   /* ---------- select N shortest paths ---------- */
-  t1 = rclcpp::Time::now();
+  t1 = rclcpp::Clock().now();
 
   select_paths = selectShortPaths(filtered_paths, 1);
 
-  select_time = (rclcpp::Time::now() - t1).toSec();
+  select_time = (rclcpp::Clock().now() - t1).seconds();
 
   final_paths_ = select_paths;
 
@@ -152,7 +152,7 @@ list<GraphNode::Ptr> TopologyPRM::createGraph(Eigen::Vector3d start, Eigen::Vect
   Eigen::Vector3d pt;
   rclcpp::Time t1, t2;
   while (sample_time < max_sample_time_ && sample_num < max_sample_num_) {
-    t1 = rclcpp::Time::now();
+    t1 = rclcpp::Clock().now();
 
     pt = getSample();
     ++sample_num;
@@ -161,7 +161,7 @@ list<GraphNode::Ptr> TopologyPRM::createGraph(Eigen::Vector3d start, Eigen::Vect
     // edt_environment_->evaluateEDTWithGrad(pt, -1.0, dist, grad);
     dist = edt_environment_->evaluateCoarseEDT(pt, -1.0);
     if (dist <= clearance_) {
-      sample_time += (rclcpp::Time::now() - t1).toSec();
+      sample_time += (rclcpp::Clock().now() - t1).seconds();
       continue;
     }
 
@@ -176,7 +176,7 @@ list<GraphNode::Ptr> TopologyPRM::createGraph(Eigen::Vector3d start, Eigen::Vect
       // sortVisibGuard(visib_guards);
       bool need_connect = needConnection(visib_guards[0], visib_guards[1], pt);
       if (!need_connect) {
-        sample_time += (rclcpp::Time::now() - t1).toSec();
+        sample_time += (rclcpp::Clock().now() - t1).seconds();
         continue;
       }
       // new useful connection needed, add new connector
@@ -191,7 +191,7 @@ list<GraphNode::Ptr> TopologyPRM::createGraph(Eigen::Vector3d start, Eigen::Vect
       connector->neighbors_.push_back(visib_guards[1]);
     }
 
-    sample_time += (rclcpp::Time::now() - t1).toSec();
+    sample_time += (rclcpp::Clock().now() - t1).seconds();
   }
 
   /* print record */
@@ -244,7 +244,7 @@ bool TopologyPRM::needConnection(GraphNode::Ptr g1, GraphNode::Ptr g2, Eigen::Ve
           // get shorter connection ?
           if (pathLength(path1) < pathLength(path2)) {
             g1->neighbors_[i]->pos_ = pt;
-            // ROS_WARN("shorter!");
+            // RCLCPP_WARN("shorter!");
           }
           return false;
         }
@@ -518,7 +518,7 @@ void TopologyPRM::shortcutPath(vector<Eigen::Vector3d> path, int path_id, int it
     double len1 = pathLength(last_path);
     double len2 = pathLength(short_path);
     if (len2 > len1) {
-      // ROS_WARN("pause shortcut, l1: %lf, l2: %lf, iter: %d", len1, len2, k +
+      // RCLCPP_WARN("pause shortcut, l1: %lf, l2: %lf, iter: %d", len1, len2, k +
       // 1);
       short_path = last_path;
       break;
@@ -563,7 +563,7 @@ vector<Eigen::Vector3d> TopologyPRM::discretizePath(vector<Eigen::Vector3d> path
   vector<Eigen::Vector3d> dis_path, segment;
 
   if (path.size() < 2) {
-    ROS_ERROR("what path? ");
+    RCLCPP_ERROR("what path? ");
     return dis_path;
   }
 

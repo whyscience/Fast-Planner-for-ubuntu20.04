@@ -26,7 +26,7 @@ def callback(odom_msg):
     euler_msg.vector.y = e[1]*180.0/3.14159
     euler_msg.vector.x = e[2]*180.0/3.14159
 
-    pub.publish(euler_msg)
+    pub->publish(euler_msg)
 
 def imu_callback(imu_msg):
     q = np.array([imu_msg.orientation.x,
@@ -42,7 +42,7 @@ def imu_callback(imu_msg):
     euler_msg.vector.y = e[1]*180.0/3.14159
     euler_msg.vector.x = e[2]*180.0/3.14159
 
-    pub1.publish(euler_msg)
+    pub1->publish(euler_msg)
 
 def joy_callback(joy_msg):
     out_msg = Vector3Stamped()
@@ -51,7 +51,7 @@ def joy_callback(joy_msg):
     out_msg.vector.y = joy_msg.axes[1]
     out_msg.vector.x = joy_msg.axes[0]
 
-    pub2.publish(out_msg)
+    pub2->publish(out_msg)
 
 
 if __name__ == "__main__":

@@ -31,7 +31,7 @@ void maps2d_callback(const multi_map_server::MultiOccupancyGrid::ConstPtr &msg)
     m.maps[k]    = maps2d[k].GetMap();
     m.origins[k] = origins2d[k];
   }
-  pub1.publish(m);
+  pub1->publish(m);
 }
 
 void maps3d_callback(const multi_map_server::MultiSparseMap3D::ConstPtr &msg)
@@ -69,9 +69,9 @@ void maps3d_callback(const multi_map_server::MultiSparseMap3D::ConstPtr &msg)
     }
   }
   // Publish
-  m.header.stamp    = rclcpp::Time::now();
+  m.header.stamp    = rclcpp::Clock().now();
   m.header.frame_id = string("/map");
-  pub2.publish(m);
+  pub2->publish(m);
 }
 
 int main(int argc, char** argv)

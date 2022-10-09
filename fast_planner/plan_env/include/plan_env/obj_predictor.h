@@ -105,7 +105,7 @@ class ObjHistory {
 
   void init(int id);
 
-  void poseCallback(const geometry_msgs::msg::PoseStamped::ConstSharedPtr msg);
+  void poseCallback(geometry_msgs::msg::PoseStamped::SharedPtr msg);
 
   void clear() {
     history_.clear();

@@ -193,7 +193,7 @@ void MultiProbMapDisplay::update( float wall_dt, float ros_dt )
     int   height     = current_map_->maps[k].info.height;    
     
     // Load pixel
-    //t[0] = rclcpp::Time::now();
+    //t[0] = rclcpp::Clock().now();
     unsigned int pixels_size = width * height;
     unsigned char* pixels = new unsigned char[pixels_size];
     memset(pixels, 255, pixels_size);
@@ -219,21 +219,21 @@ void MultiProbMapDisplay::update( float wall_dt, float ros_dt )
     memcpy(pixels, &current_map_->maps[k].data[0], pixels_size);
 */
     // Set texture
-    //t[1] = rclcpp::Time::now();
+    //t[1] = rclcpp::Clock().now();
     Ogre::DataStreamPtr pixel_stream;
     pixel_stream.bind( new Ogre::MemoryDataStream( pixels, pixels_size ));
     static int tex_count = 0;
     std::stringstream ss1;
     ss1 << "MultiMapTexture" << tex_count++;
     Ogre::TexturePtr _texture_;
-    //t[2] = rclcpp::Time::now();
+    //t[2] = rclcpp::Clock().now();
     _texture_ = Ogre::TextureManager::getSingleton().loadRawData( ss1.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                                   pixel_stream, width, height, Ogre::PF_L8, Ogre::TEX_TYPE_2D, 0);   
-    //t[3] = rclcpp::Time::now();
+    //t[3] = rclcpp::Clock().now();
     texture_.push_back(_texture_);                                                
     delete [] pixels;     
     setStatus( StatusProperty::Ok, "Map", "Map OK" );      
-    //t[4] = rclcpp::Time::now();
+    //t[4] = rclcpp::Clock().now();
     
     // Set material
     static int material_count = 0;
@@ -336,11 +336,11 @@ void MultiProbMapDisplay::update( float wall_dt, float ros_dt )
       manual_object_.back()->setRenderQueueGroup(Ogre::RENDER_QUEUE_4);  
       
     //for (int i = 0; i < 4; i++)
-    //  dt[i] += (t[i+1] - t[i]).toSec();
+    //  dt[i] += (t[i+1] - t[i]).seconds();
   }
   loaded_ = true;  
   context_->queueRender(); 
-  //ROS_ERROR("RVIZ MAP:  %f %f %f %f", dt[0],dt[1],dt[2],dt[3]);
+  //RCLCPP_ERROR("RVIZ MAP:  %f %f %f %f", dt[0],dt[1],dt[2],dt[3]);
 }
 
 // ***********************************************************************************************************************************

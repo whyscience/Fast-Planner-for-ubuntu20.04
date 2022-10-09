@@ -21,16 +21,17 @@
 * along with Fast-Planner. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <visualization_msgs/msg/marker.hpp>
 #include "rclcpp/rclcpp.hpp"
 
+#include <visualization_msgs/msg/marker.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <random>
 #include <sensor_msgs/msg/point_cloud2.hpp>
+#include <random>
 #include <string>
 
 #include <plan_env/linear_obj_model.hpp>
@@ -39,8 +40,8 @@ using namespace std;
 int obj_num;
 double _xy_size, _h_size, _vel, _yaw_dot, _acc_r1, _acc_r2, _acc_z, _scale1, _scale2, _interval;
 
-rclcpp::Publisher obj_pub;            // visualize marker
-vector<rclcpp::Publisher> pose_pubs;  // obj pose (from optitrack)
+rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr obj_pub;            // visualize marker
+vector<rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr> pose_pubs;  // obj pose (from optitrack)
 vector<LinearObjModel> obj_models;
 
 random_device rd;
@@ -62,32 +63,47 @@ void updateCallback();
 void visualizeObj(int id);
 
 int main(int argc, char **argv) {
-  rclcpp::init(argc, argv, "dynamic_obj");
-  rclcpp::Node::SharedPtr node("~");
+  rclcpp::init(argc, argv);
+  auto node = rclcpp::Node::make_shared("dynamic_obj");
 
   /* ---------- initialize ---------- */
-  node.param("obj_generator/obj_num", obj_num, 10);
-  node.param("obj_generator/xy_size", _xy_size, 15.0);
-  node.param("obj_generator/h_size", _h_size, 5.0);
-  node.param("obj_generator/vel", _vel, 5.0);
-  node.param("obj_generator/yaw_dot", _yaw_dot, 5.0);
-  node.param("obj_generator/acc_r1", _acc_r1, 4.0);
-  node.param("obj_generator/acc_r2", _acc_r2, 6.0);
-  node.param("obj_generator/acc_z", _acc_z, 3.0);
-  node.param("obj_generator/scale1", _scale1, 1.5);
-  node.param("obj_generator/scale2", _scale2, 2.5);
-  node.param("obj_generator/interval", _interval, 2.5);
+  //https://blog.csdn.net/qq_45701501/article/details/118611735
+  node->declare_parameter<int>("obj_generator/obj_num", 10);
+  node->declare_parameter<double>("obj_generator/xy_size", 15.0);
+  node->declare_parameter<double>("obj_generator/h_size", 5.0);
+  node->declare_parameter<double>("obj_generator/vel", 5.0);
+  node->declare_parameter<double>("obj_generator/yaw_dot", 5.0);
+  node->declare_parameter<double>("obj_generator/acc_r1", 4.0);
+  node->declare_parameter<double>("obj_generator/acc_r2", 6.0);
+  node->declare_parameter<double>("obj_generator/acc_z", 3.0);
+  node->declare_parameter<double>("obj_generator/scale1", 1.5);
+  node->declare_parameter<double>("obj_generator/scale2", 2.5);
+  node->declare_parameter<double>("obj_generator/interval", 2.5);
 
-  obj_pub = node.advertise<visualization_msgs::Marker>("/dynamic/obj", 10);
+  node->get_parameter("obj_generator/obj_num", obj_num);
+  node->get_parameter("obj_generator/xy_size", _xy_size);
+  node->get_parameter("obj_generator/h_size", _h_size);
+  node->get_parameter("obj_generator/vel", _vel);
+  node->get_parameter("obj_generator/yaw_dot", _yaw_dot);
+  node->get_parameter("obj_generator/acc_r1", _acc_r1);
+  node->get_parameter("obj_generator/acc_r2", _acc_r2);
+  node->get_parameter("obj_generator/acc_z", _acc_z);
+  node->get_parameter("obj_generator/scale1", _scale1);
+  node->get_parameter("obj_generator/scale2", _scale2);
+  node->get_parameter("obj_generator/interval", _interval);
+
+  obj_pub = node->create_publisher<visualization_msgs::msg::Marker>("/dynamic/obj", 10);
   for (int i = 0; i < obj_num; ++i) {
-    rclcpp::Publisher pose_pub =
-        node.advertise<geometry_msgs::msg::PoseStamped>("/dynamic/pose_" + to_string(i), 10);
+    auto pose_pub = node->create_publisher<geometry_msgs::msg::PoseStamped>("/dynamic/pose_" + to_string(i), 10);
     pose_pubs.push_back(pose_pub);
   }
 
-  rclcpp::TimerBase::SharedPtr update_timer = node.createTimer(rclcpp::Duration(1 / 30.0), updateCallback);
+  //https://roboticsbackend.com/write-minimal-ros2-cpp-node/
+  auto update_timer = node->create_wall_timer(std::chrono::milliseconds(1000 / 3), updateCallback);
   cout << "[dynamic]: initialize with " + to_string(obj_num) << " moving obj." << endl;
-  rclcpp::Duration(1.0).sleep();
+  //https://www.reddit.com/r/ROS/comments/hzmlhw/error_with_using_sleep_with_the_duration_client/
+  rclcpp::Rate sleepRate(1.0);
+  sleepRate.sleep();
 
   rand_color = uniform_real_distribution<double>(0.0, 1.0);
   rand_pos = uniform_real_distribution<double>(-_xy_size, _xy_size);
@@ -122,20 +138,21 @@ int main(int argc, char **argv) {
     obj_models.push_back(model);
   }
 
-  time_update = rclcpp::Time::now();
-  time_change = rclcpp::Time::now();
+  //https://github.com/ros-controls/ros2_controllers/commit/e3f57ed938c9e17643e54a2c58026529bc481561
+  time_update = rclcpp::Clock().now();
+  time_change = rclcpp::Clock().now();
 
   /* ---------- start loop ---------- */
-  rclcpp::spin();
+  rclcpp::spin(node);
 
   return 0;
 }
 
 void updateCallback() {
-  rclcpp::Time time_now = rclcpp::Time::now();
+  rclcpp::Time time_now = rclcpp::Clock().now();
 
   /* ---------- change input ---------- */
-  double dtc = (time_now - time_change).toSec();
+  double dtc = (time_now - time_change).seconds();
   if (dtc > _interval) {
     for (int i = 0; i < obj_num; ++i) {
       /* ---------- use acc input ---------- */
@@ -160,7 +177,7 @@ void updateCallback() {
   }
 
   /* ---------- update obj state ---------- */
-  double dt = (time_now - time_update).toSec();
+  double dt = (time_now - time_update).seconds();
   time_update = time_now;
   for (int i = 0; i < obj_num; ++i) {
     obj_models[i].update(dt);
@@ -194,11 +211,12 @@ void visualizeObj(int id) {
   qua = rot;
 
   /* ---------- rviz ---------- */
-  visualization_msgs::Marker mk;
+  visualization_msgs::msg::Marker mk;
   mk.header.frame_id = "world";
-  mk.header.stamp = rclcpp::Time::now();
-  mk.type = visualization_msgs::Marker::CUBE;
-  mk.action = visualization_msgs::Marker::ADD;
+  //  msg.header.stamp = this->now(); //todo eric replace allwith this
+  mk.header.stamp = rclcpp::Clock().now();
+  mk.type = visualization_msgs::msg::Marker::CUBE;
+  mk.action = visualization_msgs::msg::Marker::ADD;
   mk.id = id;
 
   mk.scale.x = scale(0), mk.scale.y = scale(1), mk.scale.z = scale(2);
@@ -211,13 +229,13 @@ void visualizeObj(int id) {
 
   mk.pose.position.x = pos(0), mk.pose.position.y = pos(1), mk.pose.position.z = pos(2);
 
-  obj_pub.publish(mk);
+  obj_pub->publish(mk);
 
   /* ---------- pose ---------- */
   geometry_msgs::msg::PoseStamped pose;
   pose.header.frame_id = "world";
-  pose.header.seq = id;
+  //pose.header.seq = id;
   pose.pose.position.x = pos(0), pose.pose.position.y = pos(1), pose.pose.position.z = pos(2);
   pose.pose.orientation.w = 1.0;
-  pose_pubs[id].publish(pose);
+  pose_pubs[id]->publish(pose);
 }

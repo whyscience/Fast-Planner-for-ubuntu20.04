@@ -360,9 +360,9 @@ public:
   void PackMsg(multi_map_server::SparseMap3D &msg)
   {
     // Basic map info
-    msg.header.stamp            = rclcpp::Time::now();
+    msg.header.stamp            = rclcpp::Clock().now();
     msg.header.frame_id         = string("/map");
-    msg.info.map_load_time      = rclcpp::Time::now();
+    msg.info.map_load_time      = rclcpp::Clock().now();
     msg.info.resolution         = resolution;
     msg.info.origin.position.x  = originX;
     msg.info.origin.position.y  = originY;
@@ -569,9 +569,9 @@ private:
     if (decayInterval < 0)
       return;
     // Check whether to decay
-    static rclcpp::Time prevDecayT = rclcpp::Time::now();
-    rclcpp::Time t = rclcpp::Time::now();
-    double dt = (t - prevDecayT).toSec();
+    static rclcpp::Time prevDecayT = rclcpp::Clock().now();
+    rclcpp::Time t = rclcpp::Clock().now();
+    double dt = (t - prevDecayT).seconds();
     if (dt > decayInterval)
     {
       double r = pow(LOG_ODD_DECAY_RATE, dt);

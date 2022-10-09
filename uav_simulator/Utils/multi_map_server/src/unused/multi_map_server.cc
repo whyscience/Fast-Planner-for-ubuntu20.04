@@ -51,7 +51,7 @@ void map2d_callback(const nav_msgs::OccupancyGrid::ConstPtr &msg)
   {
     grids2d.maps.back() = *msg;
   }
-  pub1.publish(grids2d);
+  pub1->publish(grids2d);
   // Update internval map
   maps2d[maps2dCnt-1].update(*msg);
 }
@@ -180,10 +180,10 @@ int main(int argc, char **argv)
         msg.maps_active.push_back((bool)(!mapLinks[k](0)) && mapLinks[k](2) > 50);
         map_server_3d_new::SparseMap3D m;
         maps3d[k].GetSparseMap3DMsg(m);
-        m.header.seq = k;
+        //m.header.seq = k;
         msg.maps.push_back(m);
       }
-      pub2.publish(msg);
+      pub2->publish(msg);
     }
     rclcpp::spinOnce();
     r.sleep();

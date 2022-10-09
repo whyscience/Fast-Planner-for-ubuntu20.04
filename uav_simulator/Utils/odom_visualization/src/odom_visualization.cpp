@@ -38,12 +38,12 @@ rclcpp::Publisher heightPub;
 tf::TransformBroadcaster* broadcaster;
 geometry_msgs::msg::PoseStamped poseROS;
 nav_msgs::msg::Path             pathROS;
-visualization_msgs::Marker velROS;
-visualization_msgs::Marker covROS;
-visualization_msgs::Marker covVelROS;
-visualization_msgs::Marker trajROS;
-visualization_msgs::Marker sensorROS;
-visualization_msgs::Marker meshROS;
+visualization_msgs::msg::Marker velROS;
+visualization_msgs::msg::Marker covROS;
+visualization_msgs::msg::Marker covVelROS;
+visualization_msgs::msg::Marker trajROS;
+visualization_msgs::msg::Marker sensorROS;
+visualization_msgs::msg::Marker meshROS;
 sensor_msgs::Range         heightROS;
 string _frame_id;
 
@@ -90,7 +90,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
   poseROS.pose.orientation.x = q(1);
   poseROS.pose.orientation.y = q(2);
   poseROS.pose.orientation.z = q(3);      
-  posePub.publish(poseROS);
+  posePub->publish(poseROS);
   
   // Velocity
   colvec yprVel(3);
@@ -102,8 +102,8 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
   velROS.header.stamp = msg->header.stamp;
   velROS.ns = string("velocity");
   velROS.id = 0;
-  velROS.type = visualization_msgs::Marker::ARROW;
-  velROS.action = visualization_msgs::Marker::ADD;
+  velROS.type = visualization_msgs::msg::Marker::ARROW;
+  velROS.action = visualization_msgs::msg::Marker::ADD;
   velROS.pose.position.x = pose(0);
   velROS.pose.position.y = pose(1);
   velROS.pose.position.z = pose(2);
@@ -118,16 +118,16 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
   velROS.color.r = color_r;
   velROS.color.g = color_g;
   velROS.color.b = color_b;
-  velPub.publish(velROS);
+  velPub->publish(velROS);
 
   // Path
   static rclcpp::Time prevt = msg->header.stamp;
-  if ((msg->header.stamp - prevt).toSec() > 0.1)
+  if ((msg->header.stamp - prevt).seconds() > 0.1)
   {
     prevt = msg->header.stamp;
     pathROS.header = poseROS.header;
     pathROS.poses.push_back(poseROS);
-    pathPub.publish(pathROS);
+    pathPub->publish(pathROS);
   }
 
   // Covariance color
@@ -171,8 +171,8 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
     covROS.header.stamp = msg->header.stamp;
     covROS.ns = string("covariance");
     covROS.id = 0;
-    covROS.type = visualization_msgs::Marker::SPHERE;
-    covROS.action = visualization_msgs::Marker::ADD;
+    covROS.type = visualization_msgs::msg::Marker::SPHERE;
+    covROS.action = visualization_msgs::msg::Marker::ADD;
     covROS.pose.position.x = pose(0);
     covROS.pose.position.y = pose(1);
     covROS.pose.position.z = pose(2);
@@ -188,7 +188,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
     covROS.color.r = r * 0.5;
     covROS.color.g = g * 0.5;
     covROS.color.b = b * 0.5;
-    covPub.publish(covROS);
+    covPub->publish(covROS);
   }
 
   // Covariance Velocity
@@ -220,8 +220,8 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
     covVelROS.header.stamp = msg->header.stamp;
     covVelROS.ns = string("covariance_velocity");
     covVelROS.id = 0;
-    covVelROS.type = visualization_msgs::Marker::SPHERE;
-    covVelROS.action = visualization_msgs::Marker::ADD;
+    covVelROS.type = visualization_msgs::msg::Marker::SPHERE;
+    covVelROS.action = visualization_msgs::msg::Marker::ADD;
     covVelROS.pose.position.x = pose(0);
     covVelROS.pose.position.y = pose(1);
     covVelROS.pose.position.z = pose(2);
@@ -237,20 +237,20 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
     covVelROS.color.r = r;
     covVelROS.color.g = g;
     covVelROS.color.b = b;
-    covVelPub.publish(covVelROS);
+    covVelPub->publish(covVelROS);
   }
 
   // Color Coded Trajectory
   static colvec ppose = pose;
   static rclcpp::Time pt = msg->header.stamp;
   rclcpp::Time t = msg->header.stamp;
-  if ((t - pt).toSec() > 0.5)
+  if ((t - pt).seconds() > 0.5)
   {
     trajROS.header.frame_id = string("world");
-    trajROS.header.stamp    = rclcpp::Time::now();
+    trajROS.header.stamp    = rclcpp::Clock().now();
     trajROS.ns              = string("trajectory");
-    trajROS.type            = visualization_msgs::Marker::LINE_LIST;
-    trajROS.action          = visualization_msgs::Marker::ADD;  
+    trajROS.type            = visualization_msgs::msg::Marker::LINE_LIST;
+    trajROS.action          = visualization_msgs::msg::Marker::ADD;
     trajROS.pose.position.x    = 0;
     trajROS.pose.position.y    = 0;
     trajROS.pose.position.z    = 0;  
@@ -283,15 +283,15 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
     trajROS.colors.push_back(color);
     ppose = pose;
     pt = t;
-    trajPub.publish(trajROS);
+    trajPub->publish(trajROS);
   }
 
   // Sensor availability
   sensorROS.header.frame_id = string("world");
   sensorROS.header.stamp    = msg->header.stamp;
   sensorROS.ns              = string("sensor");
-  sensorROS.type            = visualization_msgs::Marker::TEXT_VIEW_FACING;
-  sensorROS.action          = visualization_msgs::Marker::ADD;  
+  sensorROS.type            = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+  sensorROS.action          = visualization_msgs::msg::Marker::ADD;
   sensorROS.pose.position.x = pose(0);
   sensorROS.pose.position.y = pose(1);
   sensorROS.pose.position.z = pose(2) + 1.0;
@@ -308,7 +308,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
   sensorROS.color.g = 1.0;
   sensorROS.color.b = 1.0;
   sensorROS.scale.z = 0.5;
-  sensorPub.publish(sensorROS);
+  sensorPub->publish(sensorROS);
 
   // Laser height measurement
   double H = msg->twist.covariance[32];
@@ -319,15 +319,15 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
   heightROS.min_range = -100;
   heightROS.max_range =  100;
   heightROS.range     =  H; 
-  heightPub.publish(heightROS);
+  heightPub->publish(heightROS);
 
   // Mesh model                                                  
   meshROS.header.frame_id = _frame_id;
   meshROS.header.stamp = msg->header.stamp; 
   meshROS.ns = "mesh";
   meshROS.id = 0;
-  meshROS.type = visualization_msgs::Marker::MESH_RESOURCE;
-  meshROS.action = visualization_msgs::Marker::ADD;
+  meshROS.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
+  meshROS.action = visualization_msgs::msg::Marker::ADD;
   meshROS.pose.position.x = msg->pose.pose.position.x;
   meshROS.pose.position.y = msg->pose.pose.position.y;
   meshROS.pose.position.z = msg->pose.pose.position.z;
@@ -353,7 +353,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
   meshROS.color.g = color_g;
   meshROS.color.b = color_b;
   meshROS.mesh_resource = mesh_resource;
-  meshPub.publish(meshROS);                                                  
+  meshPub->publish(meshROS);
 
   // TF for raw sensor visualization
   if (tf45)
@@ -404,8 +404,8 @@ void cmd_callback(const quadrotor_msgs::PositionCommand cmd)
   meshROS.header.stamp = cmd.header.stamp; 
   meshROS.ns = "mesh";
   meshROS.id = 0;
-  meshROS.type = visualization_msgs::Marker::MESH_RESOURCE;
-  meshROS.action = visualization_msgs::Marker::ADD;
+  meshROS.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
+  meshROS.action = visualization_msgs::msg::Marker::ADD;
   meshROS.pose.position.x = cmd.position.x;
   meshROS.pose.position.y = cmd.position.y;
   meshROS.pose.position.z = cmd.position.z;
@@ -428,7 +428,7 @@ void cmd_callback(const quadrotor_msgs::PositionCommand cmd)
   meshROS.color.g = color_g;
   meshROS.color.b = color_b;
   meshROS.mesh_resource = mesh_resource;
-  meshPub.publish(meshROS);                                                  
+  meshPub->publish(meshROS);
 }
 
 int main(int argc, char** argv)
@@ -456,12 +456,12 @@ int main(int argc, char** argv)
   rclcpp::Subscriber sub_cmd  = n.subscribe("cmd",  100,  cmd_callback);
   posePub   = n.advertise<geometry_msgs::msg::PoseStamped>("pose",                100, true);
   pathPub   = n.advertise<nav_msgs::msg::Path>(            "path",                100, true);
-  velPub    = n.advertise<visualization_msgs::Marker>("velocity",            100, true);
-  covPub    = n.advertise<visualization_msgs::Marker>("covariance",          100, true);
-  covVelPub = n.advertise<visualization_msgs::Marker>("covariance_velocity", 100, true);
-  trajPub   = n.advertise<visualization_msgs::Marker>("trajectory",          100, true);
-  sensorPub = n.advertise<visualization_msgs::Marker>("sensor",              100, true);
-  meshPub   = n.advertise<visualization_msgs::Marker>("robot",               100, true);  
+  velPub    = n.advertise<visualization_msgs::msg::Marker>("velocity",            100, true);
+  covPub    = n.advertise<visualization_msgs::msg::Marker>("covariance",          100, true);
+  covVelPub = n.advertise<visualization_msgs::msg::Marker>("covariance_velocity", 100, true);
+  trajPub   = n.advertise<visualization_msgs::msg::Marker>("trajectory",          100, true);
+  sensorPub = n.advertise<visualization_msgs::msg::Marker>("sensor",              100, true);
+  meshPub   = n.advertise<visualization_msgs::msg::Marker>("robot",               100, true);
   heightPub = n.advertise<sensor_msgs::Range>(        "height",              100, true);  
   tf::TransformBroadcaster b;
   broadcaster = &b;

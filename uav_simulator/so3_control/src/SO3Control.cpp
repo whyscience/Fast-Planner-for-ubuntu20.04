@@ -42,7 +42,7 @@ SO3Control::calculateControl(const Eigen::Vector3d& des_pos,
                              const Eigen::Vector3d& kx,
                              const Eigen::Vector3d& kv)
 {
-  //  ROS_INFO("Error %lf %lf %lf", (des_pos - pos_).norm(),
+  //  RCLCPP_INFO("Error %lf %lf %lf", (des_pos - pos_).norm(),
   //           (des_vel - vel_).norm(), (des_acc - acc_).norm());
 
   Eigen::Vector3d totalError =

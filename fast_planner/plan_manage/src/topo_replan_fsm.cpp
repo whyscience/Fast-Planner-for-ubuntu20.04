@@ -191,7 +191,7 @@ void TopoReplanFSM::execFSMCallback( ) {
       start_yaw_(0)         = atan2(rot_x(1), rot_x(0));
       start_yaw_(1) = start_yaw_(2) = 0.0;
 
-      new_pub_.publish(std_msgs::Empty());
+      new_pub_->publish(std_msgs::Empty());
       /* topo path finding and optimization */
       bool success = callTopologicalTraj(1);
       if (success) {
@@ -206,8 +206,8 @@ void TopoReplanFSM::execFSMCallback( ) {
       /* determine if need to replan */
 
       GlobalTrajData* global_data = &planner_manager_->global_data_;
-      rclcpp::Time       time_now    = rclcpp::Time::now();
-      double          t_cur       = (time_now - global_data->global_start_time_).toSec();
+      rclcpp::Time       time_now    = rclcpp::Clock().now();
+      double          t_cur       = (time_now - global_data->global_start_time_).seconds();
 
       if (t_cur > global_data->global_duration_ - 1e-2) {
         have_target_ = false;
@@ -217,7 +217,7 @@ void TopoReplanFSM::execFSMCallback( ) {
       } else {
         LocalTrajData*  info      = &planner_manager_->local_data_;
         Eigen::Vector3d start_pos = info->start_pos_;
-        t_cur                     = (time_now - info->start_time_).toSec();
+        t_cur                     = (time_now - info->start_time_).seconds();
 
         if (t_cur > replan_time_threshold_) {
 
@@ -237,8 +237,8 @@ void TopoReplanFSM::execFSMCallback( ) {
 
     case REPLAN_TRAJ: {
       LocalTrajData* info     = &planner_manager_->local_data_;
-      rclcpp::Time      time_now = rclcpp::Time::now();
-      double         t_cur    = (time_now - info->start_time_).toSec();
+      rclcpp::Time      time_now = rclcpp::Clock().now();
+      double         t_cur    = (time_now - info->start_time_).seconds();
 
       start_pt_  = info->position_traj_.evaluateDeBoorT(t_cur);
       start_vel_ = info->velocity_traj_.evaluateDeBoorT(t_cur);
@@ -252,22 +252,22 @@ void TopoReplanFSM::execFSMCallback( ) {
       if (success) {
         changeFSMExecState(EXEC_TRAJ, "FSM");
       } else {
-        ROS_WARN("Replan fail, retrying...");
+        RCLCPP_WARN("Replan fail, retrying...");
       }
 
       break;
     }
     case REPLAN_NEW: {
       LocalTrajData* info     = &planner_manager_->local_data_;
-      rclcpp::Time      time_now = rclcpp::Time::now();
-      double         t_cur    = (time_now - info->start_time_).toSec();
+      rclcpp::Time      time_now = rclcpp::Clock().now();
+      double         t_cur    = (time_now - info->start_time_).seconds();
 
       start_pt_  = info->position_traj_.evaluateDeBoorT(t_cur);
       start_vel_ = info->velocity_traj_.evaluateDeBoorT(t_cur);
       start_acc_ = info->acceleration_traj_.evaluateDeBoorT(t_cur);
 
       /* inform server */
-      new_pub_.publish(std_msgs::Empty());
+      new_pub_->publish(std_msgs::Empty());
 
       // bool success = callSearchAndOptimization();
       bool success = callTopologicalTraj(1);
@@ -354,12 +354,12 @@ void TopoReplanFSM::checkCollisionCallback( ) {
     bool   safe = planner_manager_->checkTrajCollision(dist);
     if (!safe) {
       if (dist > 0.5) {
-        ROS_WARN("current traj %lf m to collision", dist);
+        RCLCPP_WARN("current traj %lf m to collision", dist);
         collide_ = true;
         changeFSMExecState(REPLAN_TRAJ, "SAFETY");
       } else {
-        ROS_ERROR("current traj %lf m to collision, emergency stop!", dist);
-        replan_pub_.publish(std_msgs::Empty());
+        RCLCPP_ERROR("current traj %lf m to collision, emergency stop!", dist);
+        replan_pub_->publish(std_msgs::Empty());
         have_target_ = false;
         changeFSMExecState(WAIT_TARGET, "SAFETY");
       }
@@ -416,7 +416,7 @@ bool TopoReplanFSM::callTopologicalTraj(int step) {
     }
     bspline.yaw_dt = locdat->yaw_traj_.getInterval();
 
-    bspline_pub_.publish(bspline);
+    bspline_pub_->publish(bspline);
 
     /* visualize new trajectories */
 
