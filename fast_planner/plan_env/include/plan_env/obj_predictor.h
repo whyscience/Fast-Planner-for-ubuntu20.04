@@ -105,7 +105,7 @@ class ObjHistory {
 
   void init(int id);
 
-  void poseCallback(const geometry_msgs::msg::PoseStamped::ConstSharedPtr &msg);
+  void poseCallback(const geometry_msgs::msg::PoseStamped::ConstSharedPtr msg);
 
   void clear() {
     history_.clear();
@@ -123,7 +123,7 @@ class ObjHistory {
 };
 
 /* ========== predict future trajectory using history ========== */
-class ObjPredictor {
+class ObjPredictor{
  private:
   rclcpp::Node::SharedPtr node_handle_;
 
@@ -131,9 +131,9 @@ class ObjPredictor {
   double lambda_;
   double predict_rate_;
 
-  vector<rclcpp::Subscriber> pose_subs_;
-  rclcpp::Subscriber marker_sub_;
-  rclcpp::Timer predict_timer_;
+  vector<rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr> pose_subs_;
+  rclcpp::Subscription<visualization_msgs::msg::Marker>::SharedPtr marker_sub_;
+  rclcpp::TimerBase::SharedPtr predict_timer_;
   vector<shared_ptr<ObjHistory>> obj_histories_;
 
   /* share data with planner */
@@ -141,14 +141,14 @@ class ObjPredictor {
   ObjScale obj_scale_;
   vector<bool> scale_init_;
 
-  void markerCallback(const visualization_msgs::msg::Marker::ConstSharedPtr &msg);
+  void markerCallback(const visualization_msgs::msg::Marker::SharedPtr pose);
 
   void predictCallback();
   void predictPolyFit();
   void predictConstVel();
 
  public:
-  ObjPredictor(/* args */);
+  //ObjPredictor(rclcpp::NodeOptions options);
   ObjPredictor(rclcpp::Node::SharedPtr &node);
   ~ObjPredictor();
 

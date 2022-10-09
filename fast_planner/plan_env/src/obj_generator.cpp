@@ -81,11 +81,11 @@ int main(int argc, char **argv) {
   obj_pub = node.advertise<visualization_msgs::Marker>("/dynamic/obj", 10);
   for (int i = 0; i < obj_num; ++i) {
     rclcpp::Publisher pose_pub =
-        node.advertise<geometry_msgs::PoseStamped>("/dynamic/pose_" + to_string(i), 10);
+        node.advertise<geometry_msgs::msg::PoseStamped>("/dynamic/pose_" + to_string(i), 10);
     pose_pubs.push_back(pose_pub);
   }
 
-  rclcpp::Timer update_timer = node.createTimer(rclcpp::Duration(1 / 30.0), updateCallback);
+  rclcpp::TimerBase::SharedPtr update_timer = node.createTimer(rclcpp::Duration(1 / 30.0), updateCallback);
   cout << "[dynamic]: initialize with " + to_string(obj_num) << " moving obj." << endl;
   rclcpp::Duration(1.0).sleep();
 
@@ -214,7 +214,7 @@ void visualizeObj(int id) {
   obj_pub.publish(mk);
 
   /* ---------- pose ---------- */
-  geometry_msgs::PoseStamped pose;
+  geometry_msgs::msg::PoseStamped pose;
   pose.header.frame_id = "world";
   pose.header.seq = id;
   pose.pose.position.x = pos(0), pose.pose.position.y = pos(1), pose.pose.position.z = pos(2);

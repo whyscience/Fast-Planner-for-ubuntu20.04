@@ -29,7 +29,7 @@
 #include <Eigen/Eigen>
 #include <algorithm>
 #include <iostream>
-#include <nav_msgs/Path.h>
+#include <nav_msgs/msg/Path.hpp>
 #include "rclcpp/rclcpp.hpp"
 #include <std_msgs/msg/empty.hpp>
 #include <vector>
@@ -114,7 +114,7 @@ private:
   void execFSMCallback(const ros::TimerEvent& e);
   void checkCollisionCallback(const ros::TimerEvent& e);
   void waypointCallback(const nav_msgs::PathConstPtr& msg);
-  void odometryCallback(const nav_msgs::OdometryConstPtr& msg);
+  void odometryCallback(const nav_msgs::msg::OdometryConstPtr& msg);
 
 public:
   KinoReplanFSM(/* args */) {

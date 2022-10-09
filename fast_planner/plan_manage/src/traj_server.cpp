@@ -33,7 +33,7 @@
 
 ros::Publisher cmd_vis_pub, pos_cmd_pub, traj_pub;
 
-nav_msgs::Odometry odom;
+nav_msgs::msg::Odometry odom;
 
 quadrotor_msgs::PositionCommand cmd;
 // double pos_gain[3] = {5.7, 5.7, 6.2};
@@ -181,7 +181,7 @@ void newCallback(std_msgs::Empty msg) {
   traj_real_.clear();
 }
 
-void odomCallbck(const nav_msgs::Odometry& msg) {
+void odomCallbck(const nav_msgs::msg::Odometry& msg) {
   if (msg.child_frame_id == "X" || msg.child_frame_id == "O") return;
 
   odom = msg;

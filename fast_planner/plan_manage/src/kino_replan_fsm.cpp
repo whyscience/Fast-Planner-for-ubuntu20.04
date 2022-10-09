@@ -90,7 +90,7 @@ void KinoReplanFSM::waypointCallback(const nav_msgs::PathConstPtr& msg) {
     changeFSMExecState(REPLAN_TRAJ, "TRIG");
 }
 
-void KinoReplanFSM::odometryCallback(const nav_msgs::OdometryConstPtr& msg) {
+void KinoReplanFSM::odometryCallback(const nav_msgs::msg::OdometryConstPtr& msg) {
   odom_pos_(0) = msg->pose.pose.position.x;
   odom_pos_(1) = msg->pose.pose.position.y;
   odom_pos_(2) = msg->pose.pose.position.z;

@@ -13,7 +13,7 @@ endif ()
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wall -Wextra -Wpedantic)
 endif ()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-but-set-variable")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable")
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -24,10 +24,12 @@ find_package(message_filters REQUIRED)
 
 find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
+find_package(OpenCV REQUIRED)
 
 include_directories(include
         ${EIGEN3_INCLUDE_DIR}
-        ${PCL_INCLUDE_DIRS})
+        ${PCL_INCLUDE_DIRS}
+        ${OpenCV_INCLUDE_DIRS})
 
 add_library(plan_env
         src/sdf_map.cpp
@@ -36,14 +38,13 @@ add_library(plan_env
         src/raycast.cpp
         )
 ament_target_dependencies(plan_env rclcpp visualization_msgs cv_bridge message_filters geometry_msgs)
-target_link_libraries(plan_env ${PCL_LIBRARIES})
+target_link_libraries(plan_env ${PCL_LIBRARIES} ${OpenCV_LIBRARIES})
 
 add_executable(obj_generator
         src/obj_generator.cpp
         )
 target_link_libraries(obj_generator
-        plan_env
-        ${PCL_LIBRARIES})
+        plan_env)
 
 install(TARGETS
         plan_env

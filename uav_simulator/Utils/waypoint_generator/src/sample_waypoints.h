@@ -3,13 +3,13 @@
 
 #include <ros/ros.h>
 #include <tf/tf.h>
-#include <nav_msgs/Path.h>
+#include <nav_msgs/msg/Path.hpp>
 
 nav_msgs::Path point()
 {
     // Circle parameters
     nav_msgs::Path waypoints;
-    geometry_msgs::PoseStamped pt;
+    geometry_msgs::msg::PoseStamped pt;
     pt.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
     
     double h = 1.0;
@@ -64,7 +64,7 @@ nav_msgs::Path circle()
     double h = 1.0;
     double scale = 5.0;
     nav_msgs::Path waypoints;
-    geometry_msgs::PoseStamped pt;
+    geometry_msgs::msg::PoseStamped pt;
     pt.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
     
     pt.pose.position.y = -1.2 * scale;
@@ -136,7 +136,7 @@ nav_msgs::Path eight()
     double r = 10.0;
     double h = 2.0;
     nav_msgs::Path waypoints;
-    geometry_msgs::PoseStamped pt;
+    geometry_msgs::msg::PoseStamped pt;
     pt.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);    
 
     for(int i=0; i< 1; ++i)

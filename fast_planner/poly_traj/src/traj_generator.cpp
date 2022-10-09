@@ -34,7 +34,7 @@ using namespace std;
 
 ros::Publisher state_pub, pos_cmd_pub, traj_pub;
 
-nav_msgs::Odometry odom;
+nav_msgs::msg::Odometry odom;
 bool have_odom;
 
 void displayPathWithColor(vector<Eigen::Vector3d> path, double resolution, Eigen::Vector4d color,
@@ -101,7 +101,7 @@ void drawState(Eigen::Vector3d pos, Eigen::Vector3d vec, int id, Eigen::Vector4d
   state_pub.publish(mk_state);
 }
 
-void odomCallbck(const nav_msgs::Odometry& msg) {
+void odomCallbck(const nav_msgs::msg::Odometry& msg) {
   if (msg.child_frame_id == "X" || msg.child_frame_id == "O") return;
 
   odom = msg;

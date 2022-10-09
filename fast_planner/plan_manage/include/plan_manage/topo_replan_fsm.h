@@ -93,7 +93,7 @@ private:
   void execFSMCallback(const ros::TimerEvent& e);
   void checkCollisionCallback(const ros::TimerEvent& e);
   void waypointCallback(const nav_msgs::PathConstPtr& msg);
-  void odometryCallback(const nav_msgs::OdometryConstPtr& msg);
+  void odometryCallback(const nav_msgs::msg::OdometryConstPtr& msg);
 
 public:
   TopoReplanFSM(/* args */) {}

@@ -47,6 +47,7 @@
 #include <message_filters/time_synchronizer.h>
 
 #include <plan_env/raycast.h>
+#include <opencv2/opencv.hpp>
 
 #define logit(x) (log((x) / (1 - (x))))
 
@@ -235,18 +236,18 @@ class SDFMap {
   void fillESDF(F_get_val f_get_val, F_set_val f_set_val, int start, int end, int dim);
 
   // get depth image and camera pose
-  void depthPoseCallback(const sensor_msgs::ImageConstPtr &img,
+  void depthPoseCallback(const sensor_msgs::msg::Image::SharedPtr img,
                          const geometry_msgs::msg::PoseStamped::ConstSharedPtr &pose);
-  void depthOdomCallback(const sensor_msgs::ImageConstPtr &img, const nav_msgs::OdometryConstPtr &odom);
-  void depthCallback(const sensor_msgs::ImageConstPtr &img);
-  void cloudCallback(const sensor_msgs::PointCloud2ConstPtr &img);
+  void depthOdomCallback(const sensor_msgs::msg::Image::SharedPtr img, const nav_msgs::msg::Odometry::SharedPtr odom);
+  void depthCallback(const sensor_msgs::msg::Image::SharedPtr img);
+  void cloudCallback(const sensor_msgs::msg::PointCloud2::SharedPtr img);
   void poseCallback(const geometry_msgs::msg::PoseStamped::ConstSharedPtr &pose);
-  void odomCallback(const nav_msgs::OdometryConstPtr &odom);
+  void odomCallback(const nav_msgs::msg::Odometry::SharedPtr odom);
 
   // update occupancy by raycasting, and update ESDF
-  void updateOccupancyCallback(const rclcpp::TimerEvent & /*event*/);
-  void updateESDFCallback(const rclcpp::TimerEvent & /*event*/);
-  void visCallback(const rclcpp::TimerEvent & /*event*/);
+  void updateOccupancyCallback();
+  void updateESDFCallback();
+  void visCallback();
 
   // main update process
   void projectDepthImage();
@@ -257,30 +258,36 @@ class SDFMap {
   int setCacheOccupancy(Eigen::Vector3d pos, int occ);
   Eigen::Vector3d closetPointInMap(const Eigen::Vector3d &pt, const Eigen::Vector3d &camera_pt);
 
-  // typedef message_filters::sync_policies::ExactTime<sensor_msgs::Image,
-  // nav_msgs::Odometry> SyncPolicyImageOdom; typedef
-  // message_filters::sync_policies::ExactTime<sensor_msgs::Image,
-  // geometry_msgs::PoseStamped> SyncPolicyImagePose;
-  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, nav_msgs::Odometry>
+  // typedef message_filters::sync_policies::ExactTime<sensor_msgs::msg::Image,
+  // nav_msgs::msg::Odometry> SyncPolicyImageOdom; typedef
+  // message_filters::sync_policies::ExactTime<sensor_msgs::msg::Image,
+  // geometry_msgs::msg::PoseStamped> SyncPolicyImagePose;
+  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::msg::Image, nav_msgs::msg::Odometry>
       SyncPolicyImageOdom;
-  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, geometry_msgs::PoseStamped>
+  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::msg::Image, geometry_msgs::msg::PoseStamped>
       SyncPolicyImagePose;
   typedef shared_ptr<message_filters::Synchronizer<SyncPolicyImagePose>> SynchronizerImagePose;
   typedef shared_ptr<message_filters::Synchronizer<SyncPolicyImageOdom>> SynchronizerImageOdom;
 
   rclcpp::Node::SharedPtr node_;
-  shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> depth_sub_;
-  shared_ptr<message_filters::Subscriber<geometry_msgs::PoseStamped>> pose_sub_;
-  shared_ptr<message_filters::Subscriber<nav_msgs::Odometry>> odom_sub_;
+  shared_ptr<message_filters::Subscriber<sensor_msgs::msg::Image>> depth_sub_;
+  shared_ptr<message_filters::Subscriber<geometry_msgs::msg::PoseStamped>> pose_sub_;
+  shared_ptr<message_filters::Subscriber<nav_msgs::msg::Odometry>> odom_sub_;
   SynchronizerImagePose sync_image_pose_;
   SynchronizerImageOdom sync_image_odom_;
 
-  rclcpp::Subscriber indep_depth_sub_, indep_odom_sub_, indep_pose_sub_, indep_cloud_sub_;
-  rclcpp::Publisher map_pub_, esdf_pub_, map_inf_pub_, update_range_pub_;
-  rclcpp::Publisher unknown_pub_, depth_pub_;
-  rclcpp::Timer occ_timer_, esdf_timer_, vis_timer_;
+  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr indep_odom_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr indep_cloud_sub_;
 
-  //
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr map_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr esdf_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr map_inf_pub_;
+  rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr update_range_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr unknown_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr depth_pub_;
+
+  rclcpp::TimerBase::SharedPtr occ_timer_, esdf_timer_, vis_timer_;
+
   uniform_real_distribution<double> rand_noise_;
   normal_distribution<double> rand_noise2_;
   default_random_engine eng_;
