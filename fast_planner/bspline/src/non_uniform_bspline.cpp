@@ -3,14 +3,7 @@
 
 namespace fast_planner {
 
-NonUniformBspline::NonUniformBspline(rclcpp::NodeOptions options)
-    : Node("NonUniformBspline", options) {
-
-}
-
-NonUniformBspline::NonUniformBspline(const rclcpp::NodeOptions &options,
-                                     const Eigen::MatrixXd &points, const int &order, const double &interval)
-    : Node("NonUniformBspline", options) {
+NonUniformBspline::NonUniformBspline(const Eigen::MatrixXd &points, const int &order, const double &interval) {
   setUniformBspline(points, order, interval);
 }
 
@@ -101,15 +94,16 @@ Eigen::MatrixXd NonUniformBspline::getDerivativeControlPoints() {
 
 NonUniformBspline NonUniformBspline::getDerivative() {
   Eigen::MatrixXd ctp = getDerivativeControlPoints();
-  NonUniformBspline derivative(this->get_node_options(), ctp, p_ - 1, interval_);
+  //  NonUniformBspline derivative(this->get_node_options());
+  //  derivative.setUniformBspline(ctp, p_ - 1, interval_);
+  NonUniformBspline derivative(ctp, p_ - 1, interval_);
 
   /* cut the first and last knot */
   Eigen::VectorXd knot(u_.rows() - 2);
   knot = u_.segment(1, u_.rows() - 2);
   derivative.setKnot(knot);
 
-  return NonUniformBspline(this->get_node_options());
-  //return derivative;//todo eric
+  return derivative;//todo this is not return
 }
 
 double NonUniformBspline::getInterval() { return interval_; }
@@ -192,7 +186,7 @@ double NonUniformBspline::checkRatio() {
     }
   }
   double ratio = max(max_vel / limit_vel_, sqrt(fabs(max_acc) / limit_acc_));
-  if (ratio > 2.0) RCLCPP_ERROR(this->get_logger(), "max vel: %lf, max acc: %lf.", max_vel, max_acc);
+  if (ratio > 2.0) printf("max vel: %lf, max acc: %lf.", max_vel, max_acc);
   //ROS_ERROR_COND(ratio > 2.0, "max vel: %lf, max acc: %lf.", max_vel, max_acc);
 
   return ratio;

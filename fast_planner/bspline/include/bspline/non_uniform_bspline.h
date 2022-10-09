@@ -11,7 +11,7 @@ using namespace std;
 namespace fast_planner {
 // An implementation of non-uniform B-spline with different dimensions
 // It also represents uniform B-spline which is a special case of non-uniform
-class NonUniformBspline : public rclcpp::Node {
+class NonUniformBspline {
  private:
   // control points for B-spline with different dimensions.
   // Each row represents one single control point
@@ -28,12 +28,10 @@ class NonUniformBspline : public rclcpp::Node {
   double limit_vel_, limit_acc_, limit_ratio_;  // physical limits and time adjustment ratio
 
  public:
-  explicit NonUniformBspline(rclcpp::NodeOptions options);
 
-  NonUniformBspline(const rclcpp::NodeOptions &options,
-                    const Eigen::MatrixXd &points, const int &order, const double &interval);
+  NonUniformBspline(const Eigen::MatrixXd &points, const int &order, const double &interval);
 
-  ~NonUniformBspline() override;
+  ~NonUniformBspline();
 
   // initialize as a uniform B-spline
   void setUniformBspline(const Eigen::MatrixXd &points, const int &order, const double &interval);

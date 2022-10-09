@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>bspline</name>
-  <version>0.0.0</version>
+  <version>0.1.0</version>
   <description>The bspline package</description>
 
   <maintainer email="bzhouai@todo.todo">bzhouai</maintainer>
@@ -10,7 +11,10 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <build_depend>rclcpp</build_depend>
+  <build_depend>rclcpp_components</build_depend>
+
   <exec_depend>rclcpp</exec_depend>
+  <exec_depend>rclcpp_components</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
