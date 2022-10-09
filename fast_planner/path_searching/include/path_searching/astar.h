@@ -30,7 +30,7 @@
 #include <iostream>
 #include <map>
 #include <ros/console.h>
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 #include <string>
 #include <unordered_map>
 // #include "grad_spline/sdf_map.h"

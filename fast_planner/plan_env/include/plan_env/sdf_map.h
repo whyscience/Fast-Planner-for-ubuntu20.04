@@ -28,16 +28,15 @@
 
 #include <Eigen/Eigen>
 #include <Eigen/StdVector>
-#include <cv_bridge/cv_bridge.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <iostream>
 #include <random>
-#include <nav_msgs/Odometry.h>
+#include <nav_msgs/msg/odometry.hpp>
 #include <queue>
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 #include <tuple>
-#include <visualization_msgs/Marker.h>
-
+#include <visualization_msgs/msg/marker.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -206,7 +205,7 @@ class SDFMap {
   void getSliceESDF(const double height, const double res, const Eigen::Vector4d &range,
                     vector<Eigen::Vector3d> &slice, vector<Eigen::Vector3d> &grad,
                     int sign = 1);  // 1 pos, 2 neg, 3 combined
-  void initMap(ros::NodeHandle &nh);
+  void initMap(rclcpp::Node::SharedPtr &nh);
 
   void publishMap();
   void publishMapInflate(bool all_info = false);
@@ -237,17 +236,17 @@ class SDFMap {
 
   // get depth image and camera pose
   void depthPoseCallback(const sensor_msgs::ImageConstPtr &img,
-                         const geometry_msgs::PoseStampedConstPtr &pose);
+                         const geometry_msgs::msg::PoseStamped::ConstSharedPtr &pose);
   void depthOdomCallback(const sensor_msgs::ImageConstPtr &img, const nav_msgs::OdometryConstPtr &odom);
   void depthCallback(const sensor_msgs::ImageConstPtr &img);
   void cloudCallback(const sensor_msgs::PointCloud2ConstPtr &img);
-  void poseCallback(const geometry_msgs::PoseStampedConstPtr &pose);
+  void poseCallback(const geometry_msgs::msg::PoseStamped::ConstSharedPtr &pose);
   void odomCallback(const nav_msgs::OdometryConstPtr &odom);
 
   // update occupancy by raycasting, and update ESDF
-  void updateOccupancyCallback(const ros::TimerEvent & /*event*/);
-  void updateESDFCallback(const ros::TimerEvent & /*event*/);
-  void visCallback(const ros::TimerEvent & /*event*/);
+  void updateOccupancyCallback(const rclcpp::TimerEvent & /*event*/);
+  void updateESDFCallback(const rclcpp::TimerEvent & /*event*/);
+  void visCallback(const rclcpp::TimerEvent & /*event*/);
 
   // main update process
   void projectDepthImage();
@@ -269,17 +268,17 @@ class SDFMap {
   typedef shared_ptr<message_filters::Synchronizer<SyncPolicyImagePose>> SynchronizerImagePose;
   typedef shared_ptr<message_filters::Synchronizer<SyncPolicyImageOdom>> SynchronizerImageOdom;
 
-  ros::NodeHandle node_;
+  rclcpp::Node::SharedPtr node_;
   shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> depth_sub_;
   shared_ptr<message_filters::Subscriber<geometry_msgs::PoseStamped>> pose_sub_;
   shared_ptr<message_filters::Subscriber<nav_msgs::Odometry>> odom_sub_;
   SynchronizerImagePose sync_image_pose_;
   SynchronizerImageOdom sync_image_odom_;
 
-  ros::Subscriber indep_depth_sub_, indep_odom_sub_, indep_pose_sub_, indep_cloud_sub_;
-  ros::Publisher map_pub_, esdf_pub_, map_inf_pub_, update_range_pub_;
-  ros::Publisher unknown_pub_, depth_pub_;
-  ros::Timer occ_timer_, esdf_timer_, vis_timer_;
+  rclcpp::Subscriber indep_depth_sub_, indep_odom_sub_, indep_pose_sub_, indep_cloud_sub_;
+  rclcpp::Publisher map_pub_, esdf_pub_, map_inf_pub_, update_range_pub_;
+  rclcpp::Publisher unknown_pub_, depth_pub_;
+  rclcpp::Timer occ_timer_, esdf_timer_, vis_timer_;
 
   //
   uniform_real_distribution<double> rand_noise_;

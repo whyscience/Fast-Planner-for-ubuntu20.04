@@ -21,13 +21,11 @@
 * along with Fast-Planner. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
-#include "nav_msgs/Odometry.h"
-#include "std_msgs/Empty.h"
-#include "visualization_msgs/Marker.h"
+#include <nav_msgs/msg/odometry.hpp>
+#include <std_msgs/msg/empty.hpp>
+#include <visualization_msgs/msg/marker.hpp>
 #include <Eigen/Eigen>
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 
 #include <swarmtal_msgs/drone_onboard_command.h>
 #include <traj_generator/polynomial_traj.hpp>

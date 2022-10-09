@@ -69,7 +69,7 @@ class PolynomialTraj {
   }
 
   Eigen::Vector3d evaluate(double t) {
-    /* detetrmine segment num */
+    /* determine segment num */
     int idx = 0;
     while (times[idx] < t) {
       t -= times[idx];
@@ -90,7 +90,7 @@ class PolynomialTraj {
   }
 
   Eigen::Vector3d evaluateVel(double t) {
-    /* detetrmine segment num */
+    /* determine segment num */
     int idx = 0;
     while (times[idx] < t) {
       t -= times[idx];
@@ -118,7 +118,7 @@ class PolynomialTraj {
   }
 
   Eigen::Vector3d evaluateAcc(double t) {
-    /* detetrmine segment num */
+    /* determine segment num */
     int idx = 0;
     while (times[idx] < t) {
       t -= times[idx];

@@ -33,9 +33,9 @@
 #include <path_searching/topo_prm.h>
 #include <plan_env/obj_predictor.h>
 #include <poly_traj/polynomial_traj.h>
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 #include <vector>
-#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/msg/marker.hpp>
 
 using std::vector;
 namespace fast_planner {

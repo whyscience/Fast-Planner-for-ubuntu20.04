@@ -21,18 +21,16 @@
 * along with Fast-Planner. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <visualization_msgs/msg/marker.hpp>
+#include "rclcpp/rclcpp.hpp"
 
-
-#include "visualization_msgs/Marker.h"
-#include <ros/ros.h>
-
-#include <geometry_msgs/PoseStamped.h>
-#include <nav_msgs/Odometry.h>
+#include <geometry_msgs/msg/point_stamped.hpp>
+#include <nav_msgs/msg/odometry.hpp>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <random>
-#include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <string>
 
 #include <plan_env/linear_obj_model.hpp>
@@ -41,8 +39,8 @@ using namespace std;
 int obj_num;
 double _xy_size, _h_size, _vel, _yaw_dot, _acc_r1, _acc_r2, _acc_z, _scale1, _scale2, _interval;
 
-ros::Publisher obj_pub;            // visualize marker
-vector<ros::Publisher> pose_pubs;  // obj pose (from optitrack)
+rclcpp::Publisher obj_pub;            // visualize marker
+vector<rclcpp::Publisher> pose_pubs;  // obj pose (from optitrack)
 vector<LinearObjModel> obj_models;
 
 random_device rd;
@@ -58,14 +56,14 @@ uniform_real_distribution<double> rand_scale;
 uniform_real_distribution<double> rand_yaw_dot;
 uniform_real_distribution<double> rand_yaw;
 
-ros::Time time_update, time_change;
+rclcpp::Time time_update, time_change;
 
-void updateCallback(const ros::TimerEvent &e);
+void updateCallback();
 void visualizeObj(int id);
 
 int main(int argc, char **argv) {
-  ros::init(argc, argv, "dynamic_obj");
-  ros::NodeHandle node("~");
+  rclcpp::init(argc, argv, "dynamic_obj");
+  rclcpp::Node::SharedPtr node("~");
 
   /* ---------- initialize ---------- */
   node.param("obj_generator/obj_num", obj_num, 10);
@@ -82,14 +80,14 @@ int main(int argc, char **argv) {
 
   obj_pub = node.advertise<visualization_msgs::Marker>("/dynamic/obj", 10);
   for (int i = 0; i < obj_num; ++i) {
-    ros::Publisher pose_pub =
+    rclcpp::Publisher pose_pub =
         node.advertise<geometry_msgs::PoseStamped>("/dynamic/pose_" + to_string(i), 10);
     pose_pubs.push_back(pose_pub);
   }
 
-  ros::Timer update_timer = node.createTimer(ros::Duration(1 / 30.0), updateCallback);
+  rclcpp::Timer update_timer = node.createTimer(rclcpp::Duration(1 / 30.0), updateCallback);
   cout << "[dynamic]: initialize with " + to_string(obj_num) << " moving obj." << endl;
-  ros::Duration(1.0).sleep();
+  rclcpp::Duration(1.0).sleep();
 
   rand_color = uniform_real_distribution<double>(0.0, 1.0);
   rand_pos = uniform_real_distribution<double>(-_xy_size, _xy_size);
@@ -124,17 +122,17 @@ int main(int argc, char **argv) {
     obj_models.push_back(model);
   }
 
-  time_update = ros::Time::now();
-  time_change = ros::Time::now();
+  time_update = rclcpp::Time::now();
+  time_change = rclcpp::Time::now();
 
   /* ---------- start loop ---------- */
-  ros::spin();
+  rclcpp::spin();
 
   return 0;
 }
 
-void updateCallback(const ros::TimerEvent &e) {
-  ros::Time time_now = ros::Time::now();
+void updateCallback() {
+  rclcpp::Time time_now = rclcpp::Time::now();
 
   /* ---------- change input ---------- */
   double dtc = (time_now - time_change).toSec();
@@ -198,7 +196,7 @@ void visualizeObj(int id) {
   /* ---------- rviz ---------- */
   visualization_msgs::Marker mk;
   mk.header.frame_id = "world";
-  mk.header.stamp = ros::Time::now();
+  mk.header.stamp = rclcpp::Time::now();
   mk.type = visualization_msgs::Marker::CUBE;
   mk.action = visualization_msgs::Marker::ADD;
   mk.id = id;

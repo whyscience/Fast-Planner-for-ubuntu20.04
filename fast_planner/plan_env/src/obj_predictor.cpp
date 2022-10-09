@@ -21,8 +21,6 @@
 * along with Fast-Planner. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
 #include <plan_env/obj_predictor.h>
 #include <string>
 
@@ -31,7 +29,7 @@ namespace fast_planner {
 
 int ObjHistory::queue_size_;
 int ObjHistory::skip_num_;
-ros::Time ObjHistory::global_start_time_;
+rclcpp::Time ObjHistory::global_start_time_;
 
 void ObjHistory::init(int id) {
   clear();
@@ -39,13 +37,13 @@ void ObjHistory::init(int id) {
   obj_idx_ = id;
 }
 
-void ObjHistory::poseCallback(const geometry_msgs::PoseStampedConstPtr &msg) {
+void ObjHistory::poseCallback(const geometry_msgs::msg::PoseStamped::ConstSharedPtr &msg) {
   ++skip_;
   if (skip_ < ObjHistory::skip_num_) return;
 
   Eigen::Vector4d pos_t;
   pos_t(0) = msg->pose.position.x, pos_t(1) = msg->pose.position.y, pos_t(2) = msg->pose.position.z;
-  pos_t(3) = (ros::Time::now() - ObjHistory::global_start_time_).toSec();
+  pos_t(3) = (rclcpp::Time::now() - ObjHistory::global_start_time_).toSec();
 
   history_.push_back(pos_t);
   // cout << "idx: " << obj_idx_ << "pos_t: " << pos_t.transpose() << endl;
@@ -61,7 +59,7 @@ void ObjHistory::poseCallback(const geometry_msgs::PoseStampedConstPtr &msg) {
 ObjPredictor::ObjPredictor(/* args */) {
 }
 
-ObjPredictor::ObjPredictor(ros::NodeHandle &node) {
+ObjPredictor::ObjPredictor(rclcpp::Node::SharedPtr &node) {
   this->node_handle_ = node;
 }
 
@@ -90,7 +88,7 @@ void ObjPredictor::init() {
     obj_his->init(i);
     obj_histories_.push_back(obj_his);
 
-    ros::Subscriber pose_sub = node_handle_.subscribe<geometry_msgs::PoseStamped>(
+    rclcpp::Subscriber pose_sub = node_handle_.subscribe<geometry_msgs::PoseStamped>(
         "/dynamic/pose_" + std::to_string(i), 10, &ObjHistory::poseCallback, obj_his.get());
 
     pose_subs_.push_back(pose_sub);
@@ -101,7 +99,7 @@ void ObjPredictor::init() {
 
   /* update prediction */
   predict_timer_ =
-      node_handle_.createTimer(ros::Duration(1 / predict_rate_), &ObjPredictor::predictCallback, this);
+      node_handle_.createTimer(rclcpp::Duration(1 / predict_rate_), &ObjPredictor::predictCallback, this);
 }
 
 ObjPrediction ObjPredictor::getPredictionTraj() {
@@ -128,9 +126,9 @@ void ObjPredictor::predictPolyFit() {
     /* ---------- estimation error ---------- */
     list<Eigen::Vector4d> his;
     obj_histories_[i]->getHistory(his);
-    for (list<Eigen::Vector4d>::iterator it = his.begin(); it != his.end(); ++it) {
-      Eigen::Vector3d qi = (*it).head(3);
-      double ti = (*it)(3);
+    for (auto & hi : his) {
+      Eigen::Vector3d qi = hi.head(3);
+      double ti = hi(3);
 
       /* A */
       temp << 1.0, ti, pow(ti, 2), pow(ti, 3), pow(ti, 4), pow(ti, 5);
@@ -173,12 +171,12 @@ void ObjPredictor::predictPolyFit() {
   }
 }
 
-void ObjPredictor::predictCallback(const ros::TimerEvent &e) {
+void ObjPredictor::predictCallback() {
   // predictPolyFit();
   predictConstVel();
 }
 
-void ObjPredictor::markerCallback(const visualization_msgs::MarkerConstPtr &msg) {
+void ObjPredictor::markerCallback(const visualization_msgs::msg::Marker::ConstSharedPtr &msg) {
   int idx = msg->id;
   (*obj_scale_)[idx](0) = msg->scale.x;
   (*obj_scale_)[idx](1) = msg->scale.y;
@@ -201,7 +199,7 @@ void ObjPredictor::predictConstVel() {
     /* ---------- get the last two point ---------- */
     list<Eigen::Vector4d> his;
     obj_histories_[i]->getHistory(his);
-    list<Eigen::Vector4d>::iterator list_it = his.end();
+    auto list_it = his.end();
 
     /* ---------- test iteration ---------- */
     // cout << "----------------------------" << endl;

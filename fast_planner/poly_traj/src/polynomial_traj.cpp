@@ -21,8 +21,6 @@
 * along with Fast-Planner. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
 #include <iostream>
 #include <poly_traj/polynomial_traj.h>
 

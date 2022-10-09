@@ -69,7 +69,7 @@ public:
   }
 
   Eigen::Vector3d evaluate(double t) {
-    /* detetrmine segment num */
+    /* determine segment num */
     int idx = 0;
     while (times[idx] + 1e-4 < t) {
       t -= times[idx];
@@ -90,7 +90,7 @@ public:
   }
 
   Eigen::Vector3d evaluateVel(double t) {
-    /* detetrmine segment num */
+    /* determine segment num */
     int idx = 0;
     while (times[idx] + 1e-4 < t) {
       t -= times[idx];
@@ -118,7 +118,7 @@ public:
   }
 
   Eigen::Vector3d evaluateAcc(double t) {
-    /* detetrmine segment num */
+    /* determine segment num */
     int idx = 0;
     while (times[idx] + 1e-4 < t) {
       t -= times[idx];

@@ -21,8 +21,6 @@
 * along with Fast-Planner. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
 #include <plan_env/edt_environment.h>
 
 namespace fast_planner {

@@ -28,7 +28,7 @@
 // #define current_img_ md_.depth_image_[image_cnt_ & 1]
 // #define last_img_ md_.depth_image_[!(image_cnt_ & 1)]
 
-void SDFMap::initMap(ros::NodeHandle &nh) {
+void SDFMap::initMap(rclcpp::Node::SharedPtr &nh) {
   node_ = nh;
 
   /* get parameter */
@@ -153,9 +153,9 @@ void SDFMap::initMap(ros::NodeHandle &nh) {
   indep_odom_sub_ =
       node_.subscribe<nav_msgs::Odometry>("/sdf_map/odom", 10, &SDFMap::odomCallback, this);
 
-  occ_timer_ = node_.createTimer(ros::Duration(0.05), &SDFMap::updateOccupancyCallback, this);
-  esdf_timer_ = node_.createTimer(ros::Duration(0.05), &SDFMap::updateESDFCallback, this);
-  vis_timer_ = node_.createTimer(ros::Duration(0.05), &SDFMap::visCallback, this);
+  occ_timer_ = node_.createTimer(rclcpp::Duration(0.05), &SDFMap::updateOccupancyCallback, this);
+  esdf_timer_ = node_.createTimer(rclcpp::Duration(0.05), &SDFMap::updateESDFCallback, this);
+  vis_timer_ = node_.createTimer(rclcpp::Duration(0.05), &SDFMap::visCallback, this);
 
   map_pub_ = node_.advertise<sensor_msgs::PointCloud2>("/sdf_map/occupancy", 10);
   map_inf_pub_ = node_.advertise<sensor_msgs::PointCloud2>("/sdf_map/occupancy_inflate", 10);
@@ -303,7 +303,7 @@ void SDFMap::updateESDF3d() {
         }
       }
 
-  ros::Time t1, t2;
+  rclcpp::Time t1, t2;
 
   for (int x = min_esdf[0]; x <= max_esdf[0]; x++) {
     for (int y = min_esdf[1]; y <= max_esdf[1]; y++) {
@@ -479,7 +479,7 @@ void SDFMap::raycastProcess() {
   // if (md_.proj_points_.size() == 0)
   if (md_.proj_points_cnt == 0) return;
 
-  ros::Time t1, t2;
+  rclcpp::Time t1, t2;
 
   md_.raycast_num_ += 1;
 
@@ -762,7 +762,7 @@ void SDFMap::clearAndInflateLocalMap() {
   }
 }
 
-void SDFMap::visCallback(const ros::TimerEvent & /*event*/) {
+void SDFMap::visCallback(const rclcpp::TimerEvent & /*event*/) {
   publishMap();
   publishMapInflate(false);
   // publishUpdateRange();
@@ -772,19 +772,19 @@ void SDFMap::visCallback(const ros::TimerEvent & /*event*/) {
   // publishDepth();
 }
 
-void SDFMap::updateOccupancyCallback(const ros::TimerEvent & /*event*/) {
+void SDFMap::updateOccupancyCallback(const rclcpp::TimerEvent & /*event*/) {
   if (!md_.occ_need_update_) return;
 
   /* update occupancy */
-  ros::Time t1, t2;
-  t1 = ros::Time::now();
+  rclcpp::Time t1, t2;
+  t1 = rclcpp::Time::now();
 
   projectDepthImage();
   raycastProcess();
 
   if (md_.local_updated_) clearAndInflateLocalMap();
 
-  t2 = ros::Time::now();
+  t2 = rclcpp::Time::now();
 
   md_.fuse_time_ += (t2 - t1).toSec();
   md_.max_fuse_time_ = max(md_.max_fuse_time_, (t2 - t1).toSec());
@@ -798,16 +798,16 @@ void SDFMap::updateOccupancyCallback(const ros::TimerEvent & /*event*/) {
   md_.local_updated_ = false;
 }
 
-void SDFMap::updateESDFCallback(const ros::TimerEvent & /*event*/) {
+void SDFMap::updateESDFCallback(const rclcpp::TimerEvent & /*event*/) {
   if (!md_.esdf_need_update_) return;
 
   /* esdf */
-  ros::Time t1, t2;
-  t1 = ros::Time::now();
+  rclcpp::Time t1, t2;
+  t1 = rclcpp::Time::now();
 
   updateESDF3d();
 
-  t2 = ros::Time::now();
+  t2 = rclcpp::Time::now();
 
   md_.esdf_time_ += (t2 - t1).toSec();
   md_.max_esdf_time_ = max(md_.max_esdf_time_, (t2 - t1).toSec());
@@ -820,7 +820,7 @@ void SDFMap::updateESDFCallback(const ros::TimerEvent & /*event*/) {
 }
 
 void SDFMap::depthPoseCallback(const sensor_msgs::ImageConstPtr &img,
-                               const geometry_msgs::PoseStampedConstPtr &pose) {
+                               const geometry_msgs::msg::PoseStamped::ConstSharedPtr &pose) {
   /* get depth image */
   cv_bridge::CvImagePtr cv_ptr;
   cv_ptr = cv_bridge::toCvCopy(img, img->encoding);
@@ -1140,7 +1140,7 @@ void SDFMap::publishUpdateRange() {
   cube_pos = 0.5 * (esdf_min_pos + esdf_max_pos);
   cube_scale = esdf_max_pos - esdf_min_pos;
   mk.header.frame_id = mp_.frame_id_;
-  mk.header.stamp = ros::Time::now();
+  mk.header.stamp = rclcpp::Time::now();
   mk.type = visualization_msgs::Marker::CUBE;
   mk.action = visualization_msgs::Marker::ADD;
   mk.id = 0;
@@ -1306,7 +1306,7 @@ void SDFMap::depthCallback(const sensor_msgs::ImageConstPtr &img) {
   std::cout << "depth: " << img->header.stamp << std::endl;
 }
 
-void SDFMap::poseCallback(const geometry_msgs::PoseStampedConstPtr &pose) {
+void SDFMap::poseCallback(const geometry_msgs::msg::PoseStamped::ConstSharedPtr &pose) {
   std::cout << "pose: " << pose->header.stamp << std::endl;
 
   md_.camera_pos_(0) = pose->pose.position.x;

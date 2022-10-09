@@ -3,7 +3,7 @@
 
 // #include <path_searching/matrix_hash.h>
 #include <ros/console.h>
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 #include <Eigen/Eigen>
 #include <boost/functional/hash.hpp>
 #include <iostream>
