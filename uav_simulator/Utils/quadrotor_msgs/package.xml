@@ -17,8 +17,6 @@
 
   <export>
     <build_type>ament_cmake</build_type>
-    <cpp cflags="-I${prefix}/include"
-         lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib"/>
   </export>
 
 </package>

@@ -39,7 +39,4 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 
 ament_export_dependencies(rosidl_default_runtime)
 
-find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
-
 ament_package()
