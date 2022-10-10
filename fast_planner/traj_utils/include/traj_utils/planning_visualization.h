@@ -60,13 +60,13 @@ private:
   /* data */
   /* visib_pub is seperated from previous ones for different info */
   rclcpp::Node::SharedPtr node;
-  rclcpp::Publisher traj_pub_;      // 0
-  rclcpp::Publisher topo_pub_;      // 1
-  rclcpp::Publisher predict_pub_;   // 2
-  rclcpp::Publisher visib_pub_;     // 3, visibility constraints
-  rclcpp::Publisher frontier_pub_;  // 4, frontier searching
-  rclcpp::Publisher yaw_pub_;       // 5, yaw trajectory
-  vector<rclcpp::Publisher> pubs_;  //
+  rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr traj_pub_;      // 0
+  rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr  topo_pub_;      // 1
+  rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr  predict_pub_;   // 2
+  rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr  visib_pub_;     // 3, visibility constraints
+  rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr  frontier_pub_;  // 4, frontier searching
+  rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr  yaw_pub_;       // 5, yaw trajectory
+  vector<rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr > pubs_;  //
 
   int last_topo_path1_num_;
   int last_topo_path2_num_;

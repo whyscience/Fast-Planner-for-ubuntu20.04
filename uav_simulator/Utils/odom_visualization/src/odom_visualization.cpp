@@ -265,7 +265,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
     trajROS.color.g = 1.0;
     trajROS.color.b = 0.0;
     trajROS.color.a = 0.8;  
-    geometry_msgs::Point p;          
+    geometry_msgs::msg::Point p;
     p.x = ppose(0);
     p.y = ppose(1);
     p.z = ppose(2);
@@ -452,8 +452,8 @@ int main(int argc, char** argv)
   n.param("covariance_velocity", cov_vel,    false);    
   n.param("covariance_color",    cov_color,  false);    
   
-  rclcpp::Subscriber sub_odom = n.subscribe("odom", 100,  odom_callback);
-  rclcpp::Subscriber sub_cmd  = n.subscribe("cmd",  100,  cmd_callback);
+  auto sub_odom = n.subscribe("odom", 100,  odom_callback);
+  auto sub_cmd  = n.subscribe("cmd",  100,  cmd_callback);
   posePub   = n.advertise<geometry_msgs::msg::PoseStamped>("pose",                100, true);
   pathPub   = n.advertise<nav_msgs::msg::Path>(            "path",                100, true);
   velPub    = n.advertise<visualization_msgs::msg::Marker>("velocity",            100, true);

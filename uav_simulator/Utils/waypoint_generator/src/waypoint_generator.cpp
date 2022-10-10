@@ -245,9 +245,9 @@ int main(int argc, char** argv) {
     rclcpp::init(argc, argv, "waypoint_generator");
     rclcpp::Node::SharedPtr n("~");
     n.param("waypoint_type", waypoint_type, string("manual"));
-    rclcpp::Subscriber sub1 = n.subscribe("odom", 10, odom_callback);
-    rclcpp::Subscriber sub2 = n.subscribe("goal", 10, goal_callback);
-    rclcpp::Subscriber sub3 = n.subscribe("traj_start_trigger", 10, traj_start_trigger_callback);
+    auto sub1 = n.subscribe("odom", 10, odom_callback);
+    auto sub2 = n.subscribe("goal", 10, goal_callback);
+    auto sub3 = n.subscribe("traj_start_trigger", 10, traj_start_trigger_callback);
     pub1 = n.advertise<nav_msgs::msg::Path>("waypoints", 50);
     pub2 = n.advertise<geometry_msgs::msg::PoseArray>("waypoints_vis", 10);
 

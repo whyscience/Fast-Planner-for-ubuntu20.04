@@ -32,10 +32,14 @@ ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 ament_export_dependencies(rclcpp std_msgs Eigen3)
 
-install(TARGETS
-        ${PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin)
-
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include)
+install(
+        DIRECTORY include/${PROJECT_NAME}
+        DESTINATION include
+)
 ament_package()

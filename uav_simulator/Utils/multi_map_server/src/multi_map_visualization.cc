@@ -79,8 +79,8 @@ int main(int argc, char** argv)
   rclcpp::init(argc, argv, "multi_map_visualization");
   rclcpp::Node::SharedPtr n("~");
 
-  rclcpp::Subscriber sub1 = n.subscribe("dmaps2d", 1, maps2d_callback);
-  rclcpp::Subscriber sub2 = n.subscribe("dmaps3d", 1, maps3d_callback);
+  auto sub1 = n.subscribe("dmaps2d", 1, maps2d_callback);
+  auto sub2 = n.subscribe("dmaps3d", 1, maps3d_callback);
   pub1 = n.advertise<multi_map_server::MultiOccupancyGrid>("maps2d", 1, true);
   pub2 = n.advertise<sensor_msgs::PointCloud>("map3d", 1, true);
 

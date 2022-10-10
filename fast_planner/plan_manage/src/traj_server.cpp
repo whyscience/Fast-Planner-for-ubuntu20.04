@@ -32,6 +32,9 @@
 #include "rclcpp/rclcpp.hpp"
 
 rclcpp::Publisher cmd_vis_pub, pos_cmd_pub, traj_pub;
+rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr cmd_vis_pub;
+rclcpp::Publisher<quadrotor_msgs::PositionCommand>::SharedPtr pos_cmd_pub;
+rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr traj_pub;
 
 nav_msgs::msg::Odometry odom;
 
@@ -81,7 +84,7 @@ void displayTrajWithColor(vector<Eigen::Vector3d> path, double resolution, Eigen
   mk.scale.y = resolution;
   mk.scale.z = resolution;
 
-  geometry_msgs::Point pt;
+  geometry_msgs::msg::Point pt;
   for (int i = 0; i < int(path.size()); i++) {
     pt.x = path[i](0);
     pt.y = path[i](1);
@@ -89,7 +92,9 @@ void displayTrajWithColor(vector<Eigen::Vector3d> path, double resolution, Eigen
     mk.points.push_back(pt);
   }
   traj_pub->publish(mk);
-  rclcpp::Duration(0.001).sleep();
+  //rclcpp::Duration(0.001).sleep();
+  rclcpp::Rate sleepRate(1000);
+  sleepRate.sleep();
 }
 
 void drawCmd(const Eigen::Vector3d& pos, const Eigen::Vector3d& vec, const int& id,
@@ -106,7 +111,7 @@ void drawCmd(const Eigen::Vector3d& pos, const Eigen::Vector3d& vec, const int& 
   mk_state.scale.y = 0.2;
   mk_state.scale.z = 0.3;
 
-  geometry_msgs::Point pt;
+  geometry_msgs::msg::Point pt;
   pt.x = pos(0);
   pt.y = pos(1);
   pt.z = pos(2);
@@ -125,7 +130,7 @@ void drawCmd(const Eigen::Vector3d& pos, const Eigen::Vector3d& vec, const int& 
   cmd_vis_pub->publish(mk_state);
 }
 
-void bsplineCallback(plan_manage::Bspline::SharedPtr msg) {
+void bsplineCallback(plan_manage::msg::Bspline::SharedPtr msg) {
   // parse pos traj
 
   Eigen::MatrixXd pos_pts(msg->pos_pts.size(), 3);
@@ -168,7 +173,7 @@ void bsplineCallback(plan_manage::Bspline::SharedPtr msg) {
   receive_traj_ = true;
 }
 
-void replanCallback(std_msgs::Empty msg) {
+void replanCallback(std_msgs::msg::Empty::SharedPtr msg) {
   /* reset duration */
   const double time_out = 0.01;
   rclcpp::Time time_now = rclcpp::Clock().now();
@@ -176,12 +181,12 @@ void replanCallback(std_msgs::Empty msg) {
   traj_duration_ = min(t_stop, traj_duration_);
 }
 
-void newCallback(std_msgs::Empty msg) {
+void newCallback(std_msgs::msg::Empty::SharedPtr msg) {
   traj_cmd_.clear();
   traj_real_.clear();
 }
 
-void odomCallbck(const nav_msgs::msg::Odometry& msg) {
+void odomCallbck(nav_msgs::msg::Odometry::SharedPtr msg) {
   if (msg.child_frame_id == "X" || msg.child_frame_id == "O") return;
 
   odom = msg;
@@ -282,16 +287,18 @@ void cmdCallback( ) {
 int main(int argc, char** argv) {
   rclcpp::init(argc, argv, "traj_server");
   rclcpp::Node::SharedPtr node;
-  rclcpp::Node::SharedPtr nh("~");
 
-  rclcpp::Subscriber bspline_sub = node.subscribe("planning/bspline", 10, bsplineCallback);
-  rclcpp::Subscriber replan_sub = node.subscribe("planning/replan", 10, replanCallback);
-  rclcpp::Subscriber new_sub = node.subscribe("planning/new", 10, newCallback);
-  rclcpp::Subscriber odom_sub = node.subscribe("/odom_world", 50, odomCallbck);
+  auto bspline_sub = node->create_subscription<plan_manage::msg::Bspline>("planning/bspline", 10, bsplineCallback);
+  auto replan_sub = node->create_subscription<std_msgs::msg::Empty>("planning/replan", 10, replanCallback);
+  auto new_sub = node->create_subscription<std_msgs::msg::Empty>("planning/new", 10, newCallback);
+  auto odom_sub = node->create_subscription<nav_msgs::msg::Odometry>("/odom_world", 50, odomCallbck);
 
-  cmd_vis_pub = node.advertise<visualization_msgs::msg::Marker>("planning/position_cmd_vis", 10);
-  pos_cmd_pub = node.advertise<quadrotor_msgs::PositionCommand>("/position_cmd", 50);
-  traj_pub = node.advertise<visualization_msgs::msg::Marker>("planning/travel_traj", 10);
+  indep_cloud_sub_ = node_->create_subscription<sensor_msgs::msg::PointCloud2>(
+      "/sdf_map/cloud", 10, std::bind(&SDFMap::cloudCallback, this, std::placeholders::_1));
+
+  cmd_vis_pub = node->create_publisher<visualization_msgs::msg::Marker>("planning/position_cmd_vis", 10);
+  pos_cmd_pub = node->create_publisher<quadrotor_msgs::PositionCommand>("/position_cmd", 50);
+  traj_pub = node->create_publisher<visualization_msgs::msg::Marker>("planning/travel_traj", 10);
 
   rclcpp::Timer cmd_timer = node.createTimer(rclcpp::Duration(0.01), cmdCallback);
   rclcpp::Timer vis_timer = node.createTimer(rclcpp::Duration(0.25), visCallback);

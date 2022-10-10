@@ -59,9 +59,9 @@ void TopoReplanFSM::init(rclcpp::Node::SharedPtr& nh) {
       nh.subscribe("/waypoint_generator/waypoints", 1, &TopoReplanFSM::waypointCallback, this);
   odom_sub_ = nh.subscribe("/odom_world", 1, &TopoReplanFSM::odometryCallback, this);
 
-  replan_pub_  = nh.advertise<std_msgs::Empty>("/planning/replan", 20);
-  new_pub_     = nh.advertise<std_msgs::Empty>("/planning/new", 20);
-  bspline_pub_ = nh.advertise<plan_manage::Bspline>("/planning/bspline", 20);
+  replan_pub_  = nh.advertise<std_msgs::msg::Empty>("/planning/replan", 20);
+  new_pub_     = nh.advertise<std_msgs::msg::Empty>("/planning/new", 20);
+  bspline_pub_ = nh.advertise<plan_manage::msg::Bspline>("/planning/bspline", 20);
 }
 
 void TopoReplanFSM::waypointCallback(const nav_msgs::msg::Path::SharedPtr msg) {
@@ -191,7 +191,7 @@ void TopoReplanFSM::execFSMCallback( ) {
       start_yaw_(0)         = atan2(rot_x(1), rot_x(0));
       start_yaw_(1) = start_yaw_(2) = 0.0;
 
-      new_pub_->publish(std_msgs::Empty());
+      new_pub_->publish(std_msgs::msg::Empty());
       /* topo path finding and optimization */
       bool success = callTopologicalTraj(1);
       if (success) {
@@ -267,7 +267,7 @@ void TopoReplanFSM::execFSMCallback( ) {
       start_acc_ = info->acceleration_traj_.evaluateDeBoorT(t_cur);
 
       /* inform server */
-      new_pub_->publish(std_msgs::Empty());
+      new_pub_->publish(std_msgs::msg::Empty());
 
       // bool success = callSearchAndOptimization();
       bool success = callTopologicalTraj(1);
@@ -359,7 +359,7 @@ void TopoReplanFSM::checkCollisionCallback( ) {
         changeFSMExecState(REPLAN_TRAJ, "SAFETY");
       } else {
         RCLCPP_ERROR(node_->get_logger(), "current traj %lf m to collision, emergency stop!", dist);
-        replan_pub_->publish(std_msgs::Empty());
+        replan_pub_->publish(std_msgs::msg::Empty());
         have_target_ = false;
         changeFSMExecState(WAIT_TARGET, "SAFETY");
       }
@@ -389,7 +389,7 @@ bool TopoReplanFSM::callTopologicalTraj(int step) {
     /* publish newest trajectory to server */
 
     /* publish traj */
-    plan_manage::Bspline bspline;
+    plan_manage::msg::Bspline bspline;
     bspline.order      = 3;
     bspline.start_time = locdat->start_time_;
     bspline.traj_id    = locdat->traj_id_;
@@ -397,7 +397,7 @@ bool TopoReplanFSM::callTopologicalTraj(int step) {
     Eigen::MatrixXd pos_pts = locdat->position_traj_.getControlPoint();
 
     for (int i = 0; i < pos_pts.rows(); ++i) {
-      geometry_msgs::Point pt;
+      geometry_msgs::msg::Point pt;
       pt.x = pos_pts(i, 0);
       pt.y = pos_pts(i, 1);
       pt.z = pos_pts(i, 2);

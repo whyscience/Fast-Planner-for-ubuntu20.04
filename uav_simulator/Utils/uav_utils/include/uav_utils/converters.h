@@ -64,12 +64,12 @@ Eigen::Matrix<Scalar_t, 3, 1> from_point_msg(const geometry_msgs::Point& msg) {
 }
 
 template <typename Derived>
-geometry_msgs::Point to_point_msg(const Eigen::DenseBase<Derived>& v) {
+geometry_msgs::msg::Point to_point_msg(const Eigen::DenseBase<Derived>& v) {
 	EIGEN_STATIC_ASSERT_FIXED_SIZE(Derived);
     EIGEN_STATIC_ASSERT(Derived::RowsAtCompileTime == 3, THIS_METHOD_IS_ONLY_FOR_MATRICES_OF_A_SPECIFIC_SIZE);
     EIGEN_STATIC_ASSERT(Derived::ColsAtCompileTime == 1, THIS_METHOD_IS_ONLY_FOR_MATRICES_OF_A_SPECIFIC_SIZE);
     
-    geometry_msgs::Point msg;
+    geometry_msgs::msg::Point msg;
     msg.x = v.x();
     msg.y = v.y();
     msg.z = v.z();

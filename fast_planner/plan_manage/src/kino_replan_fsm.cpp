@@ -56,9 +56,9 @@ void KinoReplanFSM::init(rclcpp::Node::SharedPtr& nh) {
       nh.subscribe("/waypoint_generator/waypoints", 1, &KinoReplanFSM::waypointCallback, this);
   odom_sub_ = nh.subscribe("/odom_world", 1, &KinoReplanFSM::odometryCallback, this);
 
-  replan_pub_  = nh.advertise<std_msgs::Empty>("/planning/replan", 10);
-  new_pub_     = nh.advertise<std_msgs::Empty>("/planning/new", 10);
-  bspline_pub_ = nh.advertise<plan_manage::Bspline>("/planning/bspline", 10);
+  replan_pub_  = nh.advertise<std_msgs::msg::Empty>("/planning/replan", 10);
+  new_pub_     = nh.advertise<std_msgs::msg::Empty>("/planning/new", 10);
+  bspline_pub_ = nh.advertise<plan_manage::msg::Bspline>("/planning/bspline", 10);
 }
 
 void KinoReplanFSM::waypointCallback(const nav_msgs::msg::Path::SharedPtr msg) {
@@ -210,7 +210,7 @@ void KinoReplanFSM::execFSMCallback( ) {
       start_yaw_(1) = info->yawdot_traj_.evaluateDeBoorT(t_cur)[0];
       start_yaw_(2) = info->yawdotdot_traj_.evaluateDeBoorT(t_cur)[0];
 
-      std_msgs::Empty replan_msg;
+      std_msgs::msg::Empty replan_msg;
       replan_pub_->publish(replan_msg);
 
       bool success = callKinodynamicReplan();
@@ -285,7 +285,7 @@ void KinoReplanFSM::checkCollisionCallback( ) {
         cout << "goal near collision, keep retry" << endl;
         changeFSMExecState(REPLAN_TRAJ, "FSM");
 
-        std_msgs::Empty emt;
+        std_msgs::msg::Empty emt;
         replan_pub_->publish(emt);
       }
     }
@@ -315,7 +315,7 @@ bool KinoReplanFSM::callKinodynamicReplan() {
     auto info = &planner_manager_->local_data_;
 
     /* publish traj */
-    plan_manage::Bspline bspline;
+    plan_manage::msg::Bspline bspline;
     bspline.order      = 3;
     bspline.start_time = info->start_time_;
     bspline.traj_id    = info->traj_id_;
@@ -323,7 +323,7 @@ bool KinoReplanFSM::callKinodynamicReplan() {
     Eigen::MatrixXd pos_pts = info->position_traj_.getControlPoint();
 
     for (int i = 0; i < pos_pts.rows(); ++i) {
-      geometry_msgs::Point pt;
+      geometry_msgs::msg::Point pt;
       pt.x = pos_pts(i, 0);
       pt.y = pos_pts(i, 1);
       pt.z = pos_pts(i, 2);

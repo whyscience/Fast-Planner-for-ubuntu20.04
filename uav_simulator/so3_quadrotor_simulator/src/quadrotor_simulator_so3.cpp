@@ -205,12 +205,12 @@ main(int argc, char** argv)
 
   rclcpp::Publisher  odom_pub = n.advertise<nav_msgs::msg::Odometry>("odom", 100);
   rclcpp::Publisher  imu_pub  = n.advertise<sensor_msgs::Imu>("imu", 10);
-  rclcpp::Subscriber cmd_sub =
+  auto cmd_sub =
     n.subscribe("cmd", 100, &cmd_callback, rclcpp::TransportHints().tcpNoDelay());
-  rclcpp::Subscriber f_sub =
+  auto f_sub =
     n.subscribe("force_disturbance", 100, &force_disturbance_callback,
                 rclcpp::TransportHints().tcpNoDelay());
-  rclcpp::Subscriber m_sub =
+  auto m_sub =
     n.subscribe("moment_disturbance", 100, &moment_disturbance_callback,
                 rclcpp::TransportHints().tcpNoDelay());
 

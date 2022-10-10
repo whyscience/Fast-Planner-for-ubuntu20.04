@@ -31,22 +31,22 @@ namespace fast_planner {
 PlanningVisualization::PlanningVisualization(rclcpp::Node::SharedPtr& nh) {
   node = nh;
 
-  traj_pub_ = node.advertise<visualization_msgs::msg::Marker>("/planning_vis/trajectory", 20);
+  traj_pub_ = node->create_publisher<visualization_msgs::msg::Marker>("/planning_vis/trajectory", 20);
   pubs_.push_back(traj_pub_);
 
-  topo_pub_ = node.advertise<visualization_msgs::msg::Marker>("/planning_vis/topo_path", 20);
+  topo_pub_ = node->create_publisher<visualization_msgs::msg::Marker>("/planning_vis/topo_path", 20);
   pubs_.push_back(topo_pub_);
 
-  predict_pub_ = node.advertise<visualization_msgs::msg::Marker>("/planning_vis/prediction", 20);
+  predict_pub_ = node->create_publisher<visualization_msgs::msg::Marker>("/planning_vis/prediction", 20);
   pubs_.push_back(predict_pub_);
 
-  visib_pub_ = node.advertise<visualization_msgs::msg::Marker>("/planning_vis/visib_constraint", 20);
+  visib_pub_ = node->create_publisher<visualization_msgs::msg::Marker>("/planning_vis/visib_constraint", 20);
   pubs_.push_back(visib_pub_);
 
-  frontier_pub_ = node.advertise<visualization_msgs::msg::Marker>("/planning_vis/frontier", 20);
+  frontier_pub_ = node->create_publisher<visualization_msgs::msg::Marker>("/planning_vis/frontier", 20);
   pubs_.push_back(frontier_pub_);
 
-  yaw_pub_ = node.advertise<visualization_msgs::msg::Marker>("/planning_vis/yaw", 20);
+  yaw_pub_ = node->create_publisher<visualization_msgs::msg::Marker>("/planning_vis/yaw", 20);
   pubs_.push_back(yaw_pub_);
 
   last_topo_path1_num_     = 0;
@@ -81,7 +81,7 @@ void PlanningVisualization::displaySphereList(const vector<Eigen::Vector3d>& lis
   mk.scale.y = resolution;
   mk.scale.z = resolution;
 
-  geometry_msgs::Point pt;
+  geometry_msgs::msg::Point pt;
   for (int i = 0; i < int(list.size()); i++) {
     pt.x = list[i](0);
     pt.y = list[i](1);
@@ -89,7 +89,8 @@ void PlanningVisualization::displaySphereList(const vector<Eigen::Vector3d>& lis
     mk.points.push_back(pt);
   }
   pubs_[pub_id]->publish(mk);
-  rclcpp::Duration(0.001).sleep();
+  rclcpp::Rate sleepRate(1000);
+  sleepRate.sleep();
 }
 
 void PlanningVisualization::displayCubeList(const vector<Eigen::Vector3d>& list, double resolution,
@@ -117,7 +118,7 @@ void PlanningVisualization::displayCubeList(const vector<Eigen::Vector3d>& list,
   mk.scale.y = resolution;
   mk.scale.z = resolution;
 
-  geometry_msgs::Point pt;
+  geometry_msgs::msg::Point pt;
   for (int i = 0; i < int(list.size()); i++) {
     pt.x = list[i](0);
     pt.y = list[i](1);
@@ -126,7 +127,8 @@ void PlanningVisualization::displayCubeList(const vector<Eigen::Vector3d>& list,
   }
   pubs_[pub_id]->publish(mk);
 
-  rclcpp::Duration(0.001).sleep();
+  rclcpp::Rate sleepRate(1000);
+  sleepRate.sleep();
 }
 
 void PlanningVisualization::displayLineList(const vector<Eigen::Vector3d>& list1,
@@ -152,7 +154,7 @@ void PlanningVisualization::displayLineList(const vector<Eigen::Vector3d>& list1
   mk.color.a = color(3);
   mk.scale.x = line_width;
 
-  geometry_msgs::Point pt;
+  geometry_msgs::msg::Point pt;
   for (int i = 0; i < int(list1.size()); ++i) {
     pt.x = list1[i](0);
     pt.y = list1[i](1);
@@ -166,7 +168,8 @@ void PlanningVisualization::displayLineList(const vector<Eigen::Vector3d>& list1
   }
   pubs_[pub_id]->publish(mk);
 
-  rclcpp::Duration(0.001).sleep();
+  rclcpp::Rate sleepRate(1000);
+  sleepRate.sleep();
 }
 
 void PlanningVisualization::drawBsplinesPhase1(vector<NonUniformBspline>& bsplines, double size) {

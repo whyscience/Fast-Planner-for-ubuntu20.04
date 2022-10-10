@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(path_searching)
 
-
 # Default to C++14
 if (NOT CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 14)
@@ -49,10 +48,15 @@ ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 ament_export_dependencies(${dependencies})
 
-install(TARGETS
-        ${PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin)
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include)
+install(
+        DIRECTORY include/${PROJECT_NAME}
+        DESTINATION include
+)
 
 ament_package()
