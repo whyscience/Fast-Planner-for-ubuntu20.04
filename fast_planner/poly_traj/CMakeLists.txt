@@ -8,24 +8,24 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wno-sign-compare -Wno-unused-
 find_package(Eigen3 REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
-roscpp
-std_msgs
-)
+        roscpp
+        std_msgs
+        )
 
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES poly_traj
+        INCLUDE_DIRS include
+        LIBRARIES poly_traj
 )
 
 include_directories(
-# include
-  ${catkin_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include
-  ${EIGEN3_INCLUDE_DIR}
+        # include
+        ${catkin_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include
+        ${EIGEN3_INCLUDE_DIR}
 )
 
-add_library( poly_traj 
-    src/polynomial_traj.cpp 
-    )
-target_link_libraries( poly_traj
-    ${catkin_LIBRARIES} 
-    )  
+add_library(poly_traj
+        src/polynomial_traj.cpp
+        )
+target_link_libraries(poly_traj
+        ${catkin_LIBRARIES}
+        )

@@ -101,14 +101,14 @@ void drawState(Eigen::Vector3d pos, Eigen::Vector3d vec, int id, Eigen::Vector4d
   state_pub->publish(mk_state);
 }
 
-void odomCallbck(const nav_msgs::msg::Odometry& msg) {
+void odomCallbck(const nav_msgs::msg::Odometry &msg) {
   if (msg.child_frame_id == "X" || msg.child_frame_id == "O") return;
 
   odom = msg;
   have_odom = true;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   /* ---------- initialize ---------- */
   rclcpp::init(argc, argv, "traj_generator");
   rclcpp::Node::SharedPtr node;
