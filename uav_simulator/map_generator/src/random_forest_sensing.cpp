@@ -9,7 +9,6 @@
 #include <geometry_msgs/msg/vector3.hpp>
 #include <math.h>
 #include <nav_msgs/msg/odometry.hpp>
-#include <ros/console.h>
 #include "rclcpp/rclcpp.hpp"
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <Eigen/Eigen>
@@ -218,7 +217,7 @@ void pubSensedPoints() {
       localMap.points.push_back(pt);
     }
   } else {
-    RCLCPP_ERROR("[Map server] No obstacles .");
+    RCLCPP_ERROR(node_->get_logger(), "[Map server] No obstacles .");
     return;
   }
 

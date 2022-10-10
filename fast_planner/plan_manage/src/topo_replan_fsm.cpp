@@ -358,7 +358,7 @@ void TopoReplanFSM::checkCollisionCallback( ) {
         collide_ = true;
         changeFSMExecState(REPLAN_TRAJ, "SAFETY");
       } else {
-        RCLCPP_ERROR("current traj %lf m to collision, emergency stop!", dist);
+        RCLCPP_ERROR(node_->get_logger(), "current traj %lf m to collision, emergency stop!", dist);
         replan_pub_->publish(std_msgs::Empty());
         have_target_ = false;
         changeFSMExecState(WAIT_TARGET, "SAFETY");

@@ -96,7 +96,7 @@ int KinodynamicAstar::search(Eigen::Vector3d start_pt,
         estimateHeuristic(cur_node->state, end_state, time_to_goal);
         computeShotTraj(cur_node->state, end_state, time_to_goal);
         if (init_search)
-          RCLCPP_ERROR("Shot in first search loop!");
+          RCLCPP_ERROR(node_->get_logger(), "Shot in first search loop!");
       }
     }
     if (reach_horizon) {
@@ -286,22 +286,40 @@ int KinodynamicAstar::search(Eigen::Vector3d start_pt,
 }
 
 void KinodynamicAstar::setParam(rclcpp::Node::SharedPtr &nh) {
-  nh.param("search/max_tau", max_tau_, -1.0);
-  nh.param("search/init_max_tau", init_max_tau_, -1.0);
-  nh.param("search/max_vel", max_vel_, -1.0);
-  nh.param("search/max_acc", max_acc_, -1.0);
-  nh.param("search/w_time", w_time_, -1.0);
-  nh.param("search/horizon", horizon_, -1.0);
-  nh.param("search/resolution_astar", resolution_, -1.0);
-  nh.param("search/time_resolution", time_resolution_, -1.0);
-  nh.param("search/lambda_heu", lambda_heu_, -1.0);
-  nh.param("search/allocate_num", allocate_num_, -1);
-  nh.param("search/check_num", check_num_, -1);
-  nh.param("search/optimistic", optimistic_, true);
+  node_ = nh;
+
+  node_->declare_parameter<double>("search/max_tau", -1.0);
+  node_->declare_parameter<double>("search/init_max_tau", -1.0);
+  node_->declare_parameter<double>("search/max_vel", -1.0);
+  node_->declare_parameter<double>("search/max_acc", -1.0);
+  node_->declare_parameter<double>("search/w_time", -1.0);
+  node_->declare_parameter<double>("search/horizon", -1.0);
+  node_->declare_parameter<double>("search/resolution_astar", -1.0);
+  node_->declare_parameter<double>("search/time_resolution", -1.0);
+  node_->declare_parameter<double>("search/lambda_heu", -1.0);
+  node_->declare_parameter<int>("search/allocate_num", -1);
+  node_->declare_parameter<int>("search/check_num", -1);
+  node_->declare_parameter<bool>("search/optimistic", true);
+
+  node_->get_parameter("search/max_tau", max_tau_);
+  node_->get_parameter("search/init_max_tau", init_max_tau_);
+  node_->get_parameter("search/max_vel", max_vel_);
+  node_->get_parameter("search/max_acc", max_acc_);
+  node_->get_parameter("search/w_time", w_time_);
+  node_->get_parameter("search/horizon", horizon_);
+  node_->get_parameter("search/resolution_astar", resolution_);
+  node_->get_parameter("search/time_resolution", time_resolution_);
+  node_->get_parameter("search/lambda_heu", lambda_heu_);
+  node_->declare_parameter("search/allocate_num", allocate_num_);
+  node_->declare_parameter("search/check_num", check_num_);
+  node_->declare_parameter("search/optimistic", optimistic_);
+
   tie_breaker_ = 1.0 + 1.0 / 10000;
 
   double vel_margin;
-  nh.param("search/vel_margin", vel_margin, 0.0);
+  node_->declare_parameter<double>("search/vel_margin", 0.0);
+  node_->get_parameter("search/vel_margin", vel_margin);
+
   max_vel_ += vel_margin;
 }
 

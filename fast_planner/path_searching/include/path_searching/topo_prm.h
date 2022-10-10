@@ -112,6 +112,7 @@ public:
 class TopologyPRM {
 private:
   /* data */
+  rclcpp::Node::SharedPtr node_;
   EDTEnvironment::Ptr edt_environment_;  // environment representation
 
   // sampling generator

@@ -224,7 +224,7 @@ bool FastPlannerManager::kinodynamicReplan(Eigen::Vector3d start_pt, Eigen::Vect
   double tn = pos.getTimeSum();
 
   cout << "[kino replan]: Reallocate ratio: " << tn / to << endl;
-  if (tn / to > 3.0) RCLCPP_ERROR("reallocate error.");
+  if (tn / to > 3.0) RCLCPP_ERROR(node_->get_logger(), "reallocate error.");
 
   t_adjust = (rclcpp::Clock().now() - t1).seconds();
 

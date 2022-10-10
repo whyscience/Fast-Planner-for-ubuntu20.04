@@ -340,7 +340,7 @@ void MultiProbMapDisplay::update( float wall_dt, float ros_dt )
   }
   loaded_ = true;  
   context_->queueRender(); 
-  //RCLCPP_ERROR("RVIZ MAP:  %f %f %f %f", dt[0],dt[1],dt[2],dt[3]);
+  //RCLCPP_ERROR(node_->get_logger(), "RVIZ MAP:  %f %f %f %f", dt[0],dt[1],dt[2],dt[3]);
 }
 
 // ***********************************************************************************************************************************

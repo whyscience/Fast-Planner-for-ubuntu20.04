@@ -145,7 +145,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg) {
 
 void goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
 /*    if (!is_odom_ready) {
-        RCLCPP_ERROR("[waypoint_generator] No odom!");
+        RCLCPP_ERROR(node_->get_logger(), "[waypoint_generator] No odom!");
         return;
     }*/
 
@@ -208,7 +208,7 @@ void goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
 
 void traj_start_trigger_callback(const geometry_msgs::msg::PoseStamped& msg) {
     if (!is_odom_ready) {
-        RCLCPP_ERROR("[waypoint_generator] No odom!");
+        RCLCPP_ERROR(node_->get_logger(), "[waypoint_generator] No odom!");
         return;
     }
 

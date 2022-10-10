@@ -383,19 +383,19 @@ bool place_holder;
 
       if (count != dynamic_reconfigure::ConfigTools::size(msg))
       {
-        RCLCPP_ERROR("DisturbanceUIConfig::__fromMessage__ called with an unexpected parameter.");
-        RCLCPP_ERROR("Booleans:");
+        RCLCPP_ERROR(node_->get_logger(), "DisturbanceUIConfig::__fromMessage__ called with an unexpected parameter.");
+        RCLCPP_ERROR(node_->get_logger(), "Booleans:");
         for (unsigned int i = 0; i < msg.bools.size(); i++)
-          RCLCPP_ERROR("  %s", msg.bools[i].name.c_str());
-        RCLCPP_ERROR("Integers:");
+          RCLCPP_ERROR(node_->get_logger(), "  %s", msg.bools[i].name.c_str());
+        RCLCPP_ERROR(node_->get_logger(), "Integers:");
         for (unsigned int i = 0; i < msg.ints.size(); i++)
-          RCLCPP_ERROR("  %s", msg.ints[i].name.c_str());
-        RCLCPP_ERROR("Doubles:");
+          RCLCPP_ERROR(node_->get_logger(), "  %s", msg.ints[i].name.c_str());
+        RCLCPP_ERROR(node_->get_logger(), "Doubles:");
         for (unsigned int i = 0; i < msg.doubles.size(); i++)
-          RCLCPP_ERROR("  %s", msg.doubles[i].name.c_str());
-        RCLCPP_ERROR("Strings:");
+          RCLCPP_ERROR(node_->get_logger(), "  %s", msg.doubles[i].name.c_str());
+        RCLCPP_ERROR(node_->get_logger(), "Strings:");
         for (unsigned int i = 0; i < msg.strs.size(); i++)
-          RCLCPP_ERROR("  %s", msg.strs[i].name.c_str());
+          RCLCPP_ERROR(node_->get_logger(), "  %s", msg.strs[i].name.c_str());
         // @todo Check that there are no duplicates. Make this error more
         // explicit.
         return false;

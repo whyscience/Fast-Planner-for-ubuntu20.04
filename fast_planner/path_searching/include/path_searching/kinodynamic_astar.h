@@ -2,7 +2,6 @@
 #define _KINODYNAMIC_ASTAR_H
 
 // #include <path_searching/matrix_hash.h>
-#include <ros/console.h>
 #include "rclcpp/rclcpp.hpp"
 #include <Eigen/Eigen>
 #include <boost/functional/hash.hpp>
@@ -104,6 +103,7 @@ class NodeHashTable {
 class KinodynamicAstar {
  private:
   /* ---------- main data structure ---------- */
+  rclcpp::Node::SharedPtr node_;
   vector<PathNodePtr> path_node_pool_;
   int use_node_num_, iter_num_;
   NodeHashTable expanded_nodes_;

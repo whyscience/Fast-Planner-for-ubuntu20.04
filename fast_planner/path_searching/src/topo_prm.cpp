@@ -32,23 +32,38 @@ TopologyPRM::TopologyPRM(/* args */) {}
 TopologyPRM::~TopologyPRM() {}
 
 void TopologyPRM::init(rclcpp::Node::SharedPtr &nh) {
+  node_ = nh;
   graph_.clear();
   eng_ = default_random_engine(rd_());
   rand_pos_ = uniform_real_distribution<double>(-1.0, 1.0);
 
   // init parameter
-  nh.param("topo_prm/sample_inflate_x", sample_inflate_(0), -1.0);
-  nh.param("topo_prm/sample_inflate_y", sample_inflate_(1), -1.0);
-  nh.param("topo_prm/sample_inflate_z", sample_inflate_(2), -1.0);
-  nh.param("topo_prm/clearance", clearance_, -1.0);
-  nh.param("topo_prm/short_cut_num", short_cut_num_, -1);
-  nh.param("topo_prm/reserve_num", reserve_num_, -1);
-  nh.param("topo_prm/ratio_to_short", ratio_to_short_, -1.0);
-  nh.param("topo_prm/max_sample_num", max_sample_num_, -1);
-  nh.param("topo_prm/max_sample_time", max_sample_time_, -1.0);
-  nh.param("topo_prm/max_raw_path", max_raw_path_, -1);
-  nh.param("topo_prm/max_raw_path2", max_raw_path2_, -1);
-  nh.param("topo_prm/parallel_shortcut", parallel_shortcut_, false);
+  node_->declare_parameter<double>("topo_prm/sample_inflate_x", -1.0);
+  node_->declare_parameter<double>("topo_prm/sample_inflate_y", -1.0);
+  node_->declare_parameter<double>("topo_prm/sample_inflate_z", -1.0);
+  node_->declare_parameter<double>("topo_prm/clearance", -1.0);
+  node_->declare_parameter<int>("topo_prm/short_cut_num", -1);
+  node_->declare_parameter<int>("topo_prm/reserve_num", -1);
+  node_->declare_parameter<double>("topo_prm/ratio_to_short", -1.0);
+  node_->declare_parameter<int>("topo_prm/max_sample_num", -1);
+  node_->declare_parameter<double>("topo_prm/max_sample_time", -1.0);
+  node_->declare_parameter<int>("topo_prm/max_raw_path", -1);
+  node_->declare_parameter<int>("topo_prm/max_raw_path2", -1);
+  node_->declare_parameter<bool>("topo_prm/parallel_shortcut", false);
+
+  node_->get_parameter("topo_prm/sample_inflate_x", sample_inflate_(0));
+  node_->get_parameter("topo_prm/sample_inflate_y", sample_inflate_(1));
+  node_->get_parameter("topo_prm/sample_inflate_z", sample_inflate_(2));
+  node_->get_parameter("topo_prm/clearance", clearance_);
+  node_->get_parameter("topo_prm/short_cut_num", short_cut_num_);
+  node_->get_parameter("topo_prm/reserve_num", reserve_num_);
+  node_->get_parameter("topo_prm/ratio_to_short", ratio_to_short_);
+  node_->get_parameter("topo_prm/max_sample_num", max_sample_num_);
+  node_->get_parameter("topo_prm/max_sample_time", max_sample_time_);
+  node_->get_parameter("topo_prm/max_raw_path", max_raw_path_);
+  node_->get_parameter("topo_prm/max_raw_path2", max_raw_path2_);
+  node_->get_parameter("topo_prm/parallel_shortcut", parallel_shortcut_);
+
   resolution_ = edt_environment_->sdf_map_->getResolution();
   offset_ = Eigen::Vector3d(0.5, 0.5, 0.5) - edt_environment_->sdf_map_->getOrigin() / resolution_;
 
@@ -563,7 +578,7 @@ vector<Eigen::Vector3d> TopologyPRM::discretizePath(vector<Eigen::Vector3d> path
   vector<Eigen::Vector3d> dis_path, segment;
 
   if (path.size() < 2) {
-    RCLCPP_ERROR("what path? ");
+    RCLCPP_ERROR(node_->get_logger(), "what path? ");
     return dis_path;
   }
 

@@ -21,8 +21,6 @@
 * along with Fast-Planner. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
 #include <path_searching/astar.h>
 #include <sstream>
 
@@ -203,11 +201,19 @@ int Astar::search(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt, bool dynamic
 }
 
 void Astar::setParam(rclcpp::Node::SharedPtr &nh) {
-  nh.param("astar/resolution_astar", resolution_, -1.0);
-  nh.param("astar/time_resolution", time_resolution_, -1.0);
-  nh.param("astar/lambda_heu", lambda_heu_, -1.0);
-  nh.param("astar/margin", margin_, -1.0);
-  nh.param("astar/allocate_num", allocate_num_, -1);
+  node_ = nh;
+  node_->declare_parameter<double>("astar/resolution_astar", -1.0);
+  node_->declare_parameter<double>("astar/time_resolution", -1.0);
+  node_->declare_parameter<double>("astar/lambda_heu", -1.0);
+  node_->declare_parameter<double>("astar/margin", -1.0);
+  node_->declare_parameter<int>("astar/allocate_num", -1);
+
+  node_->get_parameter("astar/resolution_astar", resolution_);
+  node_->get_parameter("astar/time_resolution", time_resolution_);
+  node_->get_parameter("astar/lambda_heu", lambda_heu_);
+  node_->get_parameter("astar/margin", margin_);
+  node_->get_parameter("astar/allocate_num", allocate_num_);
+
   tie_breaker_ = 1.0 + 1.0 / 10000;
 
   cout << "margin:" << margin_ << endl;

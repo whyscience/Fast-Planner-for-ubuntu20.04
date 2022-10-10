@@ -29,7 +29,6 @@
 #include <Eigen/Eigen>
 #include <iostream>
 #include <map>
-#include <ros/console.h>
 #include "rclcpp/rclcpp.hpp"
 #include <string>
 #include <unordered_map>
@@ -122,6 +121,7 @@ public:
 class Astar {
 private:
   /* ---------- main data structure ---------- */
+  rclcpp::Node::SharedPtr node_;
   vector<NodePtr> path_node_pool_;
   int use_node_num_, iter_num_;
   NodeHashTable0 expanded_nodes_;
