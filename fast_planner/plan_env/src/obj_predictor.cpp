@@ -56,11 +56,11 @@ void ObjHistory::poseCallback(geometry_msgs::msg::PoseStamped::SharedPtr msg) {
 // ObjHistory::
 /* ============================== obj predictor ==============================
  */
-/*ObjPredictor::ObjPredictor(rclcpp::NodeOptions options {
+/*ObjPredictor::ObjPredictor(rclcpp::Node::SharedPtrOptions options {
 }*/
 
 ObjPredictor::ObjPredictor(rclcpp::Node::SharedPtr &node) {
-  this->node_handle_ = node;
+  this->node_ = node;
 }
 
 ObjPredictor::~ObjPredictor() {
@@ -69,13 +69,13 @@ ObjPredictor::~ObjPredictor() {
 void ObjPredictor::init() {
   /* get param */
   //https://www.robotsfan.com/posts/7219ca14.html
-  this->node_handle_->declare_parameter<int>("prediction/obj_num", 5);
-  this->node_handle_->declare_parameter<double>("prediction/lambda", 1.0);
-  this->node_handle_->declare_parameter<double>("prediction/predict_rate", 1.0);
+  this->node_->declare_parameter<int>("prediction/obj_num", 5);
+  this->node_->declare_parameter<double>("prediction/lambda", 1.0);
+  this->node_->declare_parameter<double>("prediction/predict_rate", 1.0);
 
-  this->node_handle_->get_parameter("prediction/obj_num", obj_num_);
-  this->node_handle_->get_parameter("prediction/lambda", lambda_);
-  this->node_handle_->get_parameter("prediction/predict_rate", predict_rate_);
+  this->node_->get_parameter("prediction/obj_num", obj_num_);
+  this->node_->get_parameter("prediction/lambda", lambda_);
+  this->node_->get_parameter("prediction/predict_rate", predict_rate_);
 
   predict_trajs_.reset(new vector<PolynomialPrediction>);
   predict_trajs_->resize(obj_num_);
@@ -93,18 +93,18 @@ void ObjPredictor::init() {
     obj_his->init(i);
     obj_histories_.push_back(obj_his);
 
-    auto pose_sub = this->node_handle_->create_subscription<geometry_msgs::msg::PoseStamped>(
+    auto pose_sub = this->node_->create_subscription<geometry_msgs::msg::PoseStamped>(
         "/dynamic/pose_" + std::to_string(i),10,
         std::bind(&ObjHistory::poseCallback, obj_his.get(), std::placeholders::_1));
 
     pose_subs_.push_back(pose_sub);
   }
 
-  marker_sub_ = this->node_handle_->create_subscription<visualization_msgs::msg::Marker>(
+  marker_sub_ = this->node_->create_subscription<visualization_msgs::msg::Marker>(
       "/dynamic/obj", 10, std::bind(&ObjPredictor::markerCallback, this, std::placeholders::_1));
 
   /* update prediction */
-  predict_timer_ = this->node_handle_->create_wall_timer(std::chrono::milliseconds(int(1000 / predict_rate_)),
+  predict_timer_ = this->node_->create_wall_timer(std::chrono::milliseconds(int(1000 / predict_rate_)),
                                            std::bind(&ObjPredictor::predictCallback, this));
 }
 

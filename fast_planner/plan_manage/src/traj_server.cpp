@@ -281,8 +281,8 @@ void cmdCallback( ) {
 
 int main(int argc, char** argv) {
   rclcpp::init(argc, argv, "traj_server");
-  rclcpp::NodeHandle node;
-  rclcpp::NodeHandle nh("~");
+  rclcpp::Node::SharedPtr node;
+  rclcpp::Node::SharedPtr nh("~");
 
   rclcpp::Subscriber bspline_sub = node.subscribe("planning/bspline", 10, bsplineCallback);
   rclcpp::Subscriber replan_sub = node.subscribe("planning/replan", 10, replanCallback);

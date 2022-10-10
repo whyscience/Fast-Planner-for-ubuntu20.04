@@ -54,7 +54,7 @@ class BsplineOptimizer {
 
   /* main API */
   void setEnvironment(const EDTEnvironment::Ptr &env);
-  void setParam(rclcpp::NodeHandle &nh);
+  void setParam(rclcpp::Node::SharedPtr &nh);
   Eigen::MatrixXd BsplineOptimizeTraj(const Eigen::MatrixXd &points, const double &ts,
                                       const int &cost_function, int max_num_id, int max_time_id);
 
@@ -77,6 +77,7 @@ class BsplineOptimizer {
   vector<Eigen::Vector3d> matrixToVectors(const Eigen::MatrixXd &ctrl_pts);
 
  private:
+  rclcpp::Node::SharedPtr node_;
   EDTEnvironment::Ptr edt_environment_;
 
   // main input

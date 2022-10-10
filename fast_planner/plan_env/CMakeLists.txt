@@ -19,12 +19,12 @@ find_package(cv_bridge REQUIRED)
 find_package(message_filters REQUIRED)
 
 find_package(Eigen3 REQUIRED)
-find_package(PCL REQUIRED)
+#find_package(PCL REQUIRED COMPONENTS common io )
+find_package(pcl_ros REQUIRED)
 find_package(OpenCV REQUIRED)
 
 include_directories(include
         ${EIGEN3_INCLUDE_DIR}
-        ${PCL_INCLUDE_DIRS}
         ${OpenCV_INCLUDE_DIRS})
 
 add_library(plan_env
@@ -33,8 +33,19 @@ add_library(plan_env
         src/edt_environment.cpp
         src/raycast.cpp
         )
-ament_target_dependencies(plan_env rclcpp visualization_msgs cv_bridge message_filters geometry_msgs)
-target_link_libraries(plan_env ${PCL_LIBRARIES} ${OpenCV_LIBRARIES})
+
+set(dependencies
+        rclcpp
+        visualization_msgs
+        cv_bridge
+        message_filters
+        geometry_msgs
+        pcl_ros
+        Eigen3
+        )
+
+ament_target_dependencies(plan_env ${dependencies})
+target_link_libraries(plan_env ${OpenCV_LIBRARIES})
 
 add_executable(obj_generator
         src/obj_generator.cpp
@@ -42,17 +53,23 @@ add_executable(obj_generator
 target_link_libraries(obj_generator
         plan_env)
 
-install(TARGETS
-        plan_env
+install(TARGETS plan_env
+        EXPORT plan_env
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin)
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include)
 
 install(TARGETS
         obj_generator
         DESTINATION lib/${PROJECT_NAME})
 
+install(
+        DIRECTORY include/plan_env
+        DESTINATION include
+)
+
 ament_export_include_directories(include)
 ament_export_libraries(plan_env)
-ament_export_dependencies(rclcpp visualization_msgs cv_bridge message_filters geometry_msgs)
+ament_export_dependencies(${dependencies})
 ament_package()

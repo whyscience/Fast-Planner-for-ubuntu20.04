@@ -35,7 +35,7 @@ FastPlannerManager::FastPlannerManager() {}
 
 FastPlannerManager::~FastPlannerManager() { std::cout << "des manager" << std::endl; }
 
-void FastPlannerManager::initPlanModules(rclcpp::NodeHandle& nh) {
+void FastPlannerManager::initPlanModules(rclcpp::Node::SharedPtr& nh) {
   /* read algorithm parameters */
 
   nh.param("manager/max_vel", pp_.max_vel_, -1.0);

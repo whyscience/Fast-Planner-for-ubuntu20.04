@@ -201,7 +201,7 @@ main(int argc, char** argv)
 {
   rclcpp::init(argc, argv, "quadrotor_simulator_so3");
 
-  rclcpp::NodeHandle n("~");
+  rclcpp::Node::SharedPtr n("~");
 
   rclcpp::Publisher  odom_pub = n.advertise<nav_msgs::msg::Odometry>("odom", 100);
   rclcpp::Publisher  imu_pub  = n.advertise<sensor_msgs::Imu>("imu", 10);

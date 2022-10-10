@@ -59,7 +59,7 @@ private:
 
   /* data */
   /* visib_pub is seperated from previous ones for different info */
-  rclcpp::NodeHandle node;
+  rclcpp::Node::SharedPtr node;
   rclcpp::Publisher traj_pub_;      // 0
   rclcpp::Publisher topo_pub_;      // 1
   rclcpp::Publisher predict_pub_;   // 2
@@ -77,7 +77,7 @@ private:
 public:
   PlanningVisualization(/* args */) {}
   ~PlanningVisualization() {}
-  PlanningVisualization(rclcpp::NodeHandle& nh);
+  PlanningVisualization(rclcpp::Node::SharedPtr& nh);
 
   // draw basic shapes
   void displaySphereList(const vector<Eigen::Vector3d>& list, double resolution,

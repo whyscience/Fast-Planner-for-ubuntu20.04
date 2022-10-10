@@ -40,35 +40,70 @@ const int BsplineOptimizer::GUIDE_PHASE = BsplineOptimizer::SMOOTHNESS | Bspline
 const int BsplineOptimizer::NORMAL_PHASE =
     BsplineOptimizer::SMOOTHNESS | BsplineOptimizer::DISTANCE | BsplineOptimizer::FEASIBILITY;
 
-void BsplineOptimizer::setParam(rclcpp::NodeHandle &nh) {
-  nh.param("optimization/lambda1", lambda1_, -1.0);
-  nh.param("optimization/lambda2", lambda2_, -1.0);
-  nh.param("optimization/lambda3", lambda3_, -1.0);
-  nh.param("optimization/lambda4", lambda4_, -1.0);
-  nh.param("optimization/lambda5", lambda5_, -1.0);
-  nh.param("optimization/lambda6", lambda6_, -1.0);
-  nh.param("optimization/lambda7", lambda7_, -1.0);
-  nh.param("optimization/lambda8", lambda8_, -1.0);
+void BsplineOptimizer::setParam(rclcpp::Node::SharedPtr &nh) {
+  node_ = nh;
+  //declare_parameter
+  node_->declare_parameter<double>("optimization/lambda1", -1.0);
+  node_->declare_parameter<double>("optimization/lambda2", -1.0);
+  node_->declare_parameter<double>("optimization/lambda3", -1.0);
+  node_->declare_parameter<double>("optimization/lambda4", -1.0);
+  node_->declare_parameter<double>("optimization/lambda5", -1.0);
+  node_->declare_parameter<double>("optimization/lambda6", -1.0);
+  node_->declare_parameter<double>("optimization/lambda7", -1.0);
+  node_->declare_parameter<double>("optimization/lambda8", -1.0);
 
-  nh.param("optimization/dist0", dist0_, -1.0);
-  nh.param("optimization/max_vel", max_vel_, -1.0);
-  nh.param("optimization/max_acc", max_acc_, -1.0);
-  nh.param("optimization/visib_min", visib_min_, -1.0);
-  nh.param("optimization/dlmin", dlmin_, -1.0);
-  nh.param("optimization/wnl", wnl_, -1.0);
+  node_->declare_parameter<double>("optimization/dist0", -1.0);
+  node_->declare_parameter<double>("optimization/max_vel", -1.0);
+  node_->declare_parameter<double>("optimization/max_acc", -1.0);
+  node_->declare_parameter<double>("optimization/visib_min", -1.0);
+  node_->declare_parameter<double>("optimization/dlmin", -1.0);
+  node_->declare_parameter<double>("optimization/wnl", -1.0);
 
-  nh.param("optimization/max_iteration_num1", max_iteration_num_[0], -1);
-  nh.param("optimization/max_iteration_num2", max_iteration_num_[1], -1);
-  nh.param("optimization/max_iteration_num3", max_iteration_num_[2], -1);
-  nh.param("optimization/max_iteration_num4", max_iteration_num_[3], -1);
-  nh.param("optimization/max_iteration_time1", max_iteration_time_[0], -1.0);
-  nh.param("optimization/max_iteration_time2", max_iteration_time_[1], -1.0);
-  nh.param("optimization/max_iteration_time3", max_iteration_time_[2], -1.0);
-  nh.param("optimization/max_iteration_time4", max_iteration_time_[3], -1.0);
+  node_->declare_parameter<int>("optimization/max_iteration_num1", -1);
+  node_->declare_parameter<int>("optimization/max_iteration_num2", -1);
+  node_->declare_parameter<int>("optimization/max_iteration_num3", -1);
+  node_->declare_parameter<int>("optimization/max_iteration_num4", -1);
+  node_->declare_parameter<double>("optimization/max_iteration_time1", -1.0);
+  node_->declare_parameter<double>("optimization/max_iteration_time2", -1.0);
+  node_->declare_parameter<double>("optimization/max_iteration_time3", -1.0);
+  node_->declare_parameter<double>("optimization/max_iteration_time4", -1.0);
 
-  nh.param("optimization/algorithm1", algorithm1_, -1);
-  nh.param("optimization/algorithm2", algorithm2_, -1);
-  nh.param("optimization/order", order_, -1);
+  node_->declare_parameter<int>("optimization/algorithm1", -1);
+  node_->declare_parameter<int>("optimization/algorithm2", -1);
+  node_->declare_parameter<int>("optimization/order", -1);
+
+  //get param
+  node_->get_parameter("optimization/lambda1", lambda1_);
+  node_->get_parameter("optimization/lambda2", lambda2_);
+  node_->get_parameter("optimization/lambda3", lambda3_);
+  node_->get_parameter("optimization/lambda4", lambda4_);
+  node_->get_parameter("optimization/lambda5", lambda5_);
+  node_->get_parameter("optimization/lambda6", lambda6_);
+  node_->get_parameter("optimization/lambda7", lambda7_);
+  node_->get_parameter("optimization/lambda8", lambda8_);
+
+  node_->get_parameter("optimization/dist0", dist0_);
+  node_->get_parameter("optimization/max_vel", max_vel_);
+  node_->get_parameter("optimization/max_acc", max_acc_);
+  node_->get_parameter("optimization/visib_min", visib_min_);
+  node_->get_parameter("optimization/dlmin", dlmin_);
+  node_->get_parameter("optimization/wnl", wnl_);
+
+  node_->get_parameter("optimization/max_iteration_num1", max_iteration_num_[0]);
+  node_->get_parameter("optimization/max_iteration_num2", max_iteration_num_[1]);
+  node_->get_parameter("optimization/max_iteration_num3", max_iteration_num_[2]);
+  node_->get_parameter("optimization/max_iteration_num4", max_iteration_num_[3]);
+  node_->get_parameter("optimization/max_iteration_time1", max_iteration_time_[0]);
+  node_->get_parameter("optimization/max_iteration_time2", max_iteration_time_[1]);
+  node_->get_parameter("optimization/max_iteration_time3", max_iteration_time_[2]);
+  node_->get_parameter("optimization/max_iteration_time4", max_iteration_time_[3]);
+
+  node_->get_parameter("optimization/algorithm1", algorithm1_);
+  node_->get_parameter("optimization/algorithm2", algorithm2_);
+  node_->get_parameter("optimization/order", order_);
+
+  //  node_->declare_parameter<int>("obj_generator/interval", 2.5);
+  //  node_->get_parameter("obj_generator/obj_num", obj_num);
 }
 
 void BsplineOptimizer::setEnvironment(const EDTEnvironment::Ptr &env) {
@@ -99,7 +134,7 @@ void BsplineOptimizer::setCostFunction(const int &cost_code) {
   if (cost_function_ & GUIDE) cost_str += " guide |";
   if (cost_function_ & WAYPOINTS) cost_str += " waypt |";
 
-  RCLCPP_INFO_STREAM("cost func: " << cost_str);
+  RCLCPP_INFO_STREAM(node_->get_logger(), "cost func: " << cost_str);
 }
 
 void BsplineOptimizer::setGuidePath(const vector<Eigen::Vector3d> &guide_pt) { guide_pts_ = guide_pt; }
@@ -183,7 +218,7 @@ void BsplineOptimizer::optimize() {
     /* retrieve the optimization result */
     // cout << "Min cost:" << min_cost_ << endl;
   } catch (std::exception &e) {
-    RCLCPP_WARN("[Optimization]: nlopt exception");
+    RCLCPP_WARN(node_->get_logger(), "[Optimization]: nlopt exception");
     cout << e.what() << endl;
   }
 
@@ -194,7 +229,7 @@ void BsplineOptimizer::optimize() {
     }
   }
 
-  if (!(cost_function_ & GUIDE)) RCLCPP_INFO_STREAM("iter num: " << iter_num_);
+  if (!(cost_function_ & GUIDE)) RCLCPP_INFO_STREAM(node_->get_logger(), "iter num: " << iter_num_);
 }
 
 void BsplineOptimizer::calcSmoothnessCost(const vector<Eigen::Vector3d> &q, double &cost,

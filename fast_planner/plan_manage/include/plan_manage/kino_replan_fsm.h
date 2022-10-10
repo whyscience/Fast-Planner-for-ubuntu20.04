@@ -53,13 +53,13 @@ private:
   /* data */
   int test_;
   std::vector<int> test_vec_;
-  rclcpp::NodeHandle nh_;
+  rclcpp::Node::SharedPtr nh_;
 
 public:
   Test(const int& v) {
     test_ = v;
   }
-  Test(rclcpp::NodeHandle& node) {
+  Test(rclcpp::Node::SharedPtr& node) {
     nh_ = node;
   }
   ~Test() {
@@ -98,7 +98,7 @@ private:
   int current_wp_;
 
   /* ROS utils */
-  rclcpp::NodeHandle node_;
+  rclcpp::Node::SharedPtr node_;
   rclcpp::Timer exec_timer_, safety_timer_, vis_timer_, test_something_timer_;
   rclcpp::Subscriber waypoint_sub_, odom_sub_;
   rclcpp::Publisher replan_pub_, new_pub_, bspline_pub_;
@@ -122,7 +122,7 @@ public:
   ~KinoReplanFSM() {
   }
 
-  void init(rclcpp::NodeHandle& nh);
+  void init(rclcpp::Node::SharedPtr& nh);
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };

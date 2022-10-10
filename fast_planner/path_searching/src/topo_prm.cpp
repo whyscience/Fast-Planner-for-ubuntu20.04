@@ -31,7 +31,7 @@ TopologyPRM::TopologyPRM(/* args */) {}
 
 TopologyPRM::~TopologyPRM() {}
 
-void TopologyPRM::init(rclcpp::NodeHandle& nh) {
+void TopologyPRM::init(rclcpp::Node::SharedPtr& nh) {
   graph_.clear();
   eng_ = default_random_engine(rd_());
   rand_pos_ = uniform_real_distribution<double>(-1.0, 1.0);

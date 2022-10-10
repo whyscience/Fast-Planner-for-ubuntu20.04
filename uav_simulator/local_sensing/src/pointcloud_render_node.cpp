@@ -155,7 +155,7 @@ void rcvLocalPointCloudCallBack(
 
 int main(int argc, char** argv) {
   rclcpp::init(argc, argv, "pcl_render");
-  rclcpp::NodeHandle nh("~");
+  rclcpp::Node::SharedPtr nh("~");
 
   nh.getParam("sensing_horizon", sensing_horizon);
   nh.getParam("sensing_rate", sensing_rate);

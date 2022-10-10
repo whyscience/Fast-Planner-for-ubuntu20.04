@@ -77,7 +77,7 @@ private:
   int current_wp_;
 
   /* ROS utils */
-  rclcpp::NodeHandle node_;
+  rclcpp::Node::SharedPtr node_;
   rclcpp::Timer exec_timer_, safety_timer_, vis_timer_, frontier_timer_;
   rclcpp::Subscriber waypoint_sub_, odom_sub_;
   rclcpp::Publisher replan_pub_, new_pub_, bspline_pub_;
@@ -99,7 +99,7 @@ public:
   TopoReplanFSM(/* args */) {}
   ~TopoReplanFSM() {}
 
-  void init(rclcpp::NodeHandle& nh);
+  void init(rclcpp::Node::SharedPtr& nh);
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };

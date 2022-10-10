@@ -25,7 +25,7 @@
 
 namespace fast_planner {
 
-void KinoReplanFSM::init(rclcpp::NodeHandle& nh) {
+void KinoReplanFSM::init(rclcpp::Node::SharedPtr& nh) {
   current_wp_  = 0;
   exec_state_  = FSM_EXEC_STATE::INIT;
   have_target_ = false;

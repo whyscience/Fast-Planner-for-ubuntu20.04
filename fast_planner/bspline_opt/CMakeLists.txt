@@ -26,11 +26,12 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 add_library(bspline_opt
         src/bspline_optimizer.cpp
         )
-ament_target_dependencies(bspline_opt rclcpp nlopt plan_env)
+target_link_libraries(bspline_opt plan_env)
+ament_target_dependencies(bspline_opt rclcpp plan_env Eigen3)
 
 ament_export_include_directories(include)
 ament_export_libraries(bspline_opt)
-ament_export_dependencies(rclcpp nlopt plan_env)
+ament_export_dependencies(rclcpp plan_env Eigen3)
 
 install(TARGETS
         bspline_opt

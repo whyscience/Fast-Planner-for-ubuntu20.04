@@ -434,7 +434,7 @@ void cmd_callback(const quadrotor_msgs::PositionCommand cmd)
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv, "odom_visualization");
-  rclcpp::NodeHandle n("~");
+  rclcpp::Node::SharedPtr n("~");
 
   n.param("mesh_resource", mesh_resource, std::string("package://odom_visualization/meshes/hummingbird.mesh"));
   n.param("color/r", color_r, 1.0);

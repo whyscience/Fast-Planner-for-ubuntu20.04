@@ -157,7 +157,7 @@ void maps_origin_callback(const geometry_msgs::msg::PoseArray::ConstPtr &msg)
 int main(int argc, char **argv)
 {
   rclcpp::init(argc, argv, "multi_map_server_3d");
-  rclcpp::NodeHandle n("~");
+  rclcpp::Node::SharedPtr n("~");
 
   rclcpp::Subscriber sub1 = n.subscribe("dmap2d",       100, map2d_callback);
   rclcpp::Subscriber sub2 = n.subscribe("scan",         100, scan_callback);

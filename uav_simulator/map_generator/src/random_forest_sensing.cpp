@@ -270,7 +270,7 @@ void clickCallback(const geometry_msgs::msg::PoseStamped& msg) {
 
 int main(int argc, char** argv) {
   rclcpp::init(argc, argv, "random_map_sensing");
-  rclcpp::NodeHandle n("~");
+  rclcpp::Node::SharedPtr n("~");
 
   _local_map_pub = n.advertise<sensor_msgs::PointCloud2>("/map_generator/local_cloud", 1);
   _all_map_pub = n.advertise<sensor_msgs::PointCloud2>("/map_generator/global_cloud", 1);

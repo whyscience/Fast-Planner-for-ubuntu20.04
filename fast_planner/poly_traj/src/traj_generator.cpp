@@ -111,7 +111,7 @@ void odomCallbck(const nav_msgs::msg::Odometry& msg) {
 int main(int argc, char** argv) {
   /* ---------- initialize ---------- */
   rclcpp::init(argc, argv, "traj_generator");
-  rclcpp::NodeHandle node;
+  rclcpp::Node::SharedPtr node;
 
   rclcpp::Subscriber odom_sub = node.subscribe("/uwb_vicon_odom", 50, odomCallbck);
 

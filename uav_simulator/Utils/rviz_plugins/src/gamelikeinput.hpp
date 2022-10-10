@@ -54,7 +54,7 @@ private:
 
   bool moving_;
 
-  rclcpp::NodeHandle nh_;
+  rclcpp::Node::SharedPtr nh_;
   rclcpp::Publisher  pub_pointlist;
   rclcpp::Publisher  pub_selection;
   rclcpp::Publisher  pub_swarm;

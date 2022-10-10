@@ -59,7 +59,7 @@ private Q_SLOTS:
   void updateTopic();
 
 private:
-  rclcpp::NodeHandle nh_;
+  rclcpp::Node::SharedPtr nh_;
   rclcpp::Publisher pub_;
 
   StringProperty* topic_property_;

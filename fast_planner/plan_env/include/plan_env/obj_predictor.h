@@ -125,7 +125,7 @@ class ObjHistory {
 /* ========== predict future trajectory using history ========== */
 class ObjPredictor{
  private:
-  rclcpp::Node::SharedPtr node_handle_;
+  rclcpp::Node::SharedPtr node_;
 
   int obj_num_;
   double lambda_;
@@ -148,7 +148,7 @@ class ObjPredictor{
   void predictConstVel();
 
  public:
-  //ObjPredictor(rclcpp::NodeOptions options);
+  //ObjPredictor(rclcpp::Node::SharedPtrOptions options);
   ObjPredictor(rclcpp::Node::SharedPtr &node);
   ~ObjPredictor();
 

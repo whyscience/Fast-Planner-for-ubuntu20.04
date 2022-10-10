@@ -28,7 +28,7 @@
 using std::cout;
 using std::endl;
 namespace fast_planner {
-PlanningVisualization::PlanningVisualization(rclcpp::NodeHandle& nh) {
+PlanningVisualization::PlanningVisualization(rclcpp::Node::SharedPtr& nh) {
   node = nh;
 
   traj_pub_ = node.advertise<visualization_msgs::msg::Marker>("/planning_vis/trajectory", 20);

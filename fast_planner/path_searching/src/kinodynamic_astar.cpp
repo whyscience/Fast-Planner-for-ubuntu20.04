@@ -321,7 +321,7 @@ int KinodynamicAstar::search(Eigen::Vector3d start_pt, Eigen::Vector3d start_v, 
   return NO_PATH;
 }
 
-void KinodynamicAstar::setParam(rclcpp::NodeHandle& nh)
+void KinodynamicAstar::setParam(rclcpp::Node::SharedPtr& nh)
 {
   nh.param("search/max_tau", max_tau_, -1.0);
   nh.param("search/init_max_tau", init_max_tau_, -1.0);

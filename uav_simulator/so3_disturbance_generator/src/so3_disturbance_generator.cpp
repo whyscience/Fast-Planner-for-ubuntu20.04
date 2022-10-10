@@ -160,7 +160,7 @@ void set_disturbance()
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv, "so3_disturbance_generator");
-  rclcpp::NodeHandle n("~");
+  rclcpp::Node::SharedPtr n("~");
 
   rclcpp::Subscriber sub1 = n.subscribe("odom", 10, odom_callback);
   pubo = n.advertise<nav_msgs::msg::Odometry>(        "noisy_odom",         10);

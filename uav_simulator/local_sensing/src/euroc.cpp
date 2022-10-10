@@ -277,7 +277,7 @@ void render_currentpose()
 int main(int argc, char **argv)
 {
   rclcpp::init(argc, argv, "cloud_banchmark");
-  rclcpp::NodeHandle nh("~");
+  rclcpp::Node::SharedPtr nh("~");
 
   nh.getParam("cam_width", width);
   nh.getParam("cam_height", height);

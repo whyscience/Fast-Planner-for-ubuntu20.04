@@ -27,7 +27,7 @@ nav_msgs::msg::Path waypoints;
 std::deque<nav_msgs::msg::Path> waypointSegments;
 rclcpp::Time trigged_time;
 
-void load_seg(rclcpp::NodeHandle& nh, int segid, const rclcpp::Time& time_base) {
+void load_seg(rclcpp::Node::SharedPtr& nh, int segid, const rclcpp::Time& time_base) {
     std::string seg_str = boost::str(bfmt("seg%d/") % segid);
     double yaw;
     double time_from_start;
@@ -70,7 +70,7 @@ void load_seg(rclcpp::NodeHandle& nh, int segid, const rclcpp::Time& time_base) 
     waypointSegments.push_back(path_msg);
 }
 
-void load_waypoints(rclcpp::NodeHandle& nh, const rclcpp::Time& time_base) {
+void load_waypoints(rclcpp::Node::SharedPtr& nh, const rclcpp::Time& time_base) {
     int seg_cnt = 0;
     waypointSegments.clear();
     ROS_ASSERT(nh.getParam("segment_cnt", seg_cnt));
@@ -152,7 +152,7 @@ void goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
     trigged_time = rclcpp::Clock().now(); //odom.header.stamp;
     //ROS_ASSERT(trigged_time > rclcpp::Time(0));
 
-    rclcpp::NodeHandle n("~");
+    rclcpp::Node::SharedPtr n("~");
     n.param("waypoint_type", waypoint_type, string("manual"));
 
     if (waypoint_type == string("circle")) {
@@ -216,7 +216,7 @@ void traj_start_trigger_callback(const geometry_msgs::msg::PoseStamped& msg) {
     trigged_time = odom.header.stamp;
     ROS_ASSERT(trigged_time > rclcpp::Time(0));
 
-    rclcpp::NodeHandle n("~");
+    rclcpp::Node::SharedPtr n("~");
     n.param("waypoint_type", waypoint_type, string("manual"));
 
     RCLCPP_ERROR_STREAM("Pattern " << waypoint_type << " generated!");
@@ -243,7 +243,7 @@ void traj_start_trigger_callback(const geometry_msgs::msg::PoseStamped& msg) {
 
 int main(int argc, char** argv) {
     rclcpp::init(argc, argv, "waypoint_generator");
-    rclcpp::NodeHandle n("~");
+    rclcpp::Node::SharedPtr n("~");
     n.param("waypoint_type", waypoint_type, string("manual"));
     rclcpp::Subscriber sub1 = n.subscribe("odom", 10, odom_callback);
     rclcpp::Subscriber sub2 = n.subscribe("goal", 10, goal_callback);

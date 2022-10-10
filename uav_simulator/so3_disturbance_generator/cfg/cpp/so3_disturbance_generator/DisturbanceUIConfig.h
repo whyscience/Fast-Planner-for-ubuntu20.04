@@ -78,8 +78,8 @@ namespace so3_disturbance_generator
       
       virtual void clamp(DisturbanceUIConfig &config, const DisturbanceUIConfig &max, const DisturbanceUIConfig &min) const = 0;
       virtual void calcLevel(uint32_t &level, const DisturbanceUIConfig &config1, const DisturbanceUIConfig &config2) const = 0;
-      virtual void fromServer(const rclcpp::NodeHandle &nh, DisturbanceUIConfig &config) const = 0;
-      virtual void toServer(const rclcpp::NodeHandle &nh, const DisturbanceUIConfig &config) const = 0;
+      virtual void fromServer(const rclcpp::Node::SharedPtr &nh, DisturbanceUIConfig &config) const = 0;
+      virtual void toServer(const rclcpp::Node::SharedPtr &nh, const DisturbanceUIConfig &config) const = 0;
       virtual bool fromMessage(const dynamic_reconfigure::Config &msg, DisturbanceUIConfig &config) const = 0;
       virtual void toMessage(dynamic_reconfigure::Config &msg, const DisturbanceUIConfig &config) const = 0;
       virtual void getValue(const DisturbanceUIConfig &config, boost::any &val) const = 0;
@@ -115,12 +115,12 @@ namespace so3_disturbance_generator
           comb_level |= level;
       }
 
-      virtual void fromServer(const rclcpp::NodeHandle &nh, DisturbanceUIConfig &config) const
+      virtual void fromServer(const rclcpp::Node::SharedPtr &nh, DisturbanceUIConfig &config) const
       {
         nh.getParam(name, config.*field);
       }
 
-      virtual void toServer(const rclcpp::NodeHandle &nh, const DisturbanceUIConfig &config) const
+      virtual void toServer(const rclcpp::Node::SharedPtr &nh, const DisturbanceUIConfig &config) const
       {
         nh.setParam(name, config.*field);
       }
@@ -427,14 +427,14 @@ bool place_holder;
       __toMessage__(msg, __param_descriptions__, __group_descriptions__);
     }
     
-    void __toServer__(const rclcpp::NodeHandle &nh) const
+    void __toServer__(const rclcpp::Node::SharedPtr &nh) const
     {
       const std::vector<AbstractParamDescriptionConstPtr> &__param_descriptions__ = __getParamDescriptions__();
       for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = __param_descriptions__.begin(); i != __param_descriptions__.end(); ++i)
         (*i)->toServer(nh, *this);
     }
 
-    void __fromServer__(const rclcpp::NodeHandle &nh)
+    void __fromServer__(const rclcpp::Node::SharedPtr &nh)
     {
       static bool setup=false;
 

@@ -38,7 +38,7 @@ using namespace fast_planner;
 
 int main(int argc, char** argv) {
   rclcpp::init(argc, argv, "fast_planner_node");
-  rclcpp::NodeHandle nh("~");
+  rclcpp::Node::SharedPtr nh("~");
 
   int planner;
   nh.param("planner_node/planner", planner, -1);

@@ -171,7 +171,7 @@ SO3ControlNodelet::imu_callback(const sensor_msgs::Imu& imu)
 void
 SO3ControlNodelet::onInit(void)
 {
-  rclcpp::NodeHandle n(getPrivateNodeHandle());
+  rclcpp::Node::SharedPtr n(getPrivateNodeHandle());
 
   std::string quadrotor_name;
   n.param("quadrotor_name", quadrotor_name, std::string("quadrotor"));

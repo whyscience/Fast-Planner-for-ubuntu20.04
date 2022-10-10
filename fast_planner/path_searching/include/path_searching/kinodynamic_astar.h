@@ -160,7 +160,7 @@ class KinodynamicAstar {
   enum { REACH_HORIZON = 1, REACH_END = 2, NO_PATH = 3, NEAR_END = 4 };
 
   /* main API */
-  void setParam(rclcpp::NodeHandle& nh);
+  void setParam(rclcpp::Node::SharedPtr& nh);
   void init();
   void reset();
   int search(Eigen::Vector3d start_pt, Eigen::Vector3d start_vel,
