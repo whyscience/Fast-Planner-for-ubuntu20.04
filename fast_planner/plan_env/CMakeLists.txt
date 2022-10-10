@@ -27,7 +27,7 @@ include_directories(include
         ${EIGEN3_INCLUDE_DIR}
         ${OpenCV_INCLUDE_DIRS})
 
-add_library(plan_env
+add_library(${PROJECT_NAME}
         src/sdf_map.cpp
         src/obj_predictor.cpp
         src/edt_environment.cpp
@@ -44,17 +44,17 @@ set(dependencies
         Eigen3
         )
 
-ament_target_dependencies(plan_env ${dependencies})
-target_link_libraries(plan_env ${OpenCV_LIBRARIES})
+ament_target_dependencies(${PROJECT_NAME} ${dependencies})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES})
 
 add_executable(obj_generator
         src/obj_generator.cpp
         )
 target_link_libraries(obj_generator
-        plan_env)
+        ${PROJECT_NAME})
 
-install(TARGETS plan_env
-        EXPORT plan_env
+install(TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin
@@ -65,11 +65,11 @@ install(TARGETS
         DESTINATION lib/${PROJECT_NAME})
 
 install(
-        DIRECTORY include/plan_env
+        DIRECTORY include/${PROJECT_NAME}
         DESTINATION include
 )
 
 ament_export_include_directories(include)
-ament_export_libraries(plan_env)
+ament_export_libraries(${PROJECT_NAME})
 ament_export_dependencies(${dependencies})
 ament_package()

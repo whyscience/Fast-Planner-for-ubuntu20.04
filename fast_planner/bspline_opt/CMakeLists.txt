@@ -23,18 +23,18 @@ include_directories(
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
-add_library(bspline_opt
+add_library(${PROJECT_NAME}
         src/bspline_optimizer.cpp
         )
-target_link_libraries(bspline_opt plan_env)
-ament_target_dependencies(bspline_opt rclcpp plan_env Eigen3)
+target_link_libraries(${PROJECT_NAME} plan_env)
+ament_target_dependencies(${PROJECT_NAME} rclcpp plan_env Eigen3)
 
 ament_export_include_directories(include)
-ament_export_libraries(bspline_opt)
+ament_export_libraries(${PROJECT_NAME})
 ament_export_dependencies(rclcpp plan_env Eigen3)
 
 install(TARGETS
-        bspline_opt
+        ${PROJECT_NAME}
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin)
