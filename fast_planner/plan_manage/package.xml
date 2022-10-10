@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>plan_manage</name>
+    <version>0.0.0</version>
+    <description>The fast_planner package</description>
+    <maintainer email="bzhouai@todo.todo">bzhouai</maintainer>
+    <license>TODO</license>
+
+    <buildtool_depend>ament_cmake</buildtool_depend>
+    <build_depend>rclcpp</build_depend>
+    <build_depend>std_msgs</build_depend>
+    <build_depend>quadrotor_msgs</build_depend>
+    <build_depend>message_runtime</build_depend>
+    <build_depend>plan_env</build_depend>
+    <build_depend>path_searching</build_depend>
+    <build_depend>bspline</build_depend>
+    <build_depend>bspline_opt</build_depend>
+    <build_depend>traj_utils</build_depend>
+
+    <exec_depend>rclcpp</exec_depend>
+    <exec_depend>std_msgs</exec_depend>
+    <exec_depend>message_runtime</exec_depend>
+    <exec_depend>plan_env</exec_depend>
+    <exec_depend>path_searching</exec_depend>
+    <exec_depend>bspline</exec_depend>
+    <exec_depend>bspline_opt</exec_depend>
+    <exec_depend>traj_utils</exec_depend>
+    <exec_depend>quadrotor_msgs</exec_depend>
+
+
+    <!-- The export tag contains other, unspecified, tags -->
+    <export>
+        <!-- Other tools can request additional information be placed here -->
+
+    </export>
+</package>
