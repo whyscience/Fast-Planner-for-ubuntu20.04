@@ -36,12 +36,14 @@ backward::SignalHandling sh;
 
 using namespace fast_planner;
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   rclcpp::init(argc, argv, "fast_planner_node");
-  rclcpp::Node::SharedPtr nh("~");
+  rclcpp::Node::SharedPtr nh;
 
   int planner;
-  nh.param("planner_node/planner", planner, -1);
+
+  nh->declare_parameter<int>("planner_node/planner", -1);
+  nh->get_parameter("planner_node/planner", planner);
 
   TopoReplanFSM topo_replan;
   KinoReplanFSM kino_replan;

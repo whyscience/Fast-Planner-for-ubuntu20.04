@@ -46,22 +46,22 @@ namespace fast_planner {
 
 class FastPlannerManager {
   // SECTION stable
-public:
+ public:
   FastPlannerManager();
   ~FastPlannerManager();
 
   /* main planning interface */
   bool kinodynamicReplan(Eigen::Vector3d start_pt, Eigen::Vector3d start_vel, Eigen::Vector3d start_acc,
                          Eigen::Vector3d end_pt, Eigen::Vector3d end_vel);
-  bool planGlobalTraj(const Eigen::Vector3d& start_pos);
+  bool planGlobalTraj(const Eigen::Vector3d &start_pos);
   bool topoReplan(bool collide);
 
-  void planYaw(const Eigen::Vector3d& start_yaw);
+  void planYaw(const Eigen::Vector3d &start_yaw);
 
-  void initPlanModules(rclcpp::Node::SharedPtr& nh);
-  void setGlobalWaypoints(vector<Eigen::Vector3d>& waypoints);
+  void initPlanModules(rclcpp::Node::SharedPtr &nh);
+  void setGlobalWaypoints(vector<Eigen::Vector3d> &waypoints);
 
-  bool checkTrajCollision(double& distance);
+  bool checkTrajCollision(double &distance);
 
   PlanParameters pp_;
   LocalTrajData local_data_;
@@ -69,8 +69,9 @@ public:
   MidPlanData plan_data_;
   EDTEnvironment::Ptr edt_environment_;
 
-private:
+ private:
   /* main planning algorithms & modules */
+  rclcpp::Node::SharedPtr node_;
   SDFMap::Ptr sdf_map_;
 
   unique_ptr<Astar> geo_path_finder_;
@@ -82,27 +83,27 @@ private:
 
   // topology guided optimization
 
-  void findCollisionRange(vector<Eigen::Vector3d>& colli_start, vector<Eigen::Vector3d>& colli_end,
-                          vector<Eigen::Vector3d>& start_pts, vector<Eigen::Vector3d>& end_pts);
+  void findCollisionRange(vector<Eigen::Vector3d> &colli_start, vector<Eigen::Vector3d> &colli_end,
+                          vector<Eigen::Vector3d> &start_pts, vector<Eigen::Vector3d> &end_pts);
 
   void optimizeTopoBspline(double start_t, double duration, vector<Eigen::Vector3d> guide_path,
                            int traj_id);
-  Eigen::MatrixXd reparamLocalTraj(double start_t, double& dt, double& duration);
-  Eigen::MatrixXd reparamLocalTraj(double start_t, double duration, int seg_num, double& dt);
+  Eigen::MatrixXd reparamLocalTraj(double start_t, double &dt, double &duration);
+  Eigen::MatrixXd reparamLocalTraj(double start_t, double duration, int seg_num, double &dt);
 
-  void selectBestTraj(NonUniformBspline& traj);
-  void refineTraj(NonUniformBspline& best_traj, double& time_inc);
-  void reparamBspline(NonUniformBspline& bspline, double ratio, Eigen::MatrixXd& ctrl_pts, double& dt,
-                      double& time_inc);
+  void selectBestTraj(NonUniformBspline &traj);
+  void refineTraj(NonUniformBspline &best_traj, double &time_inc);
+  void reparamBspline(NonUniformBspline &bspline, double ratio, Eigen::MatrixXd &ctrl_pts, double &dt,
+                      double &time_inc);
 
   // heading planning
-  void calcNextYaw(const double& last_yaw, double& yaw);
+  void calcNextYaw(const double &last_yaw, double &yaw);
 
   // !SECTION stable
 
   // SECTION developing
 
-public:
+ public:
   typedef unique_ptr<FastPlannerManager> Ptr;
 
   // !SECTION

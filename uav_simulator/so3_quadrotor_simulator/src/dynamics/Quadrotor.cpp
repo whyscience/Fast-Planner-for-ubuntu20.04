@@ -163,7 +163,7 @@ Quadrotor::operator()(const Quadrotor::InternalState& x,
                       3.14159265 * (arm_length_) * (arm_length_) * // S
                       cur_state.v.norm() * cur_state.v.norm();
 
-  //  RCLCPP_INFO("resistance: %lf, Thrust: %lf%% ", resistance,
+  //  RCLCPP_INFO(node_->get_logger(), "resistance: %lf, Thrust: %lf%% ", resistance,
   //           motor_rpm_sq.sum() / (4 * max_rpm_ * max_rpm_) * 100.0);
 
   vnorm = cur_state.v;

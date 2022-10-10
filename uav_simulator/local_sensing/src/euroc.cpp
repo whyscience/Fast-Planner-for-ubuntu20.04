@@ -248,7 +248,7 @@ void render_currentpose()
   		max = depth > max ? depth : max;
   		depth_mat.at<float>(i,j) = depth;
   	}
-  RCLCPP_INFO("render cost %lf ms.", (rclcpp::Clock().now().seconds() - this_time) * 1000.0f);
+  RCLCPP_INFO(node_->get_logger(), "render cost %lf ms.", (rclcpp::Clock().now().seconds() - this_time) * 1000.0f);
   printf("max_depth %lf.\n", max);
 
   cv_bridge::CvImage out_msg;

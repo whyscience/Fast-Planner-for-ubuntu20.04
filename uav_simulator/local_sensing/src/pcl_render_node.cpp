@@ -175,7 +175,7 @@ void rcvGlobalPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map
   if(has_global_map)
     return;
 
-  RCLCPP_WARN("Global Pointcloud received..");
+  RCLCPP_WARN(node_->get_logger(), "Global Pointcloud received..");
   //load global map
   pcl::PointCloud<pcl::PointXYZ> cloudIn;
   pcl::PointXYZ pt_in;
@@ -197,7 +197,7 @@ void rcvGlobalPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map
 
 void rcvLocalPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map )
 {
-  //RCLCPP_WARN("Local Pointcloud received..");
+  //RCLCPP_WARN(node_->get_logger(), "Local Pointcloud received..");
   //load local map
   pcl::PointCloud<pcl::PointXYZ> cloudIn;
   pcl::PointXYZ pt_in;
@@ -294,7 +294,7 @@ void render_currentpose()
   		max = depth > max ? depth : max;
   		depth_mat.at<float>(i,j) = depth;
   	}
-  //RCLCPP_INFO("render cost %lf ms.", (rclcpp::Clock().now().seconds() - this_time) * 1000.0f);
+  //RCLCPP_INFO(node_->get_logger(), "render cost %lf ms.", (rclcpp::Clock().now().seconds() - this_time) * 1000.0f);
   //printf("max_depth %lf.\n", max);
 
   cv_bridge::CvImage out_msg;

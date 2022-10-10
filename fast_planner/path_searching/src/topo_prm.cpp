@@ -259,7 +259,7 @@ bool TopologyPRM::needConnection(GraphNode::Ptr g1, GraphNode::Ptr g2, Eigen::Ve
           // get shorter connection ?
           if (pathLength(path1) < pathLength(path2)) {
             g1->neighbors_[i]->pos_ = pt;
-            // RCLCPP_WARN("shorter!");
+            // RCLCPP_WARN(node_->get_logger(), "shorter!");
           }
           return false;
         }
@@ -533,7 +533,7 @@ void TopologyPRM::shortcutPath(vector<Eigen::Vector3d> path, int path_id, int it
     double len1 = pathLength(last_path);
     double len2 = pathLength(short_path);
     if (len2 > len1) {
-      // RCLCPP_WARN("pause shortcut, l1: %lf, l2: %lf, iter: %d", len1, len2, k +
+      // RCLCPP_WARN(node_->get_logger(), "pause shortcut, l1: %lf, l2: %lf, iter: %d", len1, len2, k +
       // 1);
       short_path = last_path;
       break;

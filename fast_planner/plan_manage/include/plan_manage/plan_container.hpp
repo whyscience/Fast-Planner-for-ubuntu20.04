@@ -39,8 +39,8 @@ using std::vector;
 namespace fast_planner {
 
 class GlobalTrajData {
-private:
-public:
+ private:
+ public:
   PolynomialTraj global_traj_;
   vector<NonUniformBspline> local_traj_;
 
@@ -56,7 +56,7 @@ public:
 
   bool localTrajReachTarget() { return fabs(local_end_time_ - global_duration_) < 0.1; }
 
-  void setGlobalTraj(const PolynomialTraj& traj, const rclcpp::Time& time) {
+  void setGlobalTraj(const PolynomialTraj &traj, const rclcpp::Time &time) {
     global_traj_ = traj;
     global_traj_.init();
     global_duration_ = global_traj_.getTimeSum();
@@ -121,9 +121,9 @@ public:
   // get Bspline paramterization data of a local trajectory within a sphere
   // start_t: start time of the trajectory
   // dist_pt: distance between the discretized points
-  void getTrajByRadius(const double& start_t, const double& des_radius, const double& dist_pt,
-                       vector<Eigen::Vector3d>& point_set, vector<Eigen::Vector3d>& start_end_derivative,
-                       double& dt, double& seg_duration) {
+  void getTrajByRadius(const double &start_t, const double &des_radius, const double &dist_pt,
+                       vector<Eigen::Vector3d> &point_set, vector<Eigen::Vector3d> &start_end_derivative,
+                       double &dt, double &seg_duration) {
     double seg_length = 0.0;  // length of the truncated segment
     double seg_time = 0.0;    // duration of the truncated segment
     double radius = 0.0;      // distance to the first point of the segment
@@ -169,8 +169,8 @@ public:
   // duration: time length of the segment
   // seg_num: discretized the segment into *seg_num* parts
   void getTrajByDuration(double start_t, double duration, int seg_num,
-                         vector<Eigen::Vector3d>& point_set,
-                         vector<Eigen::Vector3d>& start_end_derivative, double& dt) {
+                         vector<Eigen::Vector3d> &point_set,
+                         vector<Eigen::Vector3d> &start_end_derivative, double &dt) {
     dt = duration / seg_num;
     Eigen::Vector3d cur_pt;
     for (double tp = 0.0; tp <= duration + 1e-4; tp += dt) {
@@ -190,7 +190,7 @@ struct PlanParameters {
   double max_vel_, max_acc_, max_jerk_;  // physical limits
   double local_traj_len_;                // local replanning trajectory length
   double ctrl_pt_dist;                   // distance between adjacient B-spline
-                                         // control points
+  // control points
   double clearance_;
   int dynamic_;
   /* processing time */
@@ -211,7 +211,7 @@ struct LocalTrajData {
 };
 
 class MidPlanData {
-public:
+ public:
   MidPlanData(/* args */) {}
   ~MidPlanData() {}
 
@@ -253,9 +253,9 @@ public:
     topo_select_paths_.clear();
   }
 
-  void addTopoPaths(list<GraphNode::Ptr>& graph, vector<vector<Eigen::Vector3d>>& paths,
-                    vector<vector<Eigen::Vector3d>>& filtered_paths,
-                    vector<vector<Eigen::Vector3d>>& selected_paths) {
+  void addTopoPaths(list<GraphNode::Ptr> &graph, vector<vector<Eigen::Vector3d>> &paths,
+                    vector<vector<Eigen::Vector3d>> &filtered_paths,
+                    vector<vector<Eigen::Vector3d>> &selected_paths) {
     topo_graph_ = graph;
     topo_paths_ = paths;
     topo_filtered_paths_ = filtered_paths;

@@ -163,7 +163,7 @@ void RandomMapGenerate() {
   cloudMap.height = 1;
   cloudMap.is_dense = true;
 
-  RCLCPP_WARN("Finished generate random map ");
+  RCLCPP_WARN(node_->get_logger(), "Finished generate random map ");
 
   kdtreeLocalMap.setInputCloud(cloudMap.makeShared());
 

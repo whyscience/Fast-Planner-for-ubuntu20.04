@@ -1047,7 +1047,7 @@ void SDFMap::publishMap() {
   // pcl::toROSMsg(cloud, cloud_msg);
   // map_pub_->publish(cloud_msg);
 
-  // RCLCPP_INFO("pub map");
+  // RCLCPP_INFO(node_->get_logger(), "pub map");
 
   pcl::PointXYZ pt;
   pcl::PointCloud<pcl::PointXYZ> cloud;
@@ -1127,7 +1127,7 @@ void SDFMap::publishMapInflate(bool all_info) {
   pcl::toROSMsg(cloud, cloud_msg);
   map_inf_pub_->publish(cloud_msg);
 
-  // RCLCPP_INFO("pub map");
+  // RCLCPP_INFO(node_->get_logger(), "pub map");
 }
 
 void SDFMap::publishUnknown() {
@@ -1268,7 +1268,7 @@ void SDFMap::publishESDF() {
 
   esdf_pub_->publish(cloud_msg);
 
-  // RCLCPP_INFO("pub esdf");
+  // RCLCPP_INFO(node_->get_logger(), "pub esdf");
 }
 
 void SDFMap::getSliceESDF(const double height, const double res, const Eigen::Vector4d &range,

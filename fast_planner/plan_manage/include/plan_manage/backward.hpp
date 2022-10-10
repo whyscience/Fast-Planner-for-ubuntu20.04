@@ -367,16 +367,16 @@ using std::move;
 #include <map>
 namespace backward {
 namespace details {
-template <typename K, typename V>
+template<typename K, typename V>
 struct hashtable {
   typedef std::map<K, V> type;
 };
-template <typename T>
-const T& move(const T& v) {
+template<typename T>
+const T &move(const T &v) {
   return v;
 }
-template <typename T>
-T& move(T& v) {
+template<typename T>
+T &move(T &v) {
   return v;
 }
 }  // namespace details
@@ -431,37 +431,37 @@ typedef backtrace_symbol current;
 }  // namespace trace_resolver_tag
 
 namespace details {
-template <typename T>
+template<typename T>
 struct rm_ptr {
   typedef T type;
 };
 
-template <typename T>
-struct rm_ptr<T*> {
+template<typename T>
+struct rm_ptr<T *> {
   typedef T type;
 };
 
-template <typename T>
-struct rm_ptr<const T*> {
+template<typename T>
+struct rm_ptr<const T *> {
   typedef const T type;
 };
 
-template <typename R, typename T, R (*F)(T)>
+template<typename R, typename T, R (*F)(T)>
 struct deleter {
-  template <typename U>
-  void operator()(U& ptr) const {
+  template<typename U>
+  void operator()(U &ptr) const {
     (*F)(ptr);
   }
 };
 
-template <typename T>
+template<typename T>
 struct default_delete {
-  void operator()(T& ptr) const {
+  void operator()(T &ptr) const {
     delete ptr;
   }
 };
 
-template <typename T, typename Deleter = deleter<void, void*, &::free>>
+template<typename T, typename Deleter = deleter<void, void *, &::free>>
 class handle {
   struct dummy;
   T _val;
@@ -472,7 +472,7 @@ class handle {
   handle& operator=(const handle&) = delete;
 #endif
 
-public:
+ public:
   ~handle() {
     if (!_empty) {
       Deleter()(_val);
@@ -494,13 +494,13 @@ public:
     return *this;
   }
 #else
-  explicit handle(const handle& from) : _empty(true) {
+  explicit handle(const handle &from) : _empty(true) {
     // some sort of poor man's move semantic.
-    swap(const_cast<handle&>(from));
+    swap(const_cast<handle &>(from));
   }
-  handle& operator=(const handle& from) {
+  handle &operator=(const handle &from) {
     // some sort of poor man's move semantic.
-    swap(const_cast<handle&>(from));
+    swap(const_cast<handle &>(from));
     return *this;
   }
 #endif
@@ -509,11 +509,11 @@ public:
     handle tmp(new_val);
     swap(tmp);
   }
-  operator const dummy*() const {
+  operator const dummy *() const {
     if (_empty) {
       return nullptr;
     }
-    return reinterpret_cast<const dummy*>(_val);
+    return reinterpret_cast<const dummy *>(_val);
   }
   T get() {
     return _val;
@@ -522,7 +522,7 @@ public:
     _empty = true;
     return _val;
   }
-  void swap(handle& b) {
+  void swap(handle &b) {
     using std::swap;
     swap(b._val, _val);      // can throw, we are safe here.
     swap(b._empty, _empty);  // should not throw: if you cannot swap two
@@ -536,8 +536,8 @@ public:
     return _val;
   }
 
-  typedef typename rm_ptr<T>::type& ref_t;
-  typedef const typename rm_ptr<T>::type& const_ref_t;
+  typedef typename rm_ptr<T>::type &ref_t;
+  typedef const typename rm_ptr<T>::type &const_ref_t;
   ref_t operator*() {
     return *_val;
   }
@@ -549,16 +549,16 @@ public:
   }
 
   // Watch out, we've got a badass over here
-  T* operator&() {
+  T *operator&() {
     _empty = false;
     return &_val;
   }
 };
 
 // Default demangler implementation (do nothing).
-template <typename TAG>
+template<typename TAG>
 struct demangler_impl {
-  static std::string demangle(const char* funcname) {
+  static std::string demangle(const char *funcname) {
     return funcname;
   }
 };
@@ -595,13 +595,13 @@ struct demangler : public demangler_impl<system_tag::current_tag> {};
 /*************** A TRACE ***************/
 
 struct Trace {
-  void* addr;
+  void *addr;
   size_t idx;
 
   Trace() : addr(nullptr), idx(0) {
   }
 
-  explicit Trace(void* _addr, size_t _idx) : addr(_addr), idx(_idx) {
+  explicit Trace(void *_addr, size_t _idx) : addr(_addr), idx(_idx) {
   }
 };
 
@@ -615,11 +615,11 @@ struct ResolvedTrace : public Trace {
     SourceLoc() : line(0), col(0) {
     }
 
-    bool operator==(const SourceLoc& b) const {
+    bool operator==(const SourceLoc &b) const {
       return function == b.function && filename == b.filename && line == b.line && col == b.col;
     }
 
-    bool operator!=(const SourceLoc& b) const {
+    bool operator!=(const SourceLoc &b) const {
       return !(*this == b);
     }
   };
@@ -645,16 +645,16 @@ struct ResolvedTrace : public Trace {
 
   ResolvedTrace() : Trace() {
   }
-  ResolvedTrace(const Trace& mini_trace) : Trace(mini_trace) {
+  ResolvedTrace(const Trace &mini_trace) : Trace(mini_trace) {
   }
 };
 
 /*************** STACK TRACE ***************/
 
 // default implemention.
-template <typename TAG>
+template<typename TAG>
 class StackTraceImpl {
-public:
+ public:
   size_t size() const {
     return 0;
   }
@@ -664,7 +664,7 @@ public:
   size_t load_here(size_t = 0) {
     return 0;
   }
-  size_t load_from(void*, size_t = 0) {
+  size_t load_from(void *, size_t = 0) {
     return 0;
   }
   size_t thread_id() const {
@@ -675,7 +675,7 @@ public:
 };
 
 class StackTraceImplBase {
-public:
+ public:
   StackTraceImplBase() : _thread_id(0), _skip(0) {
   }
 
@@ -687,7 +687,7 @@ public:
     _skip = n;
   }
 
-protected:
+ protected:
   void load_thread_info() {
 #ifdef BACKWARD_SYSTEM_LINUX
 #ifndef __ANDROID__
@@ -713,13 +713,13 @@ protected:
     return _skip;
   }
 
-private:
+ private:
   size_t _thread_id;
   size_t _skip;
 };
 
 class StackTraceImplHolder : public StackTraceImplBase {
-public:
+ public:
   size_t size() const {
     return _stacktrace.size() ? _stacktrace.size() - skip_n_firsts() : 0;
   }
@@ -729,15 +729,15 @@ public:
     }
     return Trace(_stacktrace[idx + skip_n_firsts()], idx);
   }
-  void* const* begin() const {
+  void *const *begin() const {
     if (size()) {
       return &_stacktrace[skip_n_firsts()];
     }
     return nullptr;
   }
 
-protected:
-  std::vector<void*> _stacktrace;
+ protected:
+  std::vector<void *> _stacktrace;
 };
 
 #if BACKWARD_HAS_UNWIND == 1
@@ -841,9 +841,9 @@ private:
 
 #else  // BACKWARD_HAS_UNWIND == 0
 
-template <>
+template<>
 class StackTraceImpl<system_tag::current_tag> : public StackTraceImplHolder {
-public:
+ public:
   __attribute__((noinline))  // TODO use some macro
   size_t
   load_here(size_t depth = 32) {
@@ -858,13 +858,13 @@ public:
     return size();
   }
 
-  size_t load_from(void* addr, size_t depth = 32) {
+  size_t load_from(void *addr, size_t depth = 32) {
     load_here(depth + 8);
 
     for (size_t i = 0; i < _stacktrace.size(); ++i) {
       if (_stacktrace[i] == addr) {
         skip_n_firsts(i);
-        _stacktrace[i] = (void*)((uintptr_t)_stacktrace[i] + 1);
+        _stacktrace[i] = (void *) ((uintptr_t) _stacktrace[i] + 1);
         break;
       }
     }
@@ -880,16 +880,16 @@ class StackTrace : public StackTraceImpl<system_tag::current_tag> {};
 
 /*************** TRACE RESOLVER ***************/
 
-template <typename TAG>
+template<typename TAG>
 class TraceResolverImpl;
 
 #ifdef BACKWARD_SYSTEM_UNKNOWN
 
-template <>
+template<>
 class TraceResolverImpl<system_tag::unknown_tag> {
-public:
-  template <class ST>
-  void load_stacktrace(ST&) {
+ public:
+  template<class ST>
+  void load_stacktrace(ST &) {
   }
   ResolvedTrace resolve(ResolvedTrace t) {
     return t;
@@ -899,12 +899,12 @@ public:
 #endif
 
 class TraceResolverImplBase {
-protected:
-  std::string demangle(const char* funcname) {
+ protected:
+  std::string demangle(const char *funcname) {
     return _demangler.demangle(funcname);
   }
 
-private:
+ private:
   details::demangler _demangler;
 };
 
@@ -1097,47 +1097,47 @@ public:
       trace.inliners = backtrace_inliners(fobj, *details_selected);
 
 #if 0
-			if (trace.inliners.size() == 0) {
-				// Maybe the trace was not inlined... or maybe it was and we
-				// are lacking the debug information. Let's try to make the
-				// world better and see if we can get the line number of the
-				// function (trace.source.function) now.
-				//
-				// We will get the location of where the function start (to be
-				// exact: the first instruction that really start the
-				// function), not where the name of the function is defined.
-				// This can be quite far away from the name of the function
-				// btw.
-				//
-				// If the source of the function is the same as the source of
-				// the trace, we cannot say if the trace was really inlined or
-				// not.  However, if the filename of the source is different
-				// between the function and the trace... we can declare it as
-				// an inliner.  This is not 100% accurate, but better than
-				// nothing.
+            if (trace.inliners.size() == 0) {
+                // Maybe the trace was not inlined... or maybe it was and we
+                // are lacking the debug information. Let's try to make the
+                // world better and see if we can get the line number of the
+                // function (trace.source.function) now.
+                //
+                // We will get the location of where the function start (to be
+                // exact: the first instruction that really start the
+                // function), not where the name of the function is defined.
+                // This can be quite far away from the name of the function
+                // btw.
+                //
+                // If the source of the function is the same as the source of
+                // the trace, we cannot say if the trace was really inlined or
+                // not.  However, if the filename of the source is different
+                // between the function and the trace... we can declare it as
+                // an inliner.  This is not 100% accurate, but better than
+                // nothing.
 
-				if (symbol_info.dli_saddr) {
-					find_sym_result details = find_symbol_details(fobj,
-							symbol_info.dli_saddr,
-							symbol_info.dli_fbase);
+                if (symbol_info.dli_saddr) {
+                    find_sym_result details = find_symbol_details(fobj,
+                            symbol_info.dli_saddr,
+                            symbol_info.dli_fbase);
 
-					if (details.found) {
-						ResolvedTrace::SourceLoc diy_inliner;
-						diy_inliner.line = details.line;
-						if (details.filename) {
-							diy_inliner.filename = details.filename;
-						}
-						if (details.funcname) {
-							diy_inliner.function = demangle(details.funcname);
-						} else {
-							diy_inliner.function = trace.source.function;
-						}
-						if (diy_inliner != trace.source) {
-							trace.inliners.push_back(diy_inliner);
-						}
-					}
-				}
-			}
+                    if (details.found) {
+                        ResolvedTrace::SourceLoc diy_inliner;
+                        diy_inliner.line = details.line;
+                        if (details.filename) {
+                            diy_inliner.filename = details.filename;
+                        }
+                        if (details.funcname) {
+                            diy_inliner.function = demangle(details.funcname);
+                        } else {
+                            diy_inliner.function = trace.source.function;
+                        }
+                        if (diy_inliner != trace.source) {
+                            trace.inliners.push_back(diy_inliner);
+                        }
+                    }
+                }
+            }
 #endif
     }
 
@@ -3102,18 +3102,18 @@ class TraceResolver : public TraceResolverImpl<system_tag::current_tag> {};
 /*************** CODE SNIPPET ***************/
 
 class SourceFile {
-public:
+ public:
   typedef std::vector<std::pair<unsigned, std::string>> lines_t;
 
   SourceFile() {
   }
-  SourceFile(const std::string& path) : _file(new std::ifstream(path.c_str())) {
+  SourceFile(const std::string &path) : _file(new std::ifstream(path.c_str())) {
   }
   bool is_open() const {
     return _file->is_open();
   }
 
-  lines_t& get_lines(unsigned line_start, unsigned line_count, lines_t& lines) {
+  lines_t &get_lines(unsigned line_start, unsigned line_count, lines_t &lines) {
     using namespace std;
     // This function make uses of the dumbest algo ever:
     //	1) seek(0)
@@ -3177,12 +3177,12 @@ public:
   // and define this one here because C++98 is not happy with local defined
   // struct passed to template functions, fuuuu.
   struct not_isempty {
-    bool operator()(const lines_t::value_type& p) {
+    bool operator()(const lines_t::value_type &p) {
       return !(std::find_if(p.second.begin(), p.second.end(), not_isspace()) == p.second.end());
     }
   };
 
-  void swap(SourceFile& b) {
+  void swap(SourceFile &b) {
     _file.swap(b._file);
   }
 
@@ -3195,19 +3195,19 @@ public:
     return *this;
   }
 #else
-  explicit SourceFile(const SourceFile& from) {
+  explicit SourceFile(const SourceFile &from) {
     // some sort of poor man's move semantic.
-    swap(const_cast<SourceFile&>(from));
+    swap(const_cast<SourceFile &>(from));
   }
-  SourceFile& operator=(const SourceFile& from) {
+  SourceFile &operator=(const SourceFile &from) {
     // some sort of poor man's move semantic.
-    swap(const_cast<SourceFile&>(from));
+    swap(const_cast<SourceFile &>(from));
     return *this;
   }
 #endif
 
-private:
-  details::handle<std::ifstream*, details::default_delete<std::ifstream*>> _file;
+ private:
+  details::handle<std::ifstream *, details::default_delete<std::ifstream *>> _file;
 
 #ifdef BACKWARD_ATLEAST_CXX11
   SourceFile(const SourceFile&) = delete;
@@ -3216,28 +3216,28 @@ private:
 };
 
 class SnippetFactory {
-public:
+ public:
   typedef SourceFile::lines_t lines_t;
 
-  lines_t get_snippet(const std::string& filename, unsigned line_start, unsigned context_size) {
-    SourceFile& src_file = get_src_file(filename);
+  lines_t get_snippet(const std::string &filename, unsigned line_start, unsigned context_size) {
+    SourceFile &src_file = get_src_file(filename);
     unsigned start = line_start - context_size / 2;
     return src_file.get_lines(start, context_size);
   }
 
-  lines_t get_combined_snippet(const std::string& filename_a, unsigned line_a,
-                               const std::string& filename_b, unsigned line_b, unsigned context_size) {
-    SourceFile& src_file_a = get_src_file(filename_a);
-    SourceFile& src_file_b = get_src_file(filename_b);
+  lines_t get_combined_snippet(const std::string &filename_a, unsigned line_a,
+                               const std::string &filename_b, unsigned line_b, unsigned context_size) {
+    SourceFile &src_file_a = get_src_file(filename_a);
+    SourceFile &src_file_b = get_src_file(filename_b);
 
     lines_t lines = src_file_a.get_lines(line_a - context_size / 4, context_size / 2);
     src_file_b.get_lines(line_b - context_size / 4, context_size / 2, lines);
     return lines;
   }
 
-  lines_t get_coalesced_snippet(const std::string& filename, unsigned line_a, unsigned line_b,
+  lines_t get_coalesced_snippet(const std::string &filename, unsigned line_a, unsigned line_b,
                                 unsigned context_size) {
-    SourceFile& src_file = get_src_file(filename);
+    SourceFile &src_file = get_src_file(filename);
 
     using std::min;
     using std::max;
@@ -3253,16 +3253,16 @@ public:
     return lines;
   }
 
-private:
+ private:
   typedef details::hashtable<std::string, SourceFile>::type src_files_t;
   src_files_t _src_files;
 
-  SourceFile& get_src_file(const std::string& filename) {
+  SourceFile &get_src_file(const std::string &filename) {
     src_files_t::iterator it = _src_files.find(filename);
     if (it != _src_files.end()) {
       return it->second;
     }
-    SourceFile& new_src_file = _src_files[filename];
+    SourceFile &new_src_file = _src_files[filename];
     new_src_file = SourceFile(filename);
     return new_src_file;
   }
@@ -3275,8 +3275,8 @@ enum type { automatic, never, always };
 }
 
 class cfile_streambuf : public std::streambuf {
-public:
-  cfile_streambuf(FILE* _sink) : sink(_sink) {
+ public:
+  cfile_streambuf(FILE *_sink) : sink(_sink) {
   }
   int_type underflow() override {
     return traits_type::eof();
@@ -3288,22 +3288,22 @@ public:
     return traits_type::eof();
   }
 
-  std::streamsize xsputn(const char_type* s, std::streamsize count) override {
+  std::streamsize xsputn(const char_type *s, std::streamsize count) override {
     return static_cast<std::streamsize>(fwrite(s, sizeof *s, static_cast<size_t>(count), sink));
   }
 
 #ifdef BACKWARD_ATLEAST_CXX11
-public:
-  cfile_streambuf(const cfile_streambuf&) = delete;
-  cfile_streambuf& operator=(const cfile_streambuf&) = delete;
+  public:
+    cfile_streambuf(const cfile_streambuf&) = delete;
+    cfile_streambuf& operator=(const cfile_streambuf&) = delete;
 #else
-private:
-  cfile_streambuf(const cfile_streambuf&);
-  cfile_streambuf& operator=(const cfile_streambuf&);
+ private:
+  cfile_streambuf(const cfile_streambuf &);
+  cfile_streambuf &operator=(const cfile_streambuf &);
 #endif
 
-private:
-  FILE* sink;
+ private:
+  FILE *sink;
   std::vector<char> buffer;
 };
 
@@ -3358,12 +3358,12 @@ enum type { yellow = 0, purple = 0, reset = 0 };
 }  // namespace Color
 
 class Colorize {
-public:
-  Colorize(std::ostream&) {
+ public:
+  Colorize(std::ostream &) {
   }
   void activate(ColorMode::type) {
   }
-  void activate(ColorMode::type, FILE*) {
+  void activate(ColorMode::type, FILE *) {
   }
   void set_color(Color::type) {
   }
@@ -3372,7 +3372,7 @@ public:
 #endif  // BACKWARD_SYSTEM_LINUX
 
 class Printer {
-public:
+ public:
   bool snippet;
   ColorMode::type color_mode;
   bool address;
@@ -3381,16 +3381,16 @@ public:
   int trace_context_size;
 
   Printer()
-    : snippet(true)
-    , color_mode(ColorMode::automatic)
-    , address(false)
-    , object(false)
-    , inliner_context_size(5)
-    , trace_context_size(7) {
+      : snippet(true),
+        color_mode(ColorMode::automatic),
+        address(false),
+        object(false),
+        inliner_context_size(5),
+        trace_context_size(7) {
   }
 
-  template <typename ST>
-  FILE* print(ST& st, FILE* fp = stderr) {
+  template<typename ST>
+  FILE *print(ST &st, FILE *fp = stderr) {
     cfile_streambuf obuf(fp);
     std::ostream os(&obuf);
     Colorize colorize(os);
@@ -3399,16 +3399,16 @@ public:
     return fp;
   }
 
-  template <typename ST>
-  std::ostream& print(ST& st, std::ostream& os) {
+  template<typename ST>
+  std::ostream &print(ST &st, std::ostream &os) {
     Colorize colorize(os);
     colorize.activate(color_mode);
     print_stacktrace(st, os, colorize);
     return os;
   }
 
-  template <typename IT>
-  FILE* print(IT begin, IT end, FILE* fp = stderr, size_t thread_id = 0) {
+  template<typename IT>
+  FILE *print(IT begin, IT end, FILE *fp = stderr, size_t thread_id = 0) {
     cfile_streambuf obuf(fp);
     std::ostream os(&obuf);
     Colorize colorize(os);
@@ -3417,20 +3417,20 @@ public:
     return fp;
   }
 
-  template <typename IT>
-  std::ostream& print(IT begin, IT end, std::ostream& os, size_t thread_id = 0) {
+  template<typename IT>
+  std::ostream &print(IT begin, IT end, std::ostream &os, size_t thread_id = 0) {
     Colorize colorize(os);
     colorize.activate(color_mode);
     print_stacktrace(begin, end, os, thread_id, colorize);
     return os;
   }
 
-private:
+ private:
   TraceResolver _resolver;
   SnippetFactory _snippets;
 
-  template <typename ST>
-  void print_stacktrace(ST& st, std::ostream& os, Colorize& colorize) {
+  template<typename ST>
+  void print_stacktrace(ST &st, std::ostream &os, Colorize &colorize) {
     print_header(os, st.thread_id());
     _resolver.load_stacktrace(st);
     for (size_t trace_idx = st.size(); trace_idx > 0; --trace_idx) {
@@ -3438,15 +3438,15 @@ private:
     }
   }
 
-  template <typename IT>
-  void print_stacktrace(IT begin, IT end, std::ostream& os, size_t thread_id, Colorize& colorize) {
+  template<typename IT>
+  void print_stacktrace(IT begin, IT end, std::ostream &os, size_t thread_id, Colorize &colorize) {
     print_header(os, thread_id);
     for (; begin != end; ++begin) {
       print_trace(os, *begin, colorize);
     }
   }
 
-  void print_header(std::ostream& os, size_t thread_id) {
+  void print_header(std::ostream &os, size_t thread_id) {
     os << "Stack trace (most recent call last)";
     if (thread_id) {
       os << " in thread " << thread_id;
@@ -3454,7 +3454,7 @@ private:
     os << ":\n";
   }
 
-  void print_trace(std::ostream& os, const ResolvedTrace& trace, Colorize& colorize) {
+  void print_trace(std::ostream &os, const ResolvedTrace &trace, Colorize &colorize) {
     os << "#" << std::left << std::setw(2) << trace.idx << std::right;
     bool already_indented = true;
 
@@ -3468,7 +3468,7 @@ private:
       if (!already_indented) {
         os << "   ";
       }
-      const ResolvedTrace::SourceLoc& inliner_loc = trace.inliners[inliner_idx - 1];
+      const ResolvedTrace::SourceLoc &inliner_loc = trace.inliners[inliner_idx - 1];
       print_source_loc(os, " | ", inliner_loc);
       if (snippet) {
         print_snippet(os, "    | ", inliner_loc, colorize, Color::purple, inliner_context_size);
@@ -3487,8 +3487,8 @@ private:
     }
   }
 
-  void print_snippet(std::ostream& os, const char* indent, const ResolvedTrace::SourceLoc& source_loc,
-                     Colorize& colorize, Color::type color_code, int context_size) {
+  void print_snippet(std::ostream &os, const char *indent, const ResolvedTrace::SourceLoc &source_loc,
+                     Colorize &colorize, Color::type color_code, int context_size) {
     using namespace std;
     typedef SnippetFactory::lines_t lines_t;
 
@@ -3509,8 +3509,8 @@ private:
     }
   }
 
-  void print_source_loc(std::ostream& os, const char* indent, const ResolvedTrace::SourceLoc& source_loc,
-                        void* addr = nullptr) {
+  void print_source_loc(std::ostream &os, const char *indent, const ResolvedTrace::SourceLoc &source_loc,
+                        void *addr = nullptr) {
     os << indent << "Source \"" << source_loc.filename << "\", line " << source_loc.line << ", in "
        << source_loc.function;
 
@@ -3658,8 +3658,8 @@ private:
 #ifdef BACKWARD_SYSTEM_UNKNOWN
 
 class SignalHandling {
-public:
-  SignalHandling(const std::vector<int>& = std::vector<int>()) {
+ public:
+  SignalHandling(const std::vector<int> & = std::vector<int>()) {
   }
   bool init() {
     return false;

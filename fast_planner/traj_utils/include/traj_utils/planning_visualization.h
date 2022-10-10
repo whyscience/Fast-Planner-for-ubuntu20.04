@@ -59,7 +59,7 @@ private:
 
   /* data */
   /* visib_pub is seperated from previous ones for different info */
-  rclcpp::Node::SharedPtr node;
+  rclcpp::Node::SharedPtr node_;
   rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr traj_pub_;      // 0
   rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr  topo_pub_;      // 1
   rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr  predict_pub_;   // 2

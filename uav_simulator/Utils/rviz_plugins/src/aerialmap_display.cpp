@@ -418,11 +418,11 @@ AerialMapDisplay::update(float wall_dt, float ros_dt)
                 QString::fromStdString(ss.str()));
     }
 
-    RCLCPP_WARN("Failed to create full-size map texture, likely because your "
+    RCLCPP_WARN(node_->get_logger(), "Failed to create full-size map texture, likely because your "
              "graphics card does not support textures of size > 2048.  "
              "Downsampling to [%d x %d]...",
              (int)fwidth, (int)fheight);
-    // RCLCPP_INFO("Stream size [%d], width [%f], height [%f], w * h [%f]",
+    // RCLCPP_INFO(node_->get_logger(), "Stream size [%d], width [%f], height [%f], w * h [%f]",
     // pixel_stream->size(), width, height, width * height);
     image.loadRawData(pixel_stream, width, height, Ogre::PF_R8G8B8);
     image.resize(fwidth, fheight, Ogre::Image::FILTER_NEAREST);

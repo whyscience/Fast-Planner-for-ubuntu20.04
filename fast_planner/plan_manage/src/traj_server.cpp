@@ -25,7 +25,7 @@
 
 #include "bspline/non_uniform_bspline.h"
 #include <nav_msgs/msg/odometry.hpp>
-#include "plan_manage/Bspline.h"
+#include "quadrotor_msgs/msg/bspline.hpp"
 #include "quadrotor_msgs/PositionCommand.h"
 #include <std_msgs/msg/empty.hpp>
 #include <visualization_msgs/msg/marker.hpp>
@@ -41,8 +41,8 @@ nav_msgs::msg::Odometry odom;
 quadrotor_msgs::PositionCommand cmd;
 // double pos_gain[3] = {5.7, 5.7, 6.2};
 // double vel_gain[3] = {3.4, 3.4, 4.0};
-double pos_gain[3] = { 5.7, 5.7, 6.2 };
-double vel_gain[3] = { 3.4, 3.4, 4.0 };
+double pos_gain[3] = {5.7, 5.7, 6.2};
+double vel_gain[3] = {3.4, 3.4, 4.0};
 
 using fast_planner::NonUniformBspline;
 
@@ -97,8 +97,8 @@ void displayTrajWithColor(vector<Eigen::Vector3d> path, double resolution, Eigen
   sleepRate.sleep();
 }
 
-void drawCmd(const Eigen::Vector3d& pos, const Eigen::Vector3d& vec, const int& id,
-             const Eigen::Vector4d& color) {
+void drawCmd(const Eigen::Vector3d &pos, const Eigen::Vector3d &vec, const int &id,
+             const Eigen::Vector4d &color) {
   visualization_msgs::msg::Marker mk_state;
   mk_state.header.frame_id = "world";
   mk_state.header.stamp = rclcpp::Clock().now();
@@ -197,7 +197,7 @@ void odomCallbck(nav_msgs::msg::Odometry::SharedPtr msg) {
   if (traj_real_.size() > 10000) traj_real_.erase(traj_real_.begin(), traj_real_.begin() + 1000);
 }
 
-void visCallback( ) {
+void visCallback() {
   // displayTrajWithColor(traj_real_, 0.03, Eigen::Vector4d(0.925, 0.054, 0.964,
   // 1),
   //                      1);
@@ -205,14 +205,14 @@ void visCallback( ) {
   displayTrajWithColor(traj_cmd_, 0.05, Eigen::Vector4d(0, 1, 0, 1), 2);
 }
 
-void cmdCallback( ) {
+void cmdCallback() {
   /* no publishing before receive traj_ */
   if (!receive_traj_) return;
 
   rclcpp::Time time_now = rclcpp::Clock().now();
   double t_cur = (time_now - start_time_).seconds();
 
-  Eigen::Vector3d pos{0,0,0}, vel{0,0,0}, acc{0,0,0}, pos_f{0,0,0};
+  Eigen::Vector3d pos{0, 0, 0}, vel{0, 0, 0}, acc{0, 0, 0}, pos_f{0, 0, 0};
   double yaw{}, yawdot{};
 
   if (t_cur < traj_duration_ && t_cur >= 0.0) {
@@ -284,7 +284,7 @@ void cmdCallback( ) {
   if (traj_cmd_.size() > 10000) traj_cmd_.erase(traj_cmd_.begin(), traj_cmd_.begin() + 1000);
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   rclcpp::init(argc, argv, "traj_server");
   rclcpp::Node::SharedPtr node;
 
@@ -317,7 +317,7 @@ int main(int argc, char** argv) {
 
   rclcpp::Duration(1.0).sleep();
 
-  RCLCPP_WARN("[Traj server]: ready.");
+  RCLCPP_WARN(node_->get_logger(), "[Traj server]: ready.");
 
   rclcpp::spin();
 

@@ -31,7 +31,7 @@ void load_seg(rclcpp::Node::SharedPtr& nh, int segid, const rclcpp::Time& time_b
     std::string seg_str = boost::str(bfmt("seg%d/") % segid);
     double yaw;
     double time_from_start;
-    RCLCPP_INFO("Getting segment %d", segid);
+    RCLCPP_INFO(node_->get_logger(), "Getting segment %d", segid);
     ROS_ASSERT(nh.getParam(seg_str + "yaw", yaw));
     ROS_ASSERT_MSG((yaw > -3.1499999) && (yaw < 3.14999999), "yaw=%.3f", yaw);
     ROS_ASSERT(nh.getParam(seg_str + "time_from_start", time_from_start));
@@ -80,7 +80,7 @@ void load_waypoints(rclcpp::Node::SharedPtr& nh, const rclcpp::Time& time_base) 
             ROS_ASSERT(waypointSegments[i - 1].header.stamp < waypointSegments[i].header.stamp);
         }
     }
-    RCLCPP_INFO("Overall load %zu segments", waypointSegments.size());
+    RCLCPP_INFO(node_->get_logger(), "Overall load %zu segments", waypointSegments.size());
 }
 
 void publish_waypoints() {
@@ -178,7 +178,7 @@ void goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
             publish_waypoints_vis();
             publish_waypoints();
         } else {
-            RCLCPP_WARN("[waypoint_generator] invalid goal in manual-lonely-waypoint mode.");
+            RCLCPP_WARN(node_->get_logger(), "[waypoint_generator] invalid goal in manual-lonely-waypoint mode.");
         }
     } else {
         if (msg->pose.position.z > 0) {
@@ -212,7 +212,7 @@ void traj_start_trigger_callback(const geometry_msgs::msg::PoseStamped& msg) {
         return;
     }
 
-    RCLCPP_WARN("[waypoint_generator] Trigger!");
+    RCLCPP_WARN(node_->get_logger(), "[waypoint_generator] Trigger!");
     trigged_time = odom.header.stamp;
     ROS_ASSERT(trigged_time > rclcpp::Time(0));
 

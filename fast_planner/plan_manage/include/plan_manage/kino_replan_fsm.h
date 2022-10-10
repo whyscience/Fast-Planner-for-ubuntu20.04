@@ -29,7 +29,7 @@
 #include <Eigen/Eigen>
 #include <algorithm>
 #include <iostream>
-#include <nav_msgs/msg/Path.hpp>
+#include <nav_msgs/msg/path.hpp>
 #include "rclcpp/rclcpp.hpp"
 #include <std_msgs/msg/empty.hpp>
 #include <vector>
@@ -40,7 +40,7 @@
 #include <plan_env/edt_environment.h>
 #include <plan_env/obj_predictor.h>
 #include <plan_env/sdf_map.h>
-#include <plan_manage/Bspline.h>
+#include <quadrotor_msgs/msg/bspline.hpp>
 #include <plan_manage/planner_manager.h>
 #include <traj_utils/planning_visualization.h>
 
@@ -49,17 +49,17 @@ using std::vector;
 namespace fast_planner {
 
 class Test {
-private:
+ private:
   /* data */
   int test_;
   std::vector<int> test_vec_;
   rclcpp::Node::SharedPtr nh_;
 
-public:
-  Test(const int& v) {
+ public:
+  Test(const int &v) {
     test_ = v;
   }
-  Test(rclcpp::Node::SharedPtr& node) {
+  Test(rclcpp::Node::SharedPtr &node) {
     nh_ = node;
   }
   ~Test() {
@@ -71,7 +71,7 @@ public:
 
 class KinoReplanFSM {
 
-private:
+ private:
   /* ---------- flag ---------- */
   enum FSM_EXEC_STATE { INIT, WAIT_TARGET, GEN_NEW_TRAJ, REPLAN_TRAJ, EXEC_TRAJ, REPLAN_NEW };
   enum TARGET_TYPE { MANUAL_TARGET = 1, PRESET_TARGET = 2, REFENCE_PATH = 3 };
@@ -106,23 +106,23 @@ private:
   /* helper functions */
   bool callKinodynamicReplan();        // front-end and back-end method
   bool callTopologicalTraj(int step);  // topo path guided gradient-based
-                                       // optimization; 1: new, 2: replan
+  // optimization; 1: new, 2: replan
   void changeFSMExecState(FSM_EXEC_STATE new_state, string pos_call);
   void printFSMExecState();
 
   /* ROS functions */
-  void execFSMCallback( );
-  void checkCollisionCallback( );
+  void execFSMCallback();
+  void checkCollisionCallback();
   void waypointCallback(const nav_msgs::msg::Path::SharedPtr msg);
   void odometryCallback(const nav_msgs::msg::Odometry::SharedPtr msg);
 
-public:
+ public:
   KinoReplanFSM(/* args */) {
   }
   ~KinoReplanFSM() {
   }
 
-  void init(rclcpp::Node::SharedPtr& nh);
+  void init(rclcpp::Node::SharedPtr &nh);
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
