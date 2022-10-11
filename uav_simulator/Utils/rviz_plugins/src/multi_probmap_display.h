@@ -85,7 +85,7 @@ protected:
   virtual void subscribe();
   virtual void unsubscribe();
 
-  void incomingMap(const multi_map_server::MultiOccupancyGrid::SharedPtr  msg);
+  void incomingMap(const multi_map_server::msg::MultiOccupancyGrid::SharedPtr  msg);
 
   void clear();
 
@@ -97,13 +97,13 @@ protected:
 
   std::string topic_;
 
-  rclcpp::Subscription<MMSG>::SharedPtr  map_sub_;
+  rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr  map_sub_;
 
   RosTopicProperty* topic_property_;
   Property*         draw_under_property_;
 
-  multi_map_server::MultiOccupancyGrid::ConstPtr updated_map_;
-  multi_map_server::MultiOccupancyGrid::ConstPtr current_map_;
+  multi_map_server::msg::MultiOccupancyGrid::ConstPtr updated_map_;
+  multi_map_server::msg::MultiOccupancyGrid::ConstPtr current_map_;
   boost::mutex                                   mutex_;
   bool                                           new_map_;
 };

@@ -60,7 +60,7 @@ private Q_SLOTS:
 
 private:
   rclcpp::Node::SharedPtr nh_;
-  rclcpp::Publisher<MMSG>::SharedPtr pub_;
+  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pub_;
 
   StringProperty* topic_property_;
 };

@@ -41,13 +41,11 @@
 
 #include "rviz/display.h"
 
-namespace Ogre
-{
+namespace Ogre {
 class ManualObject;
 }
 
-namespace rviz
-{
+namespace rviz {
 
 class FloatProperty;
 class IntProperty;
@@ -60,10 +58,9 @@ class VectorProperty;
  * \class AerialMapDisplay
  * \brief Displays a map along the XY plane.
  */
-class AerialMapDisplay: public Display
-{
-Q_OBJECT
-public:
+class AerialMapDisplay : public Display {
+  Q_OBJECT
+ public:
   AerialMapDisplay();
   virtual ~AerialMapDisplay();
 
@@ -71,7 +68,7 @@ public:
   virtual void onInitialize();
   virtual void fixedFrameChanged();
   virtual void reset();
-  virtual void update( float wall_dt, float ros_dt );
+  virtual void update(float wall_dt, float ros_dt);
 
   float getResolution() { return resolution_; }
   int getWidth() { return width_; }
@@ -79,13 +76,13 @@ public:
   Ogre::Vector3 getPosition() { return position_; }
   Ogre::Quaternion getOrientation() { return orientation_; }
 
-protected Q_SLOTS:
-  void updateAlpha();
+ protected
+  Q_SLOTS:
+      void updateAlpha();
   void updateTopic();
   void updateDrawUnder();
 
-
-protected:
+ protected:
   // overrides from Display
   virtual void onEnable();
   virtual void onDisable();
@@ -93,13 +90,13 @@ protected:
   virtual void subscribe();
   virtual void unsubscribe();
 
-  void incomingAerialMap(const nav_msgs::OccupancyGrid::SharedPtr  msg);
+  void incomingAerialMap(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
 
   void clear();
 
   void transformAerialMap();
 
-  Ogre::ManualObject* manual_object_;
+  Ogre::ManualObject *manual_object_;
   Ogre::TexturePtr texture_;
   Ogre::MaterialPtr material_;
   bool loaded_;
@@ -112,23 +109,23 @@ protected:
   Ogre::Quaternion orientation_;
   std::string frame_;
 
-  rclcpp::Subscription<MMSG>::SharedPtr  map_sub_;
+  rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
 
-  RosTopicProperty* topic_property_;
-  FloatProperty* resolution_property_;
-  IntProperty* width_property_;
-  IntProperty* height_property_;
-  VectorProperty* position_property_;
-  QuaternionProperty* orientation_property_;
-  FloatProperty* alpha_property_;
-  Property* draw_under_property_;
+  RosTopicProperty *topic_property_;
+  FloatProperty *resolution_property_;
+  IntProperty *width_property_;
+  IntProperty *height_property_;
+  VectorProperty *position_property_;
+  QuaternionProperty *orientation_property_;
+  FloatProperty *alpha_property_;
+  Property *draw_under_property_;
 
-  nav_msgs::OccupancyGrid::ConstPtr updated_map_;
-  nav_msgs::OccupancyGrid::ConstPtr current_map_;
+  nav_msgs::msg::OccupancyGrid::ConstPtr updated_map_;
+  nav_msgs::msg::OccupancyGrid::ConstPtr current_map_;
   boost::mutex mutex_;
   bool new_map_;
 };
 
 } // namespace rviz
 
- #endif
+#endif

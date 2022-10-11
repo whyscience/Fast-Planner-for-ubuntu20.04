@@ -69,8 +69,8 @@ AerialMapDisplay::AerialMapDisplay()
 {
   topic_property_ = new RosTopicProperty(
     "Topic", "", QString::fromStdString(
-                   rclcpp::message_traits::datatype<nav_msgs::OccupancyGrid>()),
-    "nav_msgs::OccupancyGrid topic to subscribe to.", this,
+                   rclcpp::message_traits::datatype<nav_msgs::msg::OccupancyGrid>()),
+    "nav_msgs::msg::OccupancyGrid topic to subscribe to.", this,
     SLOT(updateTopic()));
 
   alpha_property_ = new FloatProperty(
@@ -258,7 +258,7 @@ AerialMapDisplay::clear()
   loaded_ = false;
 }
 /*
-bool validateFloats(const nav_msgs::OccupancyGrid& msg)
+bool validateFloats(const nav_msgs::msg::OccupancyGrid& msg)
 {
   bool valid = true;
   valid = valid && validateFloats( msg->info.resolution );
@@ -514,7 +514,7 @@ AerialMapDisplay::update(float wall_dt, float ros_dt)
 
 void
 AerialMapDisplay::incomingAerialMap(
-  const nav_msgs::OccupancyGrid::SharedPtr  msg)
+  const nav_msgs::msg::OccupancyGrid::SharedPtr  msg)
 {
 
   updated_map_ = msg;

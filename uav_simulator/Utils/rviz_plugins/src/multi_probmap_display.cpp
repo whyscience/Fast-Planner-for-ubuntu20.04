@@ -61,8 +61,8 @@ MultiProbMapDisplay::MultiProbMapDisplay()
   , new_map_(false)
 {
   topic_property_ = new RosTopicProperty( "Topic", "",
-                                          QString::fromStdString( rclcpp::message_traits::datatype<multi_map_server::MultiOccupancyGrid>() ),
-                                          "multi_map_server::MultiOccupancyGrid topic to subscribe to.",
+                                          QString::fromStdString( rclcpp::message_traits::datatype<multi_map_server::msg::MultiOccupancyGrid>() ),
+                                          "multi_map_server::msg::MultiOccupancyGrid topic to subscribe to.",
                                           this, SLOT( updateTopic() ));
 
   draw_under_property_ = new Property( "Draw Behind", false,
@@ -345,7 +345,7 @@ void MultiProbMapDisplay::update( float wall_dt, float ros_dt )
 
 // ***********************************************************************************************************************************
 
-void MultiProbMapDisplay::incomingMap(const multi_map_server::MultiOccupancyGrid::SharedPtr  msg)
+void MultiProbMapDisplay::incomingMap(const multi_map_server::msg::MultiOccupancyGrid::SharedPtr  msg)
 {
   updated_map_ = msg;
   boost::mutex::scoped_lock lock(mutex_);

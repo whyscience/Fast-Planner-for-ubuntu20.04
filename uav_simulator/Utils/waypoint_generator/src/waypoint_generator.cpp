@@ -15,9 +15,9 @@
 using namespace std;
 using bfmt = boost::format;
 
-rclcpp::Publisher<MMSG>::SharedPtr pub1;
-rclcpp::Publisher<MMSG>::SharedPtr pub2;
-rclcpp::Publisher<MMSG>::SharedPtr pub3;
+rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr pub1;
+rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr pub2;
+//rclcpp::Publisher<MMSG>::SharedPtr pub3;
 string waypoint_type = string("manual");
 bool is_odom_ready;
 nav_msgs::msg::Odometry odom;
@@ -32,18 +32,18 @@ void load_seg(rclcpp::Node::SharedPtr& nh, int segid, const rclcpp::Time& time_b
     double yaw;
     double time_from_start;
     RCLCPP_INFO(node_->get_logger(), "Getting segment %d", segid);
-    ROS_ASSERT(nh.getParam(seg_str + "yaw", yaw));
+    ROS_ASSERT(nh->get_parameter(seg_str + "yaw", yaw));
     ROS_ASSERT_MSG((yaw > -3.1499999) && (yaw < 3.14999999), "yaw=%.3f", yaw);
-    ROS_ASSERT(nh.getParam(seg_str + "time_from_start", time_from_start));
+    ROS_ASSERT(nh->get_parameter(seg_str + "time_from_start", time_from_start));
     ROS_ASSERT(time_from_start >= 0.0);
 
     std::vector<double> ptx;
     std::vector<double> pty;
     std::vector<double> ptz;
 
-    ROS_ASSERT(nh.getParam(seg_str + "x", ptx));
-    ROS_ASSERT(nh.getParam(seg_str + "y", pty));
-    ROS_ASSERT(nh.getParam(seg_str + "z", ptz));
+    ROS_ASSERT(nh->get_parameter(seg_str + "x", ptx));
+    ROS_ASSERT(nh->get_parameter(seg_str + "y", pty));
+    ROS_ASSERT(nh->get_parameter(seg_str + "z", ptz));
 
     ROS_ASSERT(ptx.size());
     ROS_ASSERT(ptx.size() == pty.size() && ptx.size() == ptz.size());
@@ -73,7 +73,7 @@ void load_seg(rclcpp::Node::SharedPtr& nh, int segid, const rclcpp::Time& time_b
 void load_waypoints(rclcpp::Node::SharedPtr& nh, const rclcpp::Time& time_base) {
     int seg_cnt = 0;
     waypointSegments.clear();
-    ROS_ASSERT(nh.getParam("segment_cnt", seg_cnt));
+    ROS_ASSERT(nh->get_parameter("segment_cnt", seg_cnt));
     for (int i = 0; i < seg_cnt; ++i) {
         load_seg(nh, i, time_base);
         if (i > 0) {
@@ -152,7 +152,7 @@ void goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
     trigged_time = rclcpp::Clock().now(); //odom.header.stamp;
     //ROS_ASSERT(trigged_time > rclcpp::Time(0));
 
-    rclcpp::Node::SharedPtr n("~");
+    rclcpp::Node::SharedPtr n;
     n.param("waypoint_type", waypoint_type, string("manual"));
 
     if (waypoint_type == string("circle")) {
@@ -206,7 +206,7 @@ void goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
     }
 }
 
-void traj_start_trigger_callback(const geometry_msgs::msg::PoseStamped& msg) {
+void traj_start_trigger_callback(geometry_msgs::msg::PoseStamped::SharedPtr msg) {
     if (!is_odom_ready) {
         RCLCPP_ERROR(node_->get_logger(), "[waypoint_generator] No odom!");
         return;
@@ -216,7 +216,7 @@ void traj_start_trigger_callback(const geometry_msgs::msg::PoseStamped& msg) {
     trigged_time = odom.header.stamp;
     ROS_ASSERT(trigged_time > rclcpp::Time(0));
 
-    rclcpp::Node::SharedPtr n("~");
+    rclcpp::Node::SharedPtr n;
     n.param("waypoint_type", waypoint_type, string("manual"));
 
     RCLCPP_ERROR_STREAM("Pattern " << waypoint_type << " generated!");
@@ -243,13 +243,13 @@ void traj_start_trigger_callback(const geometry_msgs::msg::PoseStamped& msg) {
 
 int main(int argc, char** argv) {
     rclcpp::init(argc, argv);
-    rclcpp::Node::SharedPtr n("~");
+    rclcpp::Node::SharedPtr n;
     n.param("waypoint_type", waypoint_type, string("manual"));
-    auto sub1 = n.subscribe("odom", 10, odom_callback);
-    auto sub2 = n.subscribe("goal", 10, goal_callback);
-    auto sub3 = n.subscribe("traj_start_trigger", 10, traj_start_trigger_callback);
-    pub1 = n.advertise<nav_msgs::msg::Path>("waypoints", 50);
-    pub2 = n.advertise<geometry_msgs::msg::PoseArray>("waypoints_vis", 10);
+    auto sub1 = n->create_subscription<MMSG>("odom", 10, odom_callback);
+    auto sub2 = n->create_subscription<MMSG>("goal", 10, goal_callback);
+    auto sub3 = n->create_subscription<MMSG>("traj_start_trigger", 10, traj_start_trigger_callback);
+    pub1 = n->create_publisher<nav_msgs::msg::Path>("waypoints", 50);
+    pub2 = n->create_publisher<geometry_msgs::msg::PoseArray>("waypoints_vis", 10);
 
     trigged_time = rclcpp::Time(0);
 

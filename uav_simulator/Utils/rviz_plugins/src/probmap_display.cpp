@@ -69,8 +69,8 @@ ProbMapDisplay::ProbMapDisplay()
 {
   topic_property_ = new RosTopicProperty(
     "Topic", "", QString::fromStdString(
-                   rclcpp::message_traits::datatype<nav_msgs::OccupancyGrid>()),
-    "nav_msgs::OccupancyGrid topic to subscribe to.", this,
+                   rclcpp::message_traits::datatype<nav_msgs::msg::OccupancyGrid>()),
+    "nav_msgs::msg::OccupancyGrid topic to subscribe to.", this,
     SLOT(updateTopic()));
 
   alpha_property_ = new FloatProperty(
@@ -258,7 +258,7 @@ ProbMapDisplay::clear()
 }
 
 bool
-validateFloats(const nav_msgs::OccupancyGrid& msg)
+validateFloats(const nav_msgs::msg::OccupancyGrid& msg)
 {
   bool valid = true;
   valid      = valid && validateFloats(msg->info.resolution);
@@ -507,7 +507,7 @@ ProbMapDisplay::update(float wall_dt, float ros_dt)
 }
 
 void
-ProbMapDisplay::incomingMap(const nav_msgs::OccupancyGrid::SharedPtr  msg)
+ProbMapDisplay::incomingMap(const nav_msgs::msg::OccupancyGrid::SharedPtr  msg)
 {
 
   updated_map_ = msg;

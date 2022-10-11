@@ -12,7 +12,7 @@ class Map2D
 {
 
 private:
-  nav_msgs::OccupancyGrid map;
+  nav_msgs::msg::OccupancyGrid map;
   int  expandStep;  
   int  binning;  
   bool isBinningSet;
@@ -47,7 +47,7 @@ public:
   double GetMaxX() { return map.info.origin.position.x + map.info.width  * map.info.resolution; }
   double GetMaxY() { return map.info.origin.position.y + map.info.height * map.info.resolution; }
   bool   Updated() { return updated; }  
-  void   Reset()   { map = nav_msgs::OccupancyGrid(); }
+  void   Reset()   { map = nav_msgs::msg::OccupancyGrid(); }
 
   void SetBinning(int _binning) 
   { 
@@ -66,7 +66,7 @@ public:
       return map.data[ym*map.info.width+xm];
   }
 
-  void Replace(nav_msgs::OccupancyGrid m)
+  void Replace(nav_msgs::msg::OccupancyGrid m)
   {
     // Check data
     if (m.data.size() == 0)
@@ -104,7 +104,7 @@ public:
   }
 
   // Merge submap
-  void Update(nav_msgs::OccupancyGrid m)
+  void Update(nav_msgs::msg::OccupancyGrid m)
   {
     // Check data
     if (m.data.size() == 0)
@@ -229,7 +229,7 @@ public:
     updated = true;
   }
 
-  const nav_msgs::OccupancyGrid& GetMap()
+  const nav_msgs::msg::OccupancyGrid& GetMap()
   {
     map.header.stamp       = rclcpp::Clock().now();
     map.info.map_load_time = rclcpp::Clock().now();

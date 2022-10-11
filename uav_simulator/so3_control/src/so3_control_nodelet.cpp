@@ -31,17 +31,17 @@ class SO3ControlNodelet : public nodelet::Nodelet {
   void position_cmd_callback(
       const quadrotor_msgs::msg::PositionCommand::SharedPtr cmd);
   void odom_callback(const nav_msgs::msg::Odometry::SharedPtr odom);
-  void enable_motors_callback(const std_msgs::Bool::SharedPtr msg);
+  void enable_motors_callback(const std_msgs::msg::Bool::SharedPtr msg);
   void corrections_callback(const quadrotor_msgs::msg::Corrections::SharedPtr msg);
-  void imu_callback(const sensor_msgs::Imu &imu);
+  void imu_callback(const sensor_msgs::msg::Imu &imu);
 
   SO3Control controller_;
-  rclcpp::Publisher<MMSG>::SharedPtr so3_command_pub_;
-  rclcpp::Subscription<MMSG>::SharedPtr  odom_sub_;
-  rclcpp::Subscription<MMSG>::SharedPtr  position_cmd_sub_;
-  rclcpp::Subscription<MMSG>::SharedPtr  enable_motors_sub_;
-  rclcpp::Subscription<MMSG>::SharedPtr  corrections_sub_;
-  rclcpp::Subscription<MMSG>::SharedPtr  imu_sub_;
+  rclcpp::Publisher<quadrotor_msgs::msg::SO3Command>::SharedPtr so3_command_pub_;
+  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr  odom_sub_;
+  rclcpp::Subscription<quadrotor_msgs::msg::PositionCommand>::SharedPtr  position_cmd_sub_;
+  rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr  enable_motors_sub_;
+  rclcpp::Subscription<quadrotor_msgs::msg::Corrections>::SharedPtr  corrections_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr  imu_sub_;
 
   bool position_cmd_updated_, position_cmd_init_;
   std::string frame_id_;
@@ -132,7 +132,7 @@ SO3ControlNodelet::odom_callback(const nav_msgs::msg::Odometry::SharedPtr odom) 
 }
 
 void
-SO3ControlNodelet::enable_motors_callback(const std_msgs::Bool::SharedPtr msg) {
+SO3ControlNodelet::enable_motors_callback(const std_msgs::msg::Bool::SharedPtr msg) {
   if (msg->data)
     RCLCPP_INFO(node_->get_logger(), "Enabling motors");
   else
@@ -150,7 +150,7 @@ SO3ControlNodelet::corrections_callback(
 }
 
 void
-SO3ControlNodelet::imu_callback(const sensor_msgs::Imu &imu) {
+SO3ControlNodelet::imu_callback(const sensor_msgs::msg::Imu &imu) {
   const Eigen::Vector3d acc(imu.linear_acceleration.x,
                             imu.linear_acceleration.y,
                             imu.linear_acceleration.z);
@@ -182,22 +182,22 @@ SO3ControlNodelet::onInit(void) {
   n.param("corrections/r", corrections_[1], 0.0);
   n.param("corrections/p", corrections_[2], 0.0);
 
-  so3_command_pub_ = n.advertise<quadrotor_msgs::msg::SO3Command>("so3_cmd", 10);
+  so3_command_pub_ = n->create_publisher<quadrotor_msgs::msg::SO3Command>("so3_cmd", 10);
 
-  odom_sub_ = n.subscribe("odom", 10, &SO3ControlNodelet::odom_callback, this,
+  odom_sub_ = n->create_subscription<MMSG>("odom", 10, std::bind(&SO3ControlNodelet::odom_callback, this, std::placeholders::_1),
                           rclcpp::TransportHints().tcpNoDelay());
   position_cmd_sub_ =
-      n.subscribe("position_cmd", 10, &SO3ControlNodelet::position_cmd_callback,
-                  this, rclcpp::TransportHints().tcpNoDelay());
+      n->create_subscription<MMSG>("position_cmd", 10, std::bind(&SO3ControlNodelet::position_cmd_callback,
+                  this, std::placeholders::_1), rclcpp::TransportHints().tcpNoDelay());
 
   enable_motors_sub_ =
-      n.subscribe("motors", 2, &SO3ControlNodelet::enable_motors_callback, this,
+      n->create_subscription<MMSG>("motors", 2, std::bind(&SO3ControlNodelet::enable_motors_callback, this, std::placeholders::_1),
                   rclcpp::TransportHints().tcpNoDelay());
   corrections_sub_ =
-      n.subscribe("corrections", 10, &SO3ControlNodelet::corrections_callback,
-                  this, rclcpp::TransportHints().tcpNoDelay());
+      n->create_subscription<quadrotor_msgs::msg::Corrections>("corrections", 10, std::bind(&SO3ControlNodelet::corrections_callback,
+                  this, std::placeholders::_1), rclcpp::TransportHints().tcpNoDelay());
 
-  imu_sub_ = n.subscribe("imu", 10, &SO3ControlNodelet::imu_callback, this,
+  imu_sub_ = n->create_subscription<sensor_msgs::msg::Imu>("imu", 10, std::bind(&SO3ControlNodelet::imu_callback, this, std::placeholders::_1),
                          rclcpp::TransportHints().tcpNoDelay());
 }
 

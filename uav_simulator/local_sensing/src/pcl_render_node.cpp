@@ -12,9 +12,9 @@
 #include <image_transport/image_transport.h>
 #include <dynamic_reconfigure/server.h>
 #include <nav_msgs/msg/odometry.hpp>
-#include <nav_msgs/Path.h>
+#include <nav_msgs/msg/path.hpp>
 #include <sensor_msgs/msg/imu.hpp>
-#include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <std_msgs/msg/bool.hpp>
 
 #include "tf/tf.h"
@@ -32,6 +32,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/eigen.hpp>
 #include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.hpp>
 
 //#include <cloud_banchmark/cloud_banchmarkConfig.h>
 #include "depth_render.cuh"
@@ -48,16 +49,18 @@ int width, height;
 double fx, fy, cx, cy;
 
 DepthRender depthrender;
-rclcpp::Publisher<MMSG>::SharedPtr pub_depth;
-rclcpp::Publisher<MMSG>::SharedPtr pub_color;
-rclcpp::Publisher<MMSG>::SharedPtr pub_pose;
-rclcpp::Publisher<MMSG>::SharedPtr pub_pcl_wolrd;
+rclcpp::Publisher<sensor_msgs::msg::Image>>
+::SharedPtr pub_depth;
+rclcpp::Publisher<sensor_msgs::msg::Image>>
+::SharedPtr pub_color;
+rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pub_pose;
+rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub_pcl_wolrd;
 
 sensor_msgs::msg::PointCloud2 local_map_pcl;
 sensor_msgs::msg::PointCloud2 local_depth_pcl;
 
-rclcpp::Subscription<MMSG>::SharedPtr odom_sub;
-rclcpp::Subscription<MMSG>::SharedPtr global_map_sub, local_map_sub;
+rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub;
+rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr global_map_sub, local_map_sub;
 
 rclcpp::TimerBase::SharedPtr local_sensing_timer, estimation_timer;
 
@@ -76,7 +79,7 @@ double _gl_xl, _gl_yl, _gl_zl;
 double _resolution, _inv_resolution;
 int _GLX_SIZE, _GLY_SIZE, _GLZ_SIZE;
 
-rclcpp::Time last_odom_stamp = rclcpp::TIME_MAX;
+rclcpp::Time last_odom_stamp;
 Eigen::Vector3d last_pose_world;
 
 void render_currentpose();
@@ -310,21 +313,21 @@ void render_currentpose() {
 
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
-  rclcpp::Node::SharedPtr nh("~");
+  rclcpp::Node::SharedPtr nh;
 
-  nh.getParam("cam_width", width);
-  nh.getParam("cam_height", height);
-  nh.getParam("cam_fx", fx);
-  nh.getParam("cam_fy", fy);
-  nh.getParam("cam_cx", cx);
-  nh.getParam("cam_cy", cy);
-  nh.getParam("sensing_horizon", sensing_horizon);
-  nh.getParam("sensing_rate", sensing_rate);
-  nh.getParam("estimation_rate", estimation_rate);
+  nh->get_parameter("cam_width", width);
+  nh->get_parameter("cam_height", height);
+  nh->get_parameter("cam_fx", fx);
+  nh->get_parameter("cam_fy", fy);
+  nh->get_parameter("cam_cx", cx);
+  nh->get_parameter("cam_cy", cy);
+  nh->get_parameter("sensing_horizon", sensing_horizon);
+  nh->get_parameter("sensing_rate", sensing_rate);
+  nh->get_parameter("estimation_rate", estimation_rate);
 
-  nh.getParam("map/x_size", _x_size);
-  nh.getParam("map/y_size", _y_size);
-  nh.getParam("map/z_size", _z_size);
+  nh->get_parameter("map/x_size", _x_size);
+  nh->get_parameter("map/y_size", _y_size);
+  nh->get_parameter("map/z_size", _z_size);
 
   depthrender.set_para(fx, fy, cx, cy, width, height);
 
@@ -346,16 +349,17 @@ int main(int argc, char **argv) {
   odom_sub = nh->create_subscription<nav_msgs::msg::Odometry>("odometry", 50, rcvOdometryCallbck);
 
   //publisher depth image and color image
-  pub_depth = nh->create_publisher<sensor_msgs::Image>("depth", 1000);
-  pub_color = nh->create_publisher<sensor_msgs::Image>("colordepth", 1000);
+  pub_depth = nh->create_publisher<sensor_msgs::msg::Image>("depth", 1000);
+  pub_color = nh->create_publisher<sensor_msgs::msg::Image>("colordepth", 1000);
   pub_pose = nh->create_publisher<geometry_msgs::msg::PoseStamped>("camera_pose", 1000);
   pub_pcl_wolrd = nh->create_publisher<sensor_msgs::msg::PointCloud2>("rendered_pcl", 1);
 
   double sensing_duration = 1.0 / sensing_rate;
   double estimate_duration = 1.0 / estimation_rate;
 
-  local_sensing_timer = nh->create_wall_timer(std::chrono::milliseconds(sensing_duration * 1000), renderSensedPoints);
-  estimation_timer = nh->create_wall_timer(std::chrono::milliseconds(estimate_duration * 1000), pubCameraPose);
+  local_sensing_timer =
+      nh->create_wall_timer(std::chrono::milliseconds(int(sensing_duration * 1000)), renderSensedPoints);
+  estimation_timer = nh->create_wall_timer(std::chrono::milliseconds(int(estimate_duration * 1000)), pubCameraPose);
   //cv::namedWindow("depth_image",1);
 
   _inv_resolution = 1.0 / _resolution;
@@ -371,7 +375,7 @@ int main(int argc, char **argv) {
   rclcpp::Rate rate(100);
   bool status = rclcpp::ok();
   while (status) {
-    rclcpp::spinOnce();
+    rclcpp::spin_some(nh);
     status = rclcpp::ok();
     rate.sleep();
   }

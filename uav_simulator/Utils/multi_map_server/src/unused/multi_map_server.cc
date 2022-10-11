@@ -14,8 +14,8 @@ using namespace arma;
 using namespace std;
 #define MAX_MAP_CNT 25
 
-rclcpp::Publisher<MMSG>::SharedPtr pub1;
-rclcpp::Publisher<MMSG>::SharedPtr pub2;
+rclcpp::Publisher<multi_map_server::msg::MultiOccupancyGrid>::SharedPtr pub1;
+rclcpp::Publisher<multi_map_server::msg::MultiSparseMap3D>::SharedPtr pub2;
 
 // 2D Map
 int maps2dCnt = 0;
@@ -27,7 +27,7 @@ Map3D maps3d[MAX_MAP_CNT];
 // Map origin from UKF
 vector<geometry_msgs::msg::Pose> maps_origin;
 
-void map2d_callback(const nav_msgs::OccupancyGrid::ConstPtr &msg)
+void map2d_callback(const nav_msgs::msg::OccupancyGrid::ConstPtr &msg)
 {
   // Update msg and publish
   if (grids2d.maps.size() == 0)
@@ -39,7 +39,7 @@ void map2d_callback(const nav_msgs::OccupancyGrid::ConstPtr &msg)
   else if (grids2d.maps.back().info.map_load_time != msg->info.map_load_time)
   {
     // Add Costmap
-    nav_msgs::OccupancyGrid m;
+    nav_msgs::msg::OccupancyGrid m;
     maps2d[maps2dCnt-1].get_map(m);
     mapMatcher.AddCostMap(m);
     // Increase msg size
@@ -94,7 +94,7 @@ void scan_callback(const sensor_msgs::LaserScan::ConstPtr &msg)
   sensor_msgs::LaserScan scan = *msg;
   scan.intensities.clear();
   laser_geometry::LaserProjection projector;
-  sensor_msgs::PointCloud scanCloud;
+  sensor_msgs::msg::PointCloud scanCloud;
   projector.projectLaser(scan, scanCloud);
   mat scanMat(3, scanCloud.points.size());
   // Get scan in body frame
@@ -157,13 +157,13 @@ void maps_origin_callback(const geometry_msgs::msg::PoseArray::ConstPtr &msg)
 int main(int argc, char **argv)
 {
   rclcpp::init(argc, argv);
-  rclcpp::Node::SharedPtr n("~");
+  rclcpp::Node::SharedPtr n;
 
-  auto sub1 = n.subscribe("dmap2d",       100, map2d_callback);
-  auto sub2 = n.subscribe("scan",         100, scan_callback);
-  auto sub3 = n.subscribe("/maps_origin", 100, maps_origin_callback);
-  pub1 = n.advertise<multi_map_server::MultiOccupancyGrid>("dmaps2d", 10, true); 
-  pub2 = n.advertise<multi_map_server::MultiSparseMap3D>(  "dmaps3d", 10, true); 
+  auto sub1 = n->create_subscription<MMSG>("dmap2d",       100, map2d_callback);
+  auto sub2 = n->create_subscription<MMSG>("scan",         100, scan_callback);
+  auto sub3 = n->create_subscription<MMSG>("/maps_origin", 100, maps_origin_callback);
+  pub1 = n->create_publisher<multi_map_server::msg::MultiOccupancyGrid>("dmaps2d", 10, true);
+  pub2 = n->create_publisher<multi_map_server::msg::MultiSparseMap3D>(  "dmaps3d", 10, true);
 
   rclcpp::Rate r(100.0);
   int cnt = 0;
@@ -185,7 +185,7 @@ int main(int argc, char **argv)
       }
       pub2->publish(msg);
     }
-    rclcpp::spinOnce();
+    rclcpp::spin_some(n);
     r.sleep();
   }
   return 0;

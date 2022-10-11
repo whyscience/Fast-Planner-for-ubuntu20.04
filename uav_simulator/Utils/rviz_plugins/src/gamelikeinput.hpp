@@ -55,9 +55,9 @@ private:
   bool moving_;
 
   rclcpp::Node::SharedPtr nh_;
-  rclcpp::Publisher<MMSG>::SharedPtr  pub_pointlist;
-  rclcpp::Publisher<MMSG>::SharedPtr  pub_selection;
-  rclcpp::Publisher<MMSG>::SharedPtr  pub_swarm;
+  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr  pub_pointlist;
+  rclcpp::Publisher<std_msgs::msg::Int32MultiArray>::SharedPtr  pub_selection;
+  rclcpp::Publisher<quadrotor_msgs::msg::SwarmCommand>::SharedPtr  pub_swarm;
 
   double z_max;
   double z_min;

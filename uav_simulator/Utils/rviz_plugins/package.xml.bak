@@ -19,13 +19,13 @@
   <build_depend>qtbase5-dev     </build_depend>
   <build_depend>message_runtime </build_depend>
 
-  <run_depend>rviz              </run_depend>
-  <run_depend>multi_map_server  </run_depend>
-  <run_depend>message_runtime   </run_depend>
-  <run_depend>roscpp            </run_depend>
-  <run_depend>libqt5-core       </run_depend>
-  <run_depend>libqt5-gui        </run_depend>
-  <run_depend>libqt5-widgets    </run_depend>
+  <exec_depend>rviz              </exec_depend>
+  <exec_depend>multi_map_server  </exec_depend>
+  <exec_depend>message_runtime   </exec_depend>
+  <exec_depend>roscpp            </exec_depend>
+  <exec_depend>libqt5-core       </exec_depend>
+  <exec_depend>libqt5-gui        </exec_depend>
+  <exec_depend>libqt5-widgets    </exec_depend>
 
   <export>
       <rviz plugin="${prefix}/plugin_description.xml"/>

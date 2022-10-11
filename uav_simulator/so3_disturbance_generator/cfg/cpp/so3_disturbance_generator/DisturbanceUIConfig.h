@@ -117,7 +117,7 @@ namespace so3_disturbance_generator
 
       virtual void fromServer(const rclcpp::Node::SharedPtr &nh, DisturbanceUIConfig &config) const
       {
-        nh.getParam(name, config.*field);
+        nh->get_parameter(name, config.*field);
       }
 
       virtual void toServer(const rclcpp::Node::SharedPtr &nh, const DisturbanceUIConfig &config) const

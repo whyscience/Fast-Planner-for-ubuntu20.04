@@ -48,7 +48,7 @@ GameLikeInput::updateTopic()
   pub_pointlist =
     nh_.advertise<nav_msgs::msg::Path>(topic_property_wp_->getStdString(), 1);
 
-  pub_selection = nh_.advertise<std_msgs::Int32MultiArray>(
+  pub_selection = nh_.advertise<std_msgs::msg::Int32MultiArray>(
     topic_property_drone_->getStdString(), 1);
 
   pub_swarm = nh_.advertise<quadrotor_msgs::msg::SwarmCommand>(
@@ -134,7 +134,7 @@ GameLikeInput::onInitialize()
 void
 GameLikeInput::sendMessage()
 {
-  std_msgs::Int32MultiArray array;
+  std_msgs::msg::Int32MultiArray array;
   nav_msgs::msg::Path            path;
 
   array.data.clear();

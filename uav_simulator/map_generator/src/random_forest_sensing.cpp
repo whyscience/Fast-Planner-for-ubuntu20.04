@@ -28,10 +28,10 @@ uniform_real_distribution<double> rand_y;
 uniform_real_distribution<double> rand_w;
 uniform_real_distribution<double> rand_h;
 
-rclcpp::Publisher<MMSG>::SharedPtr _local_map_pub;
-rclcpp::Publisher<MMSG>::SharedPtr _all_map_pub;
-rclcpp::Publisher<MMSG>::SharedPtr click_map_pub_;
-rclcpp::Subscription<MMSG>::SharedPtr  _odom_sub;
+rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _local_map_pub;
+rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _all_map_pub;
+rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr click_map_pub_;
+rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr _odom_sub;
 
 vector<double> _state;
 
@@ -230,7 +230,7 @@ void pubSensedPoints() {
   _local_map_pub->publish(localMap_pcd);
 }
 
-void clickCallback(const geometry_msgs::msg::PoseStamped& msg) {
+void clickCallback(geometry_msgs::msg::PoseStamped::SharedPtr msg) {
   double x = msg->pose.position.x;
   double y = msg->pose.position.y;
   double w = rand_w(eng);
@@ -267,18 +267,18 @@ void clickCallback(const geometry_msgs::msg::PoseStamped& msg) {
   return;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
-  rclcpp::Node::SharedPtr n("~");
+  rclcpp::Node::SharedPtr n;
 
-  _local_map_pub = n.advertise<sensor_msgs::msg::PointCloud2>("/map_generator/local_cloud", 1);
-  _all_map_pub = n.advertise<sensor_msgs::msg::PointCloud2>("/map_generator/global_cloud", 1);
+  _local_map_pub = n->create_publisher<sensor_msgs::msg::PointCloud2>("/map_generator/local_cloud", 1);
+  _all_map_pub = n->create_publisher<sensor_msgs::msg::PointCloud2>("/map_generator/global_cloud", 1);
 
-  _odom_sub = n.subscribe("odometry", 50, rcvOdometryCallbck);
+  _odom_sub = n->create_subscription<MMSG>("odometry", 50, rcvOdometryCallbck);
 
   click_map_pub_ =
-      n.advertise<sensor_msgs::msg::PointCloud2>("/pcl_render_node/local_map", 1);
-  // rclcpp::Subscription<MMSG>::SharedPtr  click_sub = n.subscribe("/goal", 10, clickCallback);
+      n->create_publisher<sensor_msgs::msg::PointCloud2>("/pcl_render_node/local_map", 1);
+  // auto click_sub = n->create_subscription<geometry_msgs::msg::PoseStamped>("/goal", 10, clickCallback);
 
   n.param("init_state_x", _init_x, 0.0);
   n.param("init_state_y", _init_y, 0.0);
@@ -310,7 +310,7 @@ int main(int argc, char** argv) {
   _y_l = -_y_size / 2.0;
   _y_h = +_y_size / 2.0;
 
-  _obs_num = min(_obs_num, (int)_x_size * 10);
+  _obs_num = min(_obs_num, (int) _x_size * 10);
   _z_limit = _z_size;
 
   rclcpp::Duration(0.5).sleep();//todo eric
@@ -321,7 +321,7 @@ int main(int argc, char** argv) {
 
   while (rclcpp::ok()) {
     pubSensedPoints();
-    rclcpp::spinOnce();
+    rclcpp::spin_some(n);
     loop_rate.sleep();
   }
 }

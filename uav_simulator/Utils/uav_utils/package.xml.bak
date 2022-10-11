@@ -35,8 +35,8 @@
   <!--   <build_depend>message_generation</build_depend> -->
   <!-- Use buildtool_depend for build tool packages: -->
   <!--   <buildtool_depend>ament_cmake</buildtool_depend> -->
-  <!-- Use run_depend for packages you need at runtime: -->
-  <!--   <run_depend>message_runtime</run_depend> -->
+  <!-- Use exec_depend for packages you need at runtime: -->
+  <!--   <exec_depend>message_runtime</exec_depend> -->
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>ament_cmake</buildtool_depend>
@@ -44,10 +44,10 @@
   <build_depend>rospy           </build_depend>
   <build_depend>cmake_modules   </build_depend>
   <build_depend>cmake_utils     </build_depend>
-  <run_depend>roscpp        </run_depend>
-  <run_depend>rospy         </run_depend>
-  <run_depend>cmake_modules </run_depend>
-  <run_depend>cmake_utils   </run_depend>
+  <exec_depend>roscpp        </exec_depend>
+  <exec_depend>rospy         </exec_depend>
+  <exec_depend>cmake_modules </exec_depend>
+  <exec_depend>cmake_utils   </exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
