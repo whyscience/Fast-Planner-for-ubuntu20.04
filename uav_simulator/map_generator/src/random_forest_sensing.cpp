@@ -280,29 +280,29 @@ int main(int argc, char **argv) {
       n->create_publisher<sensor_msgs::msg::PointCloud2>("/pcl_render_node/local_map", 1);
   // auto click_sub = n->create_subscription<geometry_msgs::msg::PoseStamped>("/goal", 10, clickCallback);
 
-  n.param("init_state_x", _init_x, 0.0);
-  n.param("init_state_y", _init_y, 0.0);
+  n->get_parameter("init_state_x", _init_x, 0.0);
+  n->get_parameter("init_state_y", _init_y, 0.0);
 
-  n.param("map/x_size", _x_size, 50.0);
-  n.param("map/y_size", _y_size, 50.0);
-  n.param("map/z_size", _z_size, 5.0);
-  n.param("map/obs_num", _obs_num, 30);
-  n.param("map/resolution", _resolution, 0.1);
-  n.param("map/circle_num", circle_num_, 30);
+  n->get_parameter("map/x_size", _x_size, 50.0);
+  n->get_parameter("map/y_size", _y_size, 50.0);
+  n->get_parameter("map/z_size", _z_size, 5.0);
+  n->get_parameter("map/obs_num", _obs_num, 30);
+  n->get_parameter("map/resolution", _resolution, 0.1);
+  n->get_parameter("map/circle_num", circle_num_, 30);
 
-  n.param("ObstacleShape/lower_rad", _w_l, 0.3);
-  n.param("ObstacleShape/upper_rad", _w_h, 0.8);
-  n.param("ObstacleShape/lower_hei", _h_l, 3.0);
-  n.param("ObstacleShape/upper_hei", _h_h, 7.0);
+  n->get_parameter("ObstacleShape/lower_rad", _w_l, 0.3);
+  n->get_parameter("ObstacleShape/upper_rad", _w_h, 0.8);
+  n->get_parameter("ObstacleShape/lower_hei", _h_l, 3.0);
+  n->get_parameter("ObstacleShape/upper_hei", _h_h, 7.0);
 
-  n.param("ObstacleShape/radius_l", radius_l_, 7.0);
-  n.param("ObstacleShape/radius_h", radius_h_, 7.0);
-  n.param("ObstacleShape/z_l", z_l_, 7.0);
-  n.param("ObstacleShape/z_h", z_h_, 7.0);
-  n.param("ObstacleShape/theta", theta_, 7.0);
+  n->get_parameter("ObstacleShape/radius_l", radius_l_, 7.0);
+  n->get_parameter("ObstacleShape/radius_h", radius_h_, 7.0);
+  n->get_parameter("ObstacleShape/z_l", z_l_, 7.0);
+  n->get_parameter("ObstacleShape/z_h", z_h_, 7.0);
+  n->get_parameter("ObstacleShape/theta", theta_, 7.0);
 
-  n.param("sensing/radius", _sensing_range, 10.0);
-  n.param("sensing/radius", _sense_rate, 10.0);
+  n->get_parameter("sensing/radius", _sensing_range, 10.0);
+  n->get_parameter("sensing/radius", _sense_rate, 10.0);
 
   _x_l = -_x_size / 2.0;
   _x_h = +_x_size / 2.0;

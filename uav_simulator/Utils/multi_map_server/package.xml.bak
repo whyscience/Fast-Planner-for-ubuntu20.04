@@ -1,4 +1,4 @@
-<package>
+<package format="2">
   <description>multi_map_server</description>
   <name>multi_map_server</name>
   <version>0.0.0</version>

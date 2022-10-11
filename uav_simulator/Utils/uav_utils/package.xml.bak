@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>uav_utils</name>
   <version>0.0.0</version>
   <description>The uav_utils package</description>
@@ -49,10 +49,7 @@
   <exec_depend>cmake_modules </exec_depend>
   <exec_depend>cmake_utils   </exec_depend>
 
-
-  <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <!-- Other tools can request additional information be placed here -->
-
+      <build_type>ament_cmake</build_type>
   </export>
 </package>
