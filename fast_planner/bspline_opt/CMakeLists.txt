@@ -26,7 +26,7 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 add_library(${PROJECT_NAME}
         src/bspline_optimizer.cpp
         )
-target_link_libraries(${PROJECT_NAME} plan_env)
+target_link_libraries(${PROJECT_NAME} nlopt)
 ament_target_dependencies(${PROJECT_NAME} rclcpp plan_env Eigen3)
 
 ament_export_include_directories(include)

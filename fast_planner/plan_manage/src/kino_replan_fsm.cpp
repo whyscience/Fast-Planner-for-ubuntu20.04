@@ -51,11 +51,15 @@ void KinoReplanFSM::init(rclcpp::Node::SharedPtr &nh) {
 
   /* callback */
   exec_timer_ = nh->create_wall_timer(std::chrono::milliseconds(10), std::bind(&KinoReplanFSM::execFSMCallback, this));
-  safety_timer_ = nh->create_wall_timer(std::chrono::milliseconds(50), std::bind(&KinoReplanFSM::checkCollisionCallback, this));
+  safety_timer_ =
+      nh->create_wall_timer(std::chrono::milliseconds(50), std::bind(&KinoReplanFSM::checkCollisionCallback, this));
 
-  waypoint_sub_ =
-      nh->create_subscription<nav_msgs::msg::Path>("/waypoint_generator/waypoints", 1, std::bind(&KinoReplanFSM::waypointCallback, this));
-  odom_sub_ = nh->create_subscription<nav_msgs::msg::Odometry>("/odom_world", 1, std::bind(&KinoReplanFSM::odometryCallback, this));
+  waypoint_sub_ = nh->create_subscription<nav_msgs::msg::Path>("/waypoint_generator/waypoints",
+                                                               1, std::bind(&KinoReplanFSM::waypointCallback,
+                                                                            this, std::placeholders::_1));
+  odom_sub_ = nh->create_subscription<nav_msgs::msg::Odometry>("/odom_world",
+                                                               1, std::bind(&KinoReplanFSM::odometryCallback,
+                                                                            this, std::placeholders::_1));
 
   replan_pub_ = nh->create_publisher<std_msgs::msg::Empty>("/planning/replan", 10);
   new_pub_ = nh->create_publisher<std_msgs::msg::Empty>("/planning/new", 10);

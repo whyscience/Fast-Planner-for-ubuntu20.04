@@ -56,9 +56,8 @@ void TopoReplanFSM::init(rclcpp::Node::SharedPtr &nh) {
   exec_timer_ = nh->create_wall_timer(std::chrono::milliseconds(10), std::bind(&TopoReplanFSM::execFSMCallback, this));
   safety_timer_ = nh->create_wall_timer(std::chrono::milliseconds(50), std::bind(&TopoReplanFSM::checkCollisionCallback, this));
 
-  waypoint_sub_ =
-      nh->create_subscription<nav_msgs::msg::Path>("/waypoint_generator/waypoints", 1, std::bind(&TopoReplanFSM::waypointCallback, this));
-  odom_sub_ = nh->create_subscription<nav_msgs::msg::Odometry>("/odom_world", 1, std::bind(&TopoReplanFSM::odometryCallback, this));
+  waypoint_sub_ = nh->create_subscription<nav_msgs::msg::Path>("/waypoint_generator/waypoints", 1, std::bind(&TopoReplanFSM::waypointCallback, this, std::placeholders::_1));
+  odom_sub_ = nh->create_subscription<nav_msgs::msg::Odometry>("/odom_world", 1, std::bind(&TopoReplanFSM::odometryCallback, this, std::placeholders::_1));
 
   replan_pub_ = nh->create_publisher<std_msgs::msg::Empty>("/planning/replan", 20);
   new_pub_ = nh->create_publisher<std_msgs::msg::Empty>("/planning/new", 20);

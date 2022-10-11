@@ -53,6 +53,7 @@ add_executable(fast_planner_node
         src/planner_manager.cpp
         )
 ament_target_dependencies(fast_planner_node ${dependencies})
+target_link_libraries(fast_planner_node nlopt)
 
 add_executable(traj_server src/traj_server.cpp)
 ament_target_dependencies(traj_server ${dependencies})
