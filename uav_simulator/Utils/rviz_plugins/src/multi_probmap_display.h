@@ -97,7 +97,7 @@ protected:
 
   std::string topic_;
 
-  rclcpp::Subscriber map_sub_;
+  rclcpp::Subscription<MMSG>::SharedPtr  map_sub_;
 
   RosTopicProperty* topic_property_;
   Property*         draw_under_property_;

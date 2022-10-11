@@ -56,28 +56,28 @@ public:
 
   void PackMsg(multi_map_server::VerticalOccupancyGridList &msg)
   {
-    msg.x = x;
-    msg.y = y;
+    msg->x = x;
+    msg->y = y;
     for (list<OccupancyGrid>::iterator k = grids.begin(); k != grids.end(); k++)
     {
-      msg.upper.push_back(k->upper);
-      msg.lower.push_back(k->lower);
-      msg.mass.push_back(k->mass);
+      msg->upper.push_back(k->upper);
+      msg->lower.push_back(k->lower);
+      msg->mass.push_back(k->mass);
     }
   }
 
   void UnpackMsg(const multi_map_server::VerticalOccupancyGridList &msg)
   {
-    x = msg.x;
-    y = msg.y;
+    x = msg->x;
+    y = msg->y;
     updateCounter = 0;
     grids.clear();
-    for (unsigned int k = 0; k < msg.mass.size(); k++)
+    for (unsigned int k = 0; k < msg->mass.size(); k++)
     {
       OccupancyGrid c;
-      c.upper = msg.upper[k];
-      c.lower = msg.lower[k];
-      c.mass  = msg.mass[k];
+      c.upper = msg->upper[k];
+      c.lower = msg->lower[k];
+      c.mass  = msg->mass[k];
       grids.push_back(c);
     }
   }
@@ -360,23 +360,23 @@ public:
   void PackMsg(multi_map_server::SparseMap3D &msg)
   {
     // Basic map info
-    msg.header.stamp            = rclcpp::Clock().now();
-    msg.header.frame_id         = string("/map");
-    msg.info.map_load_time      = rclcpp::Clock().now();
-    msg.info.resolution         = resolution;
-    msg.info.origin.position.x  = originX;
-    msg.info.origin.position.y  = originY;
-    msg.info.origin.position.z  = originZ;
-    msg.info.width              = mapX;
-    msg.info.height             = mapY;
-    msg.info.origin.orientation = tf::createQuaternionMsgFromYaw(0.0);  
+    msg->header.stamp            = rclcpp::Clock().now();
+    msg->header.frame_id         = string("/map");
+    msg->info.map_load_time      = rclcpp::Clock().now();
+    msg->info.resolution         = resolution;
+    msg->info.origin.position.x  = originX;
+    msg->info.origin.position.y  = originY;
+    msg->info.origin.position.z  = originZ;
+    msg->info.width              = mapX;
+    msg->info.height             = mapY;
+    msg->info.origin.orientation = tf::createQuaternionMsgFromYaw(0.0);
     // Pack columns into message
-    msg.lists.clear();
+    msg->lists.clear();
     for (unsigned int k = 0; k < updateList.size(); k++)
     {
       multi_map_server::VerticalOccupancyGridList c;
       updateList[k]->PackMsg(c);
-      msg.lists.push_back(c);
+      msg->lists.push_back(c);
     }
     updateList.clear();
     updateCounter++;
@@ -385,14 +385,14 @@ public:
   void UnpackMsg(const multi_map_server::SparseMap3D &msg)
   {
     // Unpack column msgs, Replace the whole column
-    for (unsigned int k = 0; k < msg.lists.size(); k++)
+    for (unsigned int k = 0; k < msg->lists.size(); k++)
     {
       int mx, my, mz;
-      WorldFrameToMapFrame(msg.lists[k].x, msg.lists[k].y, 0, mx, my, mz);
+      WorldFrameToMapFrame(msg->lists[k].x, msg->lists[k].y, 0, mx, my, mz);
       ResizeMapBase(mx, my);
       if (mapBase[my*mapX+mx]) delete mapBase[my*mapX+mx];
       mapBase[my*mapX+mx] = new OccupancyGridList;
-      mapBase[my*mapX+mx]->UnpackMsg(msg.lists[k]);
+      mapBase[my*mapX+mx]->UnpackMsg(msg->lists[k]);
     }
     CheckDecayMap();
     updated = true;

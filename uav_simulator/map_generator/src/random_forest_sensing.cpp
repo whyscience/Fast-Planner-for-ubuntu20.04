@@ -28,10 +28,10 @@ uniform_real_distribution<double> rand_y;
 uniform_real_distribution<double> rand_w;
 uniform_real_distribution<double> rand_h;
 
-rclcpp::Publisher _local_map_pub;
-rclcpp::Publisher _all_map_pub;
-rclcpp::Publisher click_map_pub_;
-rclcpp::Subscriber _odom_sub;
+rclcpp::Publisher<MMSG>::SharedPtr _local_map_pub;
+rclcpp::Publisher<MMSG>::SharedPtr _all_map_pub;
+rclcpp::Publisher<MMSG>::SharedPtr click_map_pub_;
+rclcpp::Subscription<MMSG>::SharedPtr  _odom_sub;
 
 vector<double> _state;
 
@@ -231,8 +231,8 @@ void pubSensedPoints() {
 }
 
 void clickCallback(const geometry_msgs::msg::PoseStamped& msg) {
-  double x = msg.pose.position.x;
-  double y = msg.pose.position.y;
+  double x = msg->pose.position.x;
+  double y = msg->pose.position.y;
   double w = rand_w(eng);
   double h;
   pcl::PointXYZ pt_random;
@@ -278,7 +278,7 @@ int main(int argc, char** argv) {
 
   click_map_pub_ =
       n.advertise<sensor_msgs::PointCloud2>("/pcl_render_node/local_map", 1);
-  // rclcpp::Subscriber click_sub = n.subscribe("/goal", 10, clickCallback);
+  // rclcpp::Subscription<MMSG>::SharedPtr  click_sub = n.subscribe("/goal", 10, clickCallback);
 
   n.param("init_state_x", _init_x, 0.0);
   n.param("init_state_y", _init_y, 0.0);
@@ -313,7 +313,7 @@ int main(int argc, char** argv) {
   _obs_num = min(_obs_num, (int)_x_size * 10);
   _z_limit = _z_size;
 
-  rclcpp::Duration(0.5).sleep();
+  rclcpp::Duration(0.5).sleep();//todo eric
 
   RandomMapGenerate();
 

@@ -15,9 +15,9 @@
 using namespace std;
 using bfmt = boost::format;
 
-rclcpp::Publisher pub1;
-rclcpp::Publisher pub2;
-rclcpp::Publisher pub3;
+rclcpp::Publisher<MMSG>::SharedPtr pub1;
+rclcpp::Publisher<MMSG>::SharedPtr pub2;
+rclcpp::Publisher<MMSG>::SharedPtr pub3;
 string waypoint_type = string("manual");
 bool is_odom_ready;
 nav_msgs::msg::Odometry odom;
@@ -50,7 +50,7 @@ void load_seg(rclcpp::Node::SharedPtr& nh, int segid, const rclcpp::Time& time_b
 
     nav_msgs::msg::Path path_msg;
 
-    path_msg.header.stamp = time_base + rclcpp::Duration(time_from_start);
+    path_msg.header.stamp = time_base + std::chrono::milliseconds(time_from_start);
 
     double baseyaw = tf::getYaw(odom.pose.pose.orientation);
 

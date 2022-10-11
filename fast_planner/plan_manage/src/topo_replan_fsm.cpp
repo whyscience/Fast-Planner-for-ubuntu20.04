@@ -35,7 +35,8 @@ void TopoReplanFSM::init(rclcpp::Node::SharedPtr &nh) {
   collide_ = false;
 
   /*  fsm param  */
-  nh.param("fsm/flight_type", target_type_, -1);
+  //todo eric param
+  /*nh.param("fsm/flight_type", target_type_, -1);
   nh.param("fsm/thresh_replan", replan_time_threshold_, -1.0);
   nh.param("fsm/thresh_no_replan", replan_distance_threshold_, -1.0);
   nh.param("fsm/waypoint_num", waypoint_num_, -1);
@@ -44,7 +45,7 @@ void TopoReplanFSM::init(rclcpp::Node::SharedPtr &nh) {
     nh.param("fsm/waypoint" + to_string(i) + "_x", waypoints_[i][0], -1.0);
     nh.param("fsm/waypoint" + to_string(i) + "_y", waypoints_[i][1], -1.0);
     nh.param("fsm/waypoint" + to_string(i) + "_z", waypoints_[i][2], -1.0);
-  }
+  }*/
 
   /* initialize main modules */
   planner_manager_.reset(new FastPlannerManager);
@@ -52,16 +53,16 @@ void TopoReplanFSM::init(rclcpp::Node::SharedPtr &nh) {
   visualization_.reset(new PlanningVisualization(nh));
 
   /* callback */
-  exec_timer_ = nh.createTimer(rclcpp::Duration(0.01), &TopoReplanFSM::execFSMCallback, this);
-  safety_timer_ = nh.createTimer(rclcpp::Duration(0.05), &TopoReplanFSM::checkCollisionCallback, this);
+  exec_timer_ = nh->create_wall_timer(std::chrono::milliseconds(10), &TopoReplanFSM::execFSMCallback, this);
+  safety_timer_ = nh->create_wall_timer(std::chrono::milliseconds(50), &TopoReplanFSM::checkCollisionCallback, this);
 
   waypoint_sub_ =
-      nh.subscribe("/waypoint_generator/waypoints", 1, &TopoReplanFSM::waypointCallback, this);
-  odom_sub_ = nh.subscribe("/odom_world", 1, &TopoReplanFSM::odometryCallback, this);
+      nh->create_subscription("/waypoint_generator/waypoints", 1, &TopoReplanFSM::waypointCallback, this);
+  odom_sub_ = nh->create_subscription("/odom_world", 1, &TopoReplanFSM::odometryCallback, this);
 
-  replan_pub_ = nh.advertise<std_msgs::msg::Empty>("/planning/replan", 20);
-  new_pub_ = nh.advertise<std_msgs::msg::Empty>("/planning/new", 20);
-  bspline_pub_ = nh.advertise<plan_manage::msg::Bspline>("/planning/bspline", 20);
+  replan_pub_ = nh->create_publisher<std_msgs::msg::Empty>("/planning/replan", 20);
+  new_pub_ = nh->create_publisher<std_msgs::msg::Empty>("/planning/new", 20);
+  bspline_pub_ = nh->create_publisher<quadrotor_msgs::msg::Bspline>("/planning/bspline", 20);
 }
 
 void TopoReplanFSM::waypointCallback(const nav_msgs::msg::Path::SharedPtr msg) {
@@ -389,7 +390,7 @@ bool TopoReplanFSM::callTopologicalTraj(int step) {
     /* publish newest trajectory to server */
 
     /* publish traj */
-    plan_manage::msg::Bspline bspline;
+    quadrotor_msgs::msg::Bspline bspline;
     bspline.order = 3;
     bspline.start_time = locdat->start_time_;
     bspline.traj_id = locdat->traj_id_;

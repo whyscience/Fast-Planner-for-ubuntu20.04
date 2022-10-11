@@ -35,7 +35,7 @@
 
 //#include <cloud_banchmark/cloud_banchmarkConfig.h>
 #include "depth_render.cuh"
-#include "quadrotor_msgs/PositionCommand.h"
+#include "quadrotor_msgs/msg/position_command.hpp"
 using namespace cv;
 using namespace std;
 using namespace Eigen;
@@ -48,18 +48,18 @@ int width, height;
 double fx,fy,cx,cy;
 
 DepthRender depthrender;
-rclcpp::Publisher pub_depth;
-rclcpp::Publisher pub_color;
-rclcpp::Publisher pub_pose;
-rclcpp::Publisher pub_pcl_wolrd;
+rclcpp::Publisher<MMSG>::SharedPtr pub_depth;
+rclcpp::Publisher<MMSG>::SharedPtr pub_color;
+rclcpp::Publisher<MMSG>::SharedPtr pub_pose;
+rclcpp::Publisher<MMSG>::SharedPtr pub_pcl_wolrd;
 
 sensor_msgs::PointCloud2 local_map_pcl;
 sensor_msgs::PointCloud2 local_depth_pcl;
 
-rclcpp::Subscriber odom_sub;
-rclcpp::Subscriber global_map_sub, local_map_sub;
+rclcpp::Subscription<MMSG>::SharedPtr  odom_sub;
+rclcpp::Subscription<MMSG>::SharedPtr  global_map_sub, local_map_sub;
 
-rclcpp::Timer local_sensing_timer, estimation_timer;
+rclcpp::TimerBase::SharedPtr local_sensing_timer, estimation_timer;
 
 bool has_global_map(false);
 bool has_local_map(false);
@@ -352,21 +352,21 @@ int main(int argc, char **argv)
   //init cam2world transformation
   cam2world = Matrix4d::Identity();
   //subscribe point cloud
-  global_map_sub = nh.subscribe( "global_map", 1,  rcvGlobalPointCloudCallBack);  
-  local_map_sub  = nh.subscribe( "local_map",  1,  rcvLocalPointCloudCallBack);  
-  odom_sub       = nh.subscribe( "odometry",   50, rcvOdometryCallbck   );  
+  global_map_sub = nh->create_subscription( "global_map", 1,  rcvGlobalPointCloudCallBack);
+  local_map_sub  = nh->create_subscription( "local_map",  1,  rcvLocalPointCloudCallBack);
+  odom_sub       = nh->create_subscription( "odometry",   50, rcvOdometryCallbck   );
 
   //publisher depth image and color image
-  pub_depth = nh.advertise<sensor_msgs::Image>("depth",1000);
-  pub_color = nh.advertise<sensor_msgs::Image>("colordepth",1000);
-  pub_pose  = nh.advertise<geometry_msgs::msg::PoseStamped>("camera_pose",1000);
-  pub_pcl_wolrd = nh.advertise<sensor_msgs::PointCloud2>("rendered_pcl",1);
+  pub_depth = nh->create_publisher<sensor_msgs::Image>("depth",1000);
+  pub_color = nh->create_publisher<sensor_msgs::Image>("colordepth",1000);
+  pub_pose  = nh->create_publisher<geometry_msgs::msg::PoseStamped>("camera_pose",1000);
+  pub_pcl_wolrd = nh->create_publisher<sensor_msgs::PointCloud2>("rendered_pcl",1);
 
   double sensing_duration  = 1.0 / sensing_rate;
   double estimate_duration = 1.0 / estimation_rate;
 
-  local_sensing_timer = nh.createTimer(rclcpp::Duration(sensing_duration),  renderSensedPoints);
-  estimation_timer    = nh.createTimer(rclcpp::Duration(estimate_duration), pubCameraPose);
+  local_sensing_timer = nh->create_wall_timer(std::chrono::milliseconds(sensing_duration),  renderSensedPoints);
+  estimation_timer    = nh->create_wall_timer(std::chrono::milliseconds(estimate_duration), pubCameraPose);
   //cv::namedWindow("depth_image",1);
 
   _inv_resolution = 1.0 / _resolution;

@@ -51,7 +51,7 @@ GameLikeInput::updateTopic()
   pub_selection = nh_.advertise<std_msgs::Int32MultiArray>(
     topic_property_drone_->getStdString(), 1);
 
-  pub_swarm = nh_.advertise<quadrotor_msgs::SwarmCommand>(
+  pub_swarm = nh_.advertise<quadrotor_msgs::msg::SwarmCommand>(
     topic_property_swarm_->getStdString(), 1);
 
   z_max = property_z_max->getFloat();
@@ -215,7 +215,7 @@ GameLikeInput::sendMessage()
 
   std::sort(array.data.begin(), array.data.end());
 
-  quadrotor_msgs::SwarmCommand swarm;
+  quadrotor_msgs::msg::SwarmCommand swarm;
   swarm.plan      = path;
   swarm.selection = array.data;
 

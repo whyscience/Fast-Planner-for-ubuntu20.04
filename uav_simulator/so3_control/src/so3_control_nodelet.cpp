@@ -2,7 +2,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <nodelet/nodelet.h>
 #include <quadrotor_msgs/Corrections.h>
-#include <quadrotor_msgs/PositionCommand.h>
+#include <quadrotor_msgs/msg/position_command.hpp>
 #include <quadrotor_msgs/SO3Command.h>
 #include "rclcpp/rclcpp.hpp"
 #include <sensor_msgs/msg/imu.hpp>
@@ -29,19 +29,19 @@ class SO3ControlNodelet : public nodelet::Nodelet {
  private:
   void publishSO3Command(void);
   void position_cmd_callback(
-      const quadrotor_msgs::PositionCommand::SharedPtr cmd);
+      const quadrotor_msgs::msg::PositionCommand::SharedPtr cmd);
   void odom_callback(const nav_msgs::msg::Odometry::SharedPtr odom);
   void enable_motors_callback(const std_msgs::Bool::SharedPtr msg);
-  void corrections_callback(const quadrotor_msgs::Corrections::SharedPtr msg);
+  void corrections_callback(const quadrotor_msgs::msg::Corrections::SharedPtr msg);
   void imu_callback(const sensor_msgs::Imu &imu);
 
   SO3Control controller_;
-  rclcpp::Publisher so3_command_pub_;
-  rclcpp::Subscriber odom_sub_;
-  rclcpp::Subscriber position_cmd_sub_;
-  rclcpp::Subscriber enable_motors_sub_;
-  rclcpp::Subscriber corrections_sub_;
-  rclcpp::Subscriber imu_sub_;
+  rclcpp::Publisher<MMSG>::SharedPtr so3_command_pub_;
+  rclcpp::Subscription<MMSG>::SharedPtr  odom_sub_;
+  rclcpp::Subscription<MMSG>::SharedPtr  position_cmd_sub_;
+  rclcpp::Subscription<MMSG>::SharedPtr  enable_motors_sub_;
+  rclcpp::Subscription<MMSG>::SharedPtr  corrections_sub_;
+  rclcpp::Subscription<MMSG>::SharedPtr  imu_sub_;
 
   bool position_cmd_updated_, position_cmd_init_;
   std::string frame_id_;
@@ -62,8 +62,8 @@ SO3ControlNodelet::publishSO3Command(void) {
   const Eigen::Vector3d &force = controller_.getComputedForce();
   const Eigen::Quaterniond &orientation = controller_.getComputedOrientation();
 
-  quadrotor_msgs::SO3Command::Ptr so3_command(
-      new quadrotor_msgs::SO3Command); //! @note memory leak?
+  quadrotor_msgs::msg::SO3Command::Ptr so3_command(
+      new quadrotor_msgs::msg::SO3Command); //! @note memory leak?
   so3_command->header.stamp = rclcpp::Clock().now();
   so3_command->header.frame_id = frame_id_;
   so3_command->force.x = force(0);
@@ -88,7 +88,7 @@ SO3ControlNodelet::publishSO3Command(void) {
 
 void
 SO3ControlNodelet::position_cmd_callback(
-    const quadrotor_msgs::PositionCommand::SharedPtr cmd) {
+    const quadrotor_msgs::msg::PositionCommand::SharedPtr cmd) {
   des_pos_ = Eigen::Vector3d(cmd->position.x, cmd->position.y, cmd->position.z);
   des_vel_ = Eigen::Vector3d(cmd->velocity.x, cmd->velocity.y, cmd->velocity.z);
   des_acc_ = Eigen::Vector3d(cmd->acceleration.x, cmd->acceleration.y,
@@ -143,7 +143,7 @@ SO3ControlNodelet::enable_motors_callback(const std_msgs::Bool::SharedPtr msg) {
 
 void
 SO3ControlNodelet::corrections_callback(
-    const quadrotor_msgs::Corrections::SharedPtr msg) {
+    const quadrotor_msgs::msg::Corrections::SharedPtr msg) {
   corrections_[0] = msg->kf_correction;
   corrections_[1] = msg->angle_corrections[0];
   corrections_[2] = msg->angle_corrections[1];
@@ -182,7 +182,7 @@ SO3ControlNodelet::onInit(void) {
   n.param("corrections/r", corrections_[1], 0.0);
   n.param("corrections/p", corrections_[2], 0.0);
 
-  so3_command_pub_ = n.advertise<quadrotor_msgs::SO3Command>("so3_cmd", 10);
+  so3_command_pub_ = n.advertise<quadrotor_msgs::msg::SO3Command>("so3_cmd", 10);
 
   odom_sub_ = n.subscribe("odom", 10, &SO3ControlNodelet::odom_callback, this,
                           rclcpp::TransportHints().tcpNoDelay());

@@ -14,8 +14,8 @@ using namespace arma;
 using namespace std;
 #define MAX_MAP_CNT 25
 
-rclcpp::Publisher pub1;
-rclcpp::Publisher pub2;
+rclcpp::Publisher<MMSG>::SharedPtr pub1;
+rclcpp::Publisher<MMSG>::SharedPtr pub2;
 
 // 2D Map
 int maps2dCnt = 0;
@@ -174,14 +174,14 @@ int main(int argc, char **argv)
     {
       cnt = 0;
       map_server_3d_new::MultiSparseMap3D msg;
-      msg.maps_origin = maps_origin;
+      msg->maps_origin = maps_origin;
       for (int k = 0; k < maps3dCnt; k++)
       {
-        msg.maps_active.push_back((bool)(!mapLinks[k](0)) && mapLinks[k](2) > 50);
+        msg->maps_active.push_back((bool)(!mapLinks[k](0)) && mapLinks[k](2) > 50);
         map_server_3d_new::SparseMap3D m;
         maps3d[k].GetSparseMap3DMsg(m);
         //m.header.seq = k;
-        msg.maps.push_back(m);
+        msg->maps.push_back(m);
       }
       pub2->publish(msg);
     }

@@ -7,8 +7,8 @@
 #include <multi_map_server/Map2D.h>
 #include <multi_map_server/Map3D.h>
 
-rclcpp::Publisher pub1;
-rclcpp::Publisher pub2;
+rclcpp::Publisher<MMSG>::SharedPtr pub1;
+rclcpp::Publisher<MMSG>::SharedPtr pub2;
 
 vector<Map2D> maps2d;
 vector<geometry_msgs::msg::Pose> origins2d;

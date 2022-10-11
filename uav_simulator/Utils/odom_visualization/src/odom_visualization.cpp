@@ -10,7 +10,7 @@
 #include "visualization_msgs/Marker.h"
 #include "armadillo"
 #include "pose_utils.h"
-#include "quadrotor_msgs/PositionCommand.h"
+#include "quadrotor_msgs/msg/position_command.hpp"
 
 using namespace arma;
 using namespace std;
@@ -26,15 +26,15 @@ bool   cov_color  = false;
 bool   origin       = false;
 bool   isOriginSet  = false;
 colvec poseOrigin(6);
-rclcpp::Publisher posePub;
-rclcpp::Publisher pathPub;
-rclcpp::Publisher velPub;
-rclcpp::Publisher covPub;
-rclcpp::Publisher covVelPub;
-rclcpp::Publisher trajPub;
-rclcpp::Publisher sensorPub;
-rclcpp::Publisher meshPub;
-rclcpp::Publisher heightPub;
+rclcpp::Publisher<MMSG>::SharedPtr posePub;
+rclcpp::Publisher<MMSG>::SharedPtr pathPub;
+rclcpp::Publisher<MMSG>::SharedPtr velPub;
+rclcpp::Publisher<MMSG>::SharedPtr covPub;
+rclcpp::Publisher<MMSG>::SharedPtr covVelPub;
+rclcpp::Publisher<MMSG>::SharedPtr trajPub;
+rclcpp::Publisher<MMSG>::SharedPtr sensorPub;
+rclcpp::Publisher<MMSG>::SharedPtr meshPub;
+rclcpp::Publisher<MMSG>::SharedPtr heightPub;
 tf::TransformBroadcaster* broadcaster;
 geometry_msgs::msg::PoseStamped poseROS;
 nav_msgs::msg::Path             pathROS;
@@ -383,7 +383,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg)
   } 
 }
 
-void cmd_callback(const quadrotor_msgs::PositionCommand cmd)
+void cmd_callback(const quadrotor_msgs::msg::PositionCommand cmd)
 {   
   if (cmd.header.frame_id == string("null"))
     return;

@@ -41,9 +41,9 @@ cv::Mat undist_map1, undist_map2;
 bool is_distorted(false);
 
 DepthRender depthrender;
-rclcpp::Publisher pub_depth;
-rclcpp::Publisher pub_color;
-rclcpp::Publisher pub_posedimage;
+rclcpp::Publisher<MMSG>::SharedPtr pub_depth;
+rclcpp::Publisher<MMSG>::SharedPtr pub_color;
+rclcpp::Publisher<MMSG>::SharedPtr pub_posedimage;
 
 Matrix4d vicon2body;
 Matrix4d cam02body;
@@ -358,9 +358,9 @@ int main(int argc, char **argv)
   sync2.registerCallback(std::bind(image_pose_callback, _1, _2));
 
   //publisher depth image and color image
-  pub_depth = nh.advertise<sensor_msgs::Image>("depth",1000);
-  pub_color = nh.advertise<sensor_msgs::Image>("colordepth",1000);
-  // pub_posedimage = nh.advertise<sensor_msgs::Image>("posedimage",1000);
+  pub_depth = nh->create_publisher<sensor_msgs::Image>("depth",1000);
+  pub_color = nh->create_publisher<sensor_msgs::Image>("colordepth",1000);
+  // pub_posedimage = nh->create_publisher<sensor_msgs::Image>("posedimage",1000);
 
   undistorted_image.create(height, width, CV_8UC1);
 

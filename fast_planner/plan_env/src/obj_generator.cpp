@@ -213,7 +213,7 @@ void visualizeObj(int id) {
   /* ---------- rviz ---------- */
   visualization_msgs::msg::Marker mk;
   mk.header.frame_id = "world";
-  //  msg.header.stamp = this->now(); //todo eric replace allwith this
+  //  msg->header.stamp = this->now(); //todo eric replace allwith this
   mk.header.stamp = rclcpp::Clock().now();
   mk.type = visualization_msgs::msg::Marker::CUBE;
   mk.action = visualization_msgs::msg::Marker::ADD;

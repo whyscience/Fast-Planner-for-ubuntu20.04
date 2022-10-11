@@ -50,16 +50,16 @@ void KinoReplanFSM::init(rclcpp::Node::SharedPtr &nh) {
   visualization_.reset(new PlanningVisualization(nh));
 
   /* callback */
-  exec_timer_ = nh.createTimer(rclcpp::Duration(0.01), &KinoReplanFSM::execFSMCallback, this);
-  safety_timer_ = nh.createTimer(rclcpp::Duration(0.05), &KinoReplanFSM::checkCollisionCallback, this);
+  exec_timer_ = nh->create_wall_timer(std::chrono::milliseconds(10), &KinoReplanFSM::execFSMCallback, this);
+  safety_timer_ = nh->create_wall_timer(std::chrono::milliseconds(50), &KinoReplanFSM::checkCollisionCallback, this);
 
   waypoint_sub_ =
-      nh.subscribe("/waypoint_generator/waypoints", 1, &KinoReplanFSM::waypointCallback, this);
-  odom_sub_ = nh.subscribe("/odom_world", 1, &KinoReplanFSM::odometryCallback, this);
+      nh->create_subscription("/waypoint_generator/waypoints", 1, &KinoReplanFSM::waypointCallback, this);
+  odom_sub_ = nh->create_subscription("/odom_world", 1, &KinoReplanFSM::odometryCallback, this);
 
-  replan_pub_ = nh.advertise<std_msgs::msg::Empty>("/planning/replan", 10);
-  new_pub_ = nh.advertise<std_msgs::msg::Empty>("/planning/new", 10);
-  bspline_pub_ = nh.advertise<plan_manage::msg::Bspline>("/planning/bspline", 10);
+  replan_pub_ = nh->create_publisher<std_msgs::msg::Empty>("/planning/replan", 10);
+  new_pub_ = nh->create_publisher<std_msgs::msg::Empty>("/planning/new", 10);
+  bspline_pub_ = nh->create_publisher<quadrotor_msgs::msg::Bspline>("/planning/bspline", 10);
 }
 
 void KinoReplanFSM::waypointCallback(const nav_msgs::msg::Path::SharedPtr msg) {
@@ -315,7 +315,7 @@ bool KinoReplanFSM::callKinodynamicReplan() {
     auto info = &planner_manager_->local_data_;
 
     /* publish traj */
-    plan_manage::msg::Bspline bspline;
+    quadrotor_msgs::msg::Bspline bspline;
     bspline.order = 3;
     bspline.start_time = info->start_time_;
     bspline.traj_id = info->traj_id_;

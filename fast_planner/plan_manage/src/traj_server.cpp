@@ -26,19 +26,18 @@
 #include "bspline/non_uniform_bspline.h"
 #include <nav_msgs/msg/odometry.hpp>
 #include "quadrotor_msgs/msg/bspline.hpp"
-#include "quadrotor_msgs/PositionCommand.h"
+#include "quadrotor_msgs/msg/position_command.hpp"
 #include <std_msgs/msg/empty.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 #include "rclcpp/rclcpp.hpp"
 
-rclcpp::Publisher cmd_vis_pub, pos_cmd_pub, traj_pub;
 rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr cmd_vis_pub;
-rclcpp::Publisher<quadrotor_msgs::PositionCommand>::SharedPtr pos_cmd_pub;
+rclcpp::Publisher<quadrotor_msgs::msg::PositionCommand>::SharedPtr pos_cmd_pub;
 rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr traj_pub;
 
 nav_msgs::msg::Odometry odom;
 
-quadrotor_msgs::PositionCommand cmd;
+quadrotor_msgs::msg::PositionCommand cmd;
 // double pos_gain[3] = {5.7, 5.7, 6.2};
 // double vel_gain[3] = {3.4, 3.4, 4.0};
 double pos_gain[3] = {5.7, 5.7, 6.2};
@@ -130,7 +129,7 @@ void drawCmd(const Eigen::Vector3d &pos, const Eigen::Vector3d &vec, const int &
   cmd_vis_pub->publish(mk_state);
 }
 
-void bsplineCallback(plan_manage::msg::Bspline::SharedPtr msg) {
+void bsplineCallback(quadrotor_msgs::msg::Bspline::SharedPtr msg) {
   // parse pos traj
 
   Eigen::MatrixXd pos_pts(msg->pos_pts.size(), 3);
@@ -187,9 +186,9 @@ void newCallback(std_msgs::msg::Empty::SharedPtr msg) {
 }
 
 void odomCallbck(nav_msgs::msg::Odometry::SharedPtr msg) {
-  if (msg.child_frame_id == "X" || msg.child_frame_id == "O") return;
+  if (msg->child_frame_id == "X" || msg->child_frame_id == "O") return;
 
-  odom = msg;
+  odom = *msg;
 
   traj_real_.push_back(
       Eigen::Vector3d(odom.pose.pose.position.x, odom.pose.pose.position.y, odom.pose.pose.position.z));
@@ -241,7 +240,7 @@ void cmdCallback() {
 
   cmd.header.stamp = time_now;
   cmd.header.frame_id = "world";
-  cmd.trajectory_flag = quadrotor_msgs::PositionCommand::TRAJECTORY_STATUS_READY;
+  cmd.trajectory_flag = quadrotor_msgs::msg::PositionCommand::TRAJECTORY_STATUS_READY;
   cmd.trajectory_id = traj_id_;
 
   cmd.position.x = pos(0);
@@ -288,20 +287,17 @@ int main(int argc, char **argv) {
   rclcpp::init(argc, argv, "traj_server");
   rclcpp::Node::SharedPtr node;
 
-  auto bspline_sub = node->create_subscription<plan_manage::msg::Bspline>("planning/bspline", 10, bsplineCallback);
+  auto bspline_sub = node->create_subscription<quadrotor_msgs::msg::Bspline>("planning/bspline", 10, bsplineCallback);
   auto replan_sub = node->create_subscription<std_msgs::msg::Empty>("planning/replan", 10, replanCallback);
   auto new_sub = node->create_subscription<std_msgs::msg::Empty>("planning/new", 10, newCallback);
   auto odom_sub = node->create_subscription<nav_msgs::msg::Odometry>("/odom_world", 50, odomCallbck);
 
-  indep_cloud_sub_ = node_->create_subscription<sensor_msgs::msg::PointCloud2>(
-      "/sdf_map/cloud", 10, std::bind(&SDFMap::cloudCallback, this, std::placeholders::_1));
-
   cmd_vis_pub = node->create_publisher<visualization_msgs::msg::Marker>("planning/position_cmd_vis", 10);
-  pos_cmd_pub = node->create_publisher<quadrotor_msgs::PositionCommand>("/position_cmd", 50);
+  pos_cmd_pub = node->create_publisher<quadrotor_msgs::msg::PositionCommand>("/position_cmd", 50);
   traj_pub = node->create_publisher<visualization_msgs::msg::Marker>("planning/travel_traj", 10);
 
-  rclcpp::Timer cmd_timer = node.createTimer(rclcpp::Duration(0.01), cmdCallback);
-  rclcpp::Timer vis_timer = node.createTimer(rclcpp::Duration(0.25), visCallback);
+  auto cmd_timer = node->create_wall_timer(std::chrono::milliseconds(10), cmdCallback);
+  auto vis_timer = node->create_wall_timer(std::chrono::milliseconds(250), visCallback);
 
   /* control parameter */
   cmd.kx[0] = pos_gain[0];

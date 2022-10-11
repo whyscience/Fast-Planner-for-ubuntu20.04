@@ -55,9 +55,9 @@ private:
   bool moving_;
 
   rclcpp::Node::SharedPtr nh_;
-  rclcpp::Publisher  pub_pointlist;
-  rclcpp::Publisher  pub_selection;
-  rclcpp::Publisher  pub_swarm;
+  rclcpp::Publisher<MMSG>::SharedPtr  pub_pointlist;
+  rclcpp::Publisher<MMSG>::SharedPtr  pub_selection;
+  rclcpp::Publisher<MMSG>::SharedPtr  pub_swarm;
 
   double z_max;
   double z_min;

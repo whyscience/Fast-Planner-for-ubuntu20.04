@@ -34,7 +34,6 @@
 #include <path_searching/topo_prm.h>
 
 #include <plan_env/edt_environment.h>
-
 #include <plan_manage/plan_container.hpp>
 
 #include "rclcpp/rclcpp.hpp"

@@ -112,7 +112,7 @@ protected:
   Ogre::Quaternion orientation_;
   std::string frame_;
 
-  rclcpp::Subscriber map_sub_;
+  rclcpp::Subscription<MMSG>::SharedPtr  map_sub_;
 
   RosTopicProperty* topic_property_;
   FloatProperty* resolution_property_;

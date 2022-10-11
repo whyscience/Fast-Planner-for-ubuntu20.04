@@ -158,7 +158,7 @@ getControl(const QuadrotorSimulator::Quadrotor& quad, const Command& cmd)
 }
 
 static void
-cmd_callback(const quadrotor_msgs::SO3Command::SharedPtr  cmd)
+cmd_callback(const quadrotor_msgs::msg::SO3Command::SharedPtr  cmd)
 {
   command.force[0]         = cmd->force.x;
   command.force[1]         = cmd->force.y;
@@ -203,8 +203,8 @@ main(int argc, char** argv)
 
   rclcpp::Node::SharedPtr n("~");
 
-  rclcpp::Publisher  odom_pub = n.advertise<nav_msgs::msg::Odometry>("odom", 100);
-  rclcpp::Publisher  imu_pub  = n.advertise<sensor_msgs::Imu>("imu", 10);
+  auto odom_pub = n.advertise<nav_msgs::msg::Odometry>("odom", 100);
+  auto  imu_pub  = n.advertise<sensor_msgs::Imu>("imu", 10);
   auto cmd_sub =
     n.subscribe("cmd", 100, &cmd_callback, rclcpp::TransportHints().tcpNoDelay());
   auto f_sub =

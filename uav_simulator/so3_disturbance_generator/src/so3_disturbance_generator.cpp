@@ -13,10 +13,10 @@ using namespace std;
 
 #define CORRECTION_RATE 1
 
-rclcpp::Publisher pubo;
-rclcpp::Publisher pubc;
-rclcpp::Publisher pubf;
-rclcpp::Publisher pubm;
+rclcpp::Publisher<MMSG>::SharedPtr pubo;
+rclcpp::Publisher<MMSG>::SharedPtr pubc;
+rclcpp::Publisher<MMSG>::SharedPtr pubf;
+rclcpp::Publisher<MMSG>::SharedPtr pubm;
 so3_disturbance_generator::DisturbanceUIConfig config;
 nav_msgs::msg::Odometry noisy_odom;
 geometry_msgs::msg::PoseStamped correction;

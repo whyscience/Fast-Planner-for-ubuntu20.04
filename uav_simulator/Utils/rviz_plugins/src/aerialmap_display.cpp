@@ -261,8 +261,8 @@ AerialMapDisplay::clear()
 bool validateFloats(const nav_msgs::OccupancyGrid& msg)
 {
   bool valid = true;
-  valid = valid && validateFloats( msg.info.resolution );
-  valid = valid && validateFloats( msg.info.origin );
+  valid = valid && validateFloats( msg->info.resolution );
+  valid = valid && validateFloats( msg->info.origin );
   return valid;
 }
 */
