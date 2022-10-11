@@ -50,19 +50,19 @@ void KinoReplanFSM::init(rclcpp::Node::SharedPtr &nh) {
   visualization_.reset(new PlanningVisualization(nh));
 
   /* callback */
-  exec_timer_ = nh->create_wall_timer(std::chrono::milliseconds(10), &KinoReplanFSM::execFSMCallback, this);
-  safety_timer_ = nh->create_wall_timer(std::chrono::milliseconds(50), &KinoReplanFSM::checkCollisionCallback, this);
+  exec_timer_ = nh->create_wall_timer(std::chrono::milliseconds(10), std::bind(&KinoReplanFSM::execFSMCallback, this));
+  safety_timer_ = nh->create_wall_timer(std::chrono::milliseconds(50), std::bind(&KinoReplanFSM::checkCollisionCallback, this));
 
   waypoint_sub_ =
-      nh->create_subscription("/waypoint_generator/waypoints", 1, &KinoReplanFSM::waypointCallback, this);
-  odom_sub_ = nh->create_subscription("/odom_world", 1, &KinoReplanFSM::odometryCallback, this);
+      nh->create_subscription<nav_msgs::msg::Path>("/waypoint_generator/waypoints", 1, std::bind(&KinoReplanFSM::waypointCallback, this));
+  odom_sub_ = nh->create_subscription<nav_msgs::msg::Odometry>("/odom_world", 1, std::bind(&KinoReplanFSM::odometryCallback, this));
 
   replan_pub_ = nh->create_publisher<std_msgs::msg::Empty>("/planning/replan", 10);
   new_pub_ = nh->create_publisher<std_msgs::msg::Empty>("/planning/new", 10);
   bspline_pub_ = nh->create_publisher<quadrotor_msgs::msg::Bspline>("/planning/bspline", 10);
 }
 
-void KinoReplanFSM::waypointCallback(const nav_msgs::msg::Path::SharedPtr msg) {
+void KinoReplanFSM::waypointCallback(nav_msgs::msg::Path::SharedPtr msg) {
   if (msg->poses[0].pose.position.z < -0.1) return;
 
   cout << "Triggered!" << endl;
@@ -88,7 +88,7 @@ void KinoReplanFSM::waypointCallback(const nav_msgs::msg::Path::SharedPtr msg) {
     changeFSMExecState(REPLAN_TRAJ, "TRIG");
 }
 
-void KinoReplanFSM::odometryCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
+void KinoReplanFSM::odometryCallback(nav_msgs::msg::Odometry::SharedPtr msg) {
   odom_pos_(0) = msg->pose.pose.position.x;
   odom_pos_(1) = msg->pose.pose.position.y;
   odom_pos_(2) = msg->pose.pose.position.z;

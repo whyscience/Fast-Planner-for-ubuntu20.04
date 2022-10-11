@@ -29,6 +29,7 @@ class NonUniformBspline {
 
  public:
 
+  NonUniformBspline();
   NonUniformBspline(const Eigen::MatrixXd &points, const int &order, const double &interval);
 
   ~NonUniformBspline();

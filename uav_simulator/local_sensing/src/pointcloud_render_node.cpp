@@ -19,8 +19,8 @@ using namespace Eigen;
 
 rclcpp::Publisher<MMSG>::SharedPtr pub_cloud;
 
-sensor_msgs::PointCloud2 local_map_pcl;
-sensor_msgs::PointCloud2 local_depth_pcl;
+sensor_msgs::msg::PointCloud2 local_map_pcl;
+sensor_msgs::msg::PointCloud2 local_depth_pcl;
 
 rclcpp::Subscription<MMSG>::SharedPtr  odom_sub;
 rclcpp::Subscription<MMSG>::SharedPtr  global_map_sub, local_map_sub;
@@ -71,14 +71,14 @@ void rcvOdometryCallbck(const nav_msgs::msg::Odometry& odom) {
 
 pcl::PointCloud<pcl::PointXYZ> _cloud_all_map, _local_map;
 pcl::VoxelGrid<pcl::PointXYZ> _voxel_sampler;
-sensor_msgs::PointCloud2 _local_map_pcd;
+sensor_msgs::msg::PointCloud2 _local_map_pcd;
 
 pcl::search::KdTree<pcl::PointXYZ> _kdtreeLocalMap;
 vector<int> _pointIdxRadiusSearch;
 vector<float> _pointRadiusSquaredDistance;
 
 void rcvGlobalPointCloudCallBack(
-    const sensor_msgs::PointCloud2& pointcloud_map) {
+    const sensor_msgs::msg::PointCloud2& pointcloud_map) {
   if (has_global_map) return;
 
   RCLCPP_WARN(node_->get_logger(), "Global Pointcloud received..");
@@ -149,12 +149,12 @@ void renderSensedPoints( vent) {
 }
 
 void rcvLocalPointCloudCallBack(
-    const sensor_msgs::PointCloud2& pointcloud_map) {
+    const sensor_msgs::msg::PointCloud2& pointcloud_map) {
   // do nothing, fix later
 }
 
 int main(int argc, char** argv) {
-  rclcpp::init(argc, argv, "pcl_render");
+  rclcpp::init(argc, argv);
   rclcpp::Node::SharedPtr nh("~");
 
   nh.getParam("sensing_horizon", sensing_horizon);
@@ -166,18 +166,18 @@ int main(int argc, char** argv) {
   nh.getParam("map/z_size", _z_size);
 
   // subscribe point cloud
-  global_map_sub = nh->create_subscription("global_map", 1, rcvGlobalPointCloudCallBack);
-  local_map_sub = nh->create_subscription("local_map", 1, rcvLocalPointCloudCallBack);
-  odom_sub = nh->create_subscription("odometry", 50, rcvOdometryCallbck);
+  global_map_sub = nh->create_subscription<sensor_msgs::msg::PointCloud2>("global_map", 1, rcvGlobalPointCloudCallBack);
+  local_map_sub = nh->create_subscription<sensor_msgs::msg::PointCloud2>("local_map", 1, rcvLocalPointCloudCallBack);
+  odom_sub = nh->create_subscription<nav_msgs::msg::Odometry>("odometry", 50, rcvOdometryCallbck);
 
   // publisher depth image and color image
   pub_cloud =
-      nh->create_publisher<sensor_msgs::PointCloud2>("/pcl_render_node/cloud", 10);
+      nh->create_publisher<sensor_msgs::msg::PointCloud2>("/pcl_render_node/cloud", 10);
 
   double sensing_duration = 1.0 / sensing_rate * 2.5;
 
   local_sensing_timer =
-      nh->create_wall_timer(std::chrono::milliseconds(sensing_duration), renderSensedPoints);
+      nh->create_wall_timer(std::chrono::milliseconds(sensing_duration*1000), renderSensedPoints);
 
   _inv_resolution = 1.0 / _resolution;
 

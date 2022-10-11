@@ -159,7 +159,7 @@ void set_disturbance()
 
 int main(int argc, char** argv)
 {
-  rclcpp::init(argc, argv, "so3_disturbance_generator");
+  rclcpp::init(argc, argv);
   rclcpp::Node::SharedPtr n("~");
 
   auto sub1 = n.subscribe("odom", 10, odom_callback);

@@ -215,6 +215,7 @@ class MidPlanData {
   MidPlanData(/* args */) {}
   ~MidPlanData() {}
 
+  //rclcpp::Node::SharedPtr node_;
   vector<Eigen::Vector3d> global_waypoints_;
 
   // initial trajectory segment

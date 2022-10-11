@@ -50,7 +50,7 @@ void load_seg(rclcpp::Node::SharedPtr& nh, int segid, const rclcpp::Time& time_b
 
     nav_msgs::msg::Path path_msg;
 
-    path_msg.header.stamp = time_base + std::chrono::milliseconds(time_from_start);
+    path_msg.header.stamp = time_base + std::chrono::milliseconds(time_from_start*1000);
 
     double baseyaw = tf::getYaw(odom.pose.pose.orientation);
 
@@ -242,7 +242,7 @@ void traj_start_trigger_callback(const geometry_msgs::msg::PoseStamped& msg) {
 }
 
 int main(int argc, char** argv) {
-    rclcpp::init(argc, argv, "waypoint_generator");
+    rclcpp::init(argc, argv);
     rclcpp::Node::SharedPtr n("~");
     n.param("waypoint_type", waypoint_type, string("manual"));
     auto sub1 = n.subscribe("odom", 10, odom_callback);
@@ -253,6 +253,6 @@ int main(int argc, char** argv) {
 
     trigged_time = rclcpp::Time(0);
 
-    rclcpp::spin();
+    rclcpp::spin(node);
     return 0;
 }

@@ -284,7 +284,7 @@ void cmdCallback() {
 }
 
 int main(int argc, char **argv) {
-  rclcpp::init(argc, argv, "traj_server");
+  rclcpp::init(argc, argv);
   rclcpp::Node::SharedPtr node;
 
   auto bspline_sub = node->create_subscription<quadrotor_msgs::msg::Bspline>("planning/bspline", 10, bsplineCallback);
@@ -308,14 +308,16 @@ int main(int argc, char **argv) {
   cmd.kv[1] = vel_gain[1];
   cmd.kv[2] = vel_gain[2];
 
-  nh.param("traj_server/time_forward", time_forward_, -1.0);
+  node->declare_parameter("traj_server/time_forward", -1.0);
+  node->get_parameter("traj_server/time_forward", time_forward_);
   last_yaw_ = 0.0;
 
-  rclcpp::Duration(1.0).sleep();
+  rclcpp::Rate sleepRate(1);
+  sleepRate.sleep();
 
-  RCLCPP_WARN(node_->get_logger(), "[Traj server]: ready.");
+  RCLCPP_WARN(node->get_logger(), "[Traj server]: ready.");
 
-  rclcpp::spin();
+  rclcpp::spin(node);
 
   return 0;
 }

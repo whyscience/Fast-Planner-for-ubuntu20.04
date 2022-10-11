@@ -53,19 +53,19 @@ void TopoReplanFSM::init(rclcpp::Node::SharedPtr &nh) {
   visualization_.reset(new PlanningVisualization(nh));
 
   /* callback */
-  exec_timer_ = nh->create_wall_timer(std::chrono::milliseconds(10), &TopoReplanFSM::execFSMCallback, this);
-  safety_timer_ = nh->create_wall_timer(std::chrono::milliseconds(50), &TopoReplanFSM::checkCollisionCallback, this);
+  exec_timer_ = nh->create_wall_timer(std::chrono::milliseconds(10), std::bind(&TopoReplanFSM::execFSMCallback, this));
+  safety_timer_ = nh->create_wall_timer(std::chrono::milliseconds(50), std::bind(&TopoReplanFSM::checkCollisionCallback, this));
 
   waypoint_sub_ =
-      nh->create_subscription("/waypoint_generator/waypoints", 1, &TopoReplanFSM::waypointCallback, this);
-  odom_sub_ = nh->create_subscription("/odom_world", 1, &TopoReplanFSM::odometryCallback, this);
+      nh->create_subscription<nav_msgs::msg::Path>("/waypoint_generator/waypoints", 1, std::bind(&TopoReplanFSM::waypointCallback, this));
+  odom_sub_ = nh->create_subscription<nav_msgs::msg::Odometry>("/odom_world", 1, std::bind(&TopoReplanFSM::odometryCallback, this));
 
   replan_pub_ = nh->create_publisher<std_msgs::msg::Empty>("/planning/replan", 20);
   new_pub_ = nh->create_publisher<std_msgs::msg::Empty>("/planning/new", 20);
   bspline_pub_ = nh->create_publisher<quadrotor_msgs::msg::Bspline>("/planning/bspline", 20);
 }
 
-void TopoReplanFSM::waypointCallback(const nav_msgs::msg::Path::SharedPtr msg) {
+void TopoReplanFSM::waypointCallback(nav_msgs::msg::Path::SharedPtr msg) {
   if (msg->poses[0].pose.position.z < -0.1) return;
   cout << "Triggered!" << endl;
 
@@ -109,7 +109,7 @@ void TopoReplanFSM::waypointCallback(const nav_msgs::msg::Path::SharedPtr msg) {
   }
 }
 
-void TopoReplanFSM::odometryCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
+void TopoReplanFSM::odometryCallback(nav_msgs::msg::Odometry::SharedPtr msg) {
   odom_pos_(0) = msg->pose.pose.position.x;
   odom_pos_(1) = msg->pose.pose.position.y;
   odom_pos_(2) = msg->pose.pose.position.z;

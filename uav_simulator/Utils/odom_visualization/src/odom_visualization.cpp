@@ -433,7 +433,7 @@ void cmd_callback(const quadrotor_msgs::msg::PositionCommand cmd)
 
 int main(int argc, char** argv)
 {
-  rclcpp::init(argc, argv, "odom_visualization");
+  rclcpp::init(argc, argv);
   rclcpp::Node::SharedPtr n("~");
 
   n.param("mesh_resource", mesh_resource, std::string("package://odom_visualization/meshes/hummingbird.mesh"));
@@ -466,7 +466,7 @@ int main(int argc, char** argv)
   tf::TransformBroadcaster b;
   broadcaster = &b;
 
-  rclcpp::spin();
+  rclcpp::spin(node);
 
   return 0;
 }

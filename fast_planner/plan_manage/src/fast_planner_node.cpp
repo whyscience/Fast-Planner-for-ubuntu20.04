@@ -37,25 +37,27 @@ backward::SignalHandling sh;
 using namespace fast_planner;
 
 int main(int argc, char **argv) {
-  rclcpp::init(argc, argv, "fast_planner_node");
-  rclcpp::Node::SharedPtr nh;
+  rclcpp::init(argc, argv);
+  rclcpp::Node::SharedPtr node;
 
   int planner;
 
-  nh->declare_parameter<int>("planner_node/planner", -1);
-  nh->get_parameter("planner_node/planner", planner);
+  node->declare_parameter<int>("planner_node/planner", -1);
+  node->get_parameter("planner_node/planner", planner);
 
   TopoReplanFSM topo_replan;
   KinoReplanFSM kino_replan;
 
   if (planner == 1) {
-    kino_replan.init(nh);
+    kino_replan.init(node);
   } else if (planner == 2) {
-    topo_replan.init(nh);
+    topo_replan.init(node);
   }
 
-  rclcpp::Duration(1.0).sleep();
-  rclcpp::spin();
+  rclcpp::Rate sleepRate(1);
+  sleepRate.sleep();
+
+  rclcpp::spin(node);
 
   return 0;
 }

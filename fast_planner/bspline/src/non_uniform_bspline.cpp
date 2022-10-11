@@ -2,6 +2,9 @@
 #include "rclcpp/rclcpp.hpp"
 
 namespace fast_planner {
+NonUniformBspline::NonUniformBspline() {
+
+}
 
 NonUniformBspline::NonUniformBspline(const Eigen::MatrixXd &points, const int &order, const double &interval) {
   setUniformBspline(points, order, interval);

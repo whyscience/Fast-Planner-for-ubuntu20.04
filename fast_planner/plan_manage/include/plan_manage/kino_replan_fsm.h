@@ -116,8 +116,8 @@ class KinoReplanFSM {
   /* ROS functions */
   void execFSMCallback();
   void checkCollisionCallback();
-  void waypointCallback(const nav_msgs::msg::Path::SharedPtr msg);
-  void odometryCallback(const nav_msgs::msg::Odometry::SharedPtr msg);
+  void waypointCallback(nav_msgs::msg::Path::SharedPtr msg);
+  void odometryCallback(nav_msgs::msg::Odometry::SharedPtr msg);
 
  public:
   KinoReplanFSM(/* args */) {

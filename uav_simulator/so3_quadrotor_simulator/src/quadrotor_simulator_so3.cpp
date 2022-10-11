@@ -199,7 +199,7 @@ moment_disturbance_callback(const geometry_msgs::Vector3::SharedPtr  m)
 int
 main(int argc, char** argv)
 {
-  rclcpp::init(argc, argv, "quadrotor_simulator_so3");
+  rclcpp::init(argc, argv);
 
   rclcpp::Node::SharedPtr n("~");
 

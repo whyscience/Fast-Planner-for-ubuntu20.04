@@ -76,7 +76,7 @@ void maps3d_callback(const multi_map_server::MultiSparseMap3D::ConstPtr &msg)
 
 int main(int argc, char** argv)
 {
-  rclcpp::init(argc, argv, "multi_map_visualization");
+  rclcpp::init(argc, argv);
   rclcpp::Node::SharedPtr n("~");
 
   auto sub1 = n.subscribe("dmaps2d", 1, maps2d_callback);
@@ -84,7 +84,7 @@ int main(int argc, char** argv)
   pub1 = n.advertise<multi_map_server::MultiOccupancyGrid>("maps2d", 1, true);
   pub2 = n.advertise<sensor_msgs::PointCloud>("map3d", 1, true);
 
-  rclcpp::spin();
+  rclcpp::spin(node);
   return 0;
 }
 
