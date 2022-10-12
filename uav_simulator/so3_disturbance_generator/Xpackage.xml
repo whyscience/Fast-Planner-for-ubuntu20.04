@@ -1,11 +1,7 @@
 <package format="2">
   <version>0.0.0</version>
   <name>so3_disturbance_generator</name>
-  <description>
-
-     so3_disturbance_generator
-
-  </description>
+  <description>so3_disturbance_generator</description>
 
   <maintainer email="eeshaojie@todo.todo">Shaojie Shen</maintainer>
   <license>BSD</license>
@@ -16,8 +12,7 @@
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
   <depend>nav_msgs</depend>
-  <depend>sensor_msgs</depend>
-  <depend>visualization_msgs</depend>
+  <depend>tf2_ros</depend>
   <depend>pose_utils</depend>
   <depend>dynamic_reconfigure</depend>
 

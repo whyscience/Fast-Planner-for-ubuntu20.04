@@ -2,37 +2,33 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 project(so3_disturbance_generator)
 set(CMAKE_CXX_STANDARD 14)
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  rclcpp
-  std_msgs
-  sensor_msgs
-  nav_msgs
-  visualization_msgs
-  tf
-  pose_utils
-  dynamic_reconfigure
-)
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(pose_utils REQUIRED)
+find_package(dynamic_reconfigure REQUIRED)
 
 find_package(Armadillo REQUIRED)
 include_directories(${ARMADILLO_INCLUDE_DIRS})
-
-catkin_package()
-
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
 include_directories(include)
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
+
+set(dependencies
+        rclcpp
+        std_msgs
+        nav_msgs
+        tf2_ros
+        pose_utils
+        dynamic_reconfigure
+        )
 
 add_executable(so3_disturbance_generator src/so3_disturbance_generator.cpp)
 add_dependencies(so3_disturbance_generator ${PROJECT_NAME}_gencfg)
-target_link_libraries(so3_disturbance_generator 
-   ${catkin_LIBRARIES}
-   ${ARMADILLO_LIBRARIES}
-   pose_utils 
-)
+target_link_libraries(so3_disturbance_generator
+        ${ARMADILLO_LIBRARIES}
+        pose_utils
+        )
+ament_target_dependencies(so3_disturbance_generator ${dependencies})
 
+ament_package()
