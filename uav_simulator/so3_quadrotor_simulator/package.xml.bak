@@ -1,11 +1,7 @@
 <package format="2">
   <version>0.0.0</version>
   <name>so3_quadrotor_simulator</name>
-  <description>
-
-     quadrotor_simulator
-
-  </description>
+  <description>quadrotor_simulator</description>
 
   <maintainer email="todo@todo.todo">Kartik Mohta</maintainer>
   <license>BSD</license>
