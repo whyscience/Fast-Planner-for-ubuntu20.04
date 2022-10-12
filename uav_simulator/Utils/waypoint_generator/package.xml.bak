@@ -1,24 +1,15 @@
 <package format="2">
   <version>0.0.0</version>
   <name>waypoint_generator</name>
-  <description>
-
-     waypoint_generator
-
-  </description>
-  <maintainer email="eeshaojie@todo.todo">Shaojie Shen</maintainer>
+  <description>waypoint_generator</description>
   <license>BSD</license>
   <url>http://ros.org/wiki/waypoint_generator</url>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>rclcpp</build_depend>
-  <build_depend>tf</build_depend>
-  <build_depend>nav_msgs</build_depend>
-
-  <exec_depend>rclcpp</exec_depend>
-  <exec_depend>tf</exec_depend>
-  <exec_depend>nav_msgs</exec_depend>
+  <depend>rclcpp</depend>
+  <depend>tf</depend>
+  <depend>nav_msgs</depend>
 
 </package>
 

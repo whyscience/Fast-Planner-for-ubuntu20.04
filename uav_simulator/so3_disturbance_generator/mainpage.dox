@@ -19,7 +19,7 @@ point the reader to the actual API.
 
 If your codebase is fairly large or has different sets of APIs, you
 should use the doxygen 'group' tag to keep these APIs together. For
-example, the roscpp documentation has 'libros' group.
+example, the rclcpp documentation has 'libros' group.
 -->
 
 

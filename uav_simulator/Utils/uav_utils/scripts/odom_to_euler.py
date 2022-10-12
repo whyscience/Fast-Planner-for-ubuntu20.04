@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import rospy
+import rclpy
 import numpy as np
 import tf
 from tf import transformations as tfs
@@ -55,15 +55,15 @@ def joy_callback(joy_msg):
 
 
 if __name__ == "__main__":
-    rospy.init_node("odom_to_euler")
+    rclpy.init_node("odom_to_euler")
 
-    pub = rospy.Publisher("~euler", Vector3Stamped, queue_size=10)
-    sub = rospy.Subscriber("~odom", Odometry, callback)
+    pub = rclpy.Publisher("~euler", Vector3Stamped, queue_size=10)
+    sub = rclpy.Subscriber("~odom", Odometry, callback)
 
-    pub1 = rospy.Publisher("~imueuler", Vector3Stamped, queue_size=10)
-    sub1 = rospy.Subscriber("~imu", Imu, imu_callback)
+    pub1 = rclpy.Publisher("~imueuler", Vector3Stamped, queue_size=10)
+    sub1 = rclpy.Subscriber("~imu", Imu, imu_callback)
 
-    pub2 = rospy.Publisher("~ctrlout", Vector3Stamped, queue_size=10)
-    sub2 = rospy.Subscriber("~ctrlin", Joy, joy_callback)
+    pub2 = rclpy.Publisher("~ctrlout", Vector3Stamped, queue_size=10)
+    sub2 = rclpy.Subscriber("~ctrlin", Joy, joy_callback)
 
-    rospy.spin()
+    rclpy.spin()

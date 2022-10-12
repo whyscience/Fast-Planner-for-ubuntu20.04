@@ -12,9 +12,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAG}")
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  cmake_utils
+  rclcpp
+  rclpy
 )
 
 
@@ -26,7 +25,7 @@ find_package(Eigen REQUIRED) # try to find manually installed eigen (Usually in 
 catkin_package(
   INCLUDE_DIRS include
   # LIBRARIES uav_utils
-  CATKIN_DEPENDS roscpp rospy
+  CATKIN_DEPENDS rclcpp rclpy
   # DEPENDS system_lib
 )
 

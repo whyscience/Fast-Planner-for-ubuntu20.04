@@ -9,15 +9,9 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>rclcpp</build_depend>
-  <build_depend>quadrotor_msgs</build_depend>
-  <build_depend>uav_utils</build_depend>
-  <build_depend>cmake_utils</build_depend>
-
-  <exec_depend>rclcpp</exec_depend>
-  <exec_depend>quadrotor_msgs</exec_depend>
-  <exec_depend>uav_utils</exec_depend>
-  <exec_depend>cmake_utils</exec_depend>
+  <depend>rclcpp</depend>
+  <depend>quadrotor_msgs</depend>
+  <depend>uav_utils</depend>
 
 </package>
 

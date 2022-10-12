@@ -5,8 +5,7 @@
   <maintainer email="eeshaojie@todo.todo">Shaojie Shen</maintainer>
   <license>BSD</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <build_depend>rclcpp</build_depend>
-  <exec_depend>rclcpp</exec_depend>
+  <depend>rclcpp</depend>
   <export>
     <cpp cflags="-I${prefix}/include"
          lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib"/>

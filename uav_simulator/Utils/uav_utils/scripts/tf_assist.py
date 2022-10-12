@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import rospy
+import rclpy
 import numpy as np
 import tf
 from tf import transformations as tfs
@@ -32,10 +32,10 @@ class OdometryConverter(object):
         self.path_pub_timer = None
         self.tf_pub_flag = True
         if self.broadcast_tf:
-            rospy.loginfo('ROSTopic: [%s]->[%s] TF: [%s]-[%s]-[%s]',
+            rclpy.loginfo('ROSTopic: [%s]->[%s] TF: [%s]-[%s]-[%s]',
                           self.frame_id_in, self.frame_id_out, self.body_frame_id, self.intermediate_frame_id, self.world_frame_id)
         else:
-            rospy.loginfo('ROSTopic: [%s]->[%s] No TF',
+            rclpy.loginfo('ROSTopic: [%s]->[%s] No TF',
                           self.frame_id_in, self.frame_id_out)
 
         self.path = []
@@ -113,36 +113,36 @@ class OdometryConverter(object):
 
 
 if __name__ == "__main__":
-    rospy.init_node('tf_assist')
+    rclpy.init_node('tf_assist')
 
     converters = []
     index = 0
     while True:
         prefix = "~converter%d/" % index
         try:
-            frame_id_in = rospy.get_param('%sframe_id_in' % prefix)
-            frame_id_out = rospy.get_param('%sframe_id_out' % prefix)
-            broadcast_tf = rospy.get_param('%sbroadcast_tf' % prefix, False)
-            body_frame_id = rospy.get_param('%sbody_frame_id' % prefix, 'body')
-            intermediate_frame_id = rospy.get_param(
+            frame_id_in = rclpy.get_param('%sframe_id_in' % prefix)
+            frame_id_out = rclpy.get_param('%sframe_id_out' % prefix)
+            broadcast_tf = rclpy.get_param('%sbroadcast_tf' % prefix, False)
+            body_frame_id = rclpy.get_param('%sbody_frame_id' % prefix, 'body')
+            intermediate_frame_id = rclpy.get_param(
                 '%sintermediate_frame_id' % prefix, 'intermediate')
-            world_frame_id = rospy.get_param(
+            world_frame_id = rclpy.get_param(
                 '%sworld_frame_id' % prefix, 'world')
 
             converter = OdometryConverter(
                 frame_id_in, frame_id_out, broadcast_tf, body_frame_id, intermediate_frame_id, world_frame_id)
-            converter.in_odom_sub = rospy.Subscriber(
+            converter.in_odom_sub = rclpy.Subscriber(
                 '%sin_odom' % prefix, Odometry, converter.in_odom_callback, tcp_nodelay=True)
-            converter.out_odom_pub = rospy.Publisher(
+            converter.out_odom_pub = rclpy.Publisher(
                 '%sout_odom' % prefix, Odometry, queue_size=10, tcp_nodelay=True)
-            converter.out_path_pub = rospy.Publisher(
+            converter.out_path_pub = rclpy.Publisher(
                 '%sout_path' % prefix, Path, queue_size=10)
 
-            converter.tf_pub_timer = rospy.Timer(
-                rospy.Duration(0.1), converter.tf_pub_callback)
+            converter.tf_pub_timer = rclpy.Timer(
+                rclpy.Duration(0.1), converter.tf_pub_callback)
 
-            converter.path_pub_timer = rospy.Timer(
-                rospy.Duration(0.5), converter.path_pub_callback)
+            converter.path_pub_timer = rclpy.Timer(
+                rclpy.Duration(0.5), converter.path_pub_callback)
 
             index += 1
         except KeyError, e:
@@ -150,13 +150,13 @@ if __name__ == "__main__":
                 raise(KeyError(e))
             else:
                 if index == 1:
-                    rospy.loginfo(
+                    rclpy.loginfo(
                         'prefix:"%s" not found. Generate %d converter.' % (prefix, index))
                 else:
-                    rospy.loginfo(
+                    rclpy.loginfo(
                         'prefix:"%s" not found. Generate %d converters' % (prefix, index))
                 break
 
     br = tf.TransformBroadcaster()
 
-    rospy.spin()
+    rclpy.spin()

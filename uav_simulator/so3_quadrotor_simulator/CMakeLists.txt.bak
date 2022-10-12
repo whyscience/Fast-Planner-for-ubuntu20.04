@@ -4,10 +4,9 @@ project(so3_quadrotor_simulator)
 set(CMAKE_CXX_STANDARD 14)
 
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
+  rclcpp
   quadrotor_msgs
   uav_utils
-  cmake_utils
 )
 
 ###########
@@ -25,7 +24,7 @@ include_directories(${ARMADILLO_INCLUDE_DIRS})
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES irobot_msgs
-  CATKIN_DEPENDS roscpp quadrotor_msgs uav_utils
+  CATKIN_DEPENDS rclcpp quadrotor_msgs uav_utils
 )
 
 include_directories(include)

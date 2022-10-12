@@ -13,19 +13,11 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>rviz            </build_depend>
-  <build_depend>roscpp          </build_depend>
-  <build_depend>multi_map_server</build_depend>
-  <build_depend>qtbase5-dev     </build_depend>
-  <build_depend>message_runtime </build_depend>
-
-  <exec_depend>rviz              </exec_depend>
-  <exec_depend>multi_map_server  </exec_depend>
-  <exec_depend>message_runtime   </exec_depend>
-  <exec_depend>roscpp            </exec_depend>
-  <exec_depend>libqt5-core       </exec_depend>
-  <exec_depend>libqt5-gui        </exec_depend>
-  <exec_depend>libqt5-widgets    </exec_depend>
+  <depend>rviz            </depend>
+  <depend>rclcpp          </depend>
+  <depend>multi_map_server</depend>
+  <depend>qtbase5-dev     </depend>
+  <depend>message_runtime </depend>
 
   <export>
       <rviz plugin="${prefix}/plugin_description.xml"/>

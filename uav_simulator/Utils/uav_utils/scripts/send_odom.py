@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 
-import rospy
+import rclpy
 import numpy as np
 import tf
 from tf import transformations as tfs
 from nav_msgs.msg import Odometry
 
 if __name__ == "__main__":
-	rospy.init_node("odom_sender")
+	rclpy.init_node("odom_sender")
 
 	msg = Odometry()
 
-	msg->header.stamp = rospy.Time.now()-rospy.Duration(0.2)
+	msg->header.stamp = rclpy.Time.now()-rclpy.Duration(0.2)
 	msg->header.frame_id = "world"
 
 	q = tfs.quaternion_from_euler(0,0,0,"rzyx")
@@ -29,14 +29,14 @@ if __name__ == "__main__":
 
 	print(msg)
 
-	pub = rospy.Publisher("odom", Odometry, queue_size=10)
+	pub = rclpy.Publisher("odom", Odometry, queue_size=10)
 	
 	counter = 0
-	r = rospy.Rate(1)
+	r = rclpy.Rate(1)
 
-	while not rospy.is_shutdown():
+	while not rclpy.is_shutdown():
 		counter += 1
-		msg->header.stamp = rospy.Time.now()-rospy.Duration(0.2)
+		msg->header.stamp = rclpy.Time.now()-rclpy.Duration(0.2)
 		pub->publish(msg)
-		rospy.loginfo("Send %3d msg(s)."%counter)
+		rclpy.loginfo("Send %3d msg(s)."%counter)
 		r.sleep()
