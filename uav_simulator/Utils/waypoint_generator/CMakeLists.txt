@@ -2,18 +2,15 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 project(waypoint_generator)
 
 set(CMAKE_VERBOSE_MAKEFILE "true")
-
 set(CMAKE_CXX_STANDARD 14)
 
 set(ADDITIONAL_CXX_FLAG "-Wall -O3 -march=native")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAG}")
 
-find_package(catkin REQUIRED COMPONENTS
-  rclcpp
-  tf
-  nav_msgs
-)
-catkin_package()
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 
 include_directories(include)
 include_directories(
@@ -21,7 +18,5 @@ include_directories(
 )
 
 add_executable(waypoint_generator src/waypoint_generator.cpp)
-
-target_link_libraries(waypoint_generator
-   ${catkin_LIBRARIES}
-)
+ament_target_dependencies(${PROJECT_NAME} rclcpp tf2_geometry_msgs nav_msgs)
+ament_package()

@@ -2,15 +2,24 @@
 #define SAMPLE_WAYPOINTS_H
 
 #include "rclcpp/rclcpp.hpp"
-#include <tf/tf.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <nav_msgs/msg/path.hpp>
+
+//http://wiki.ros.org/tf2/Tutorials/Quaternions#Components_of_a_quaternion
+//https://answers.ros.org/question/364561/tfcreatequaternionfromyaw-equivalent-in-ros2/
+auto createQuaternionMsgFromYaw(double yaw)
+{
+  tf2::Quaternion q;
+  q.setRPY(0, 0, yaw);
+  return tf2::toMsg(q);
+}
 
 nav_msgs::msg::Path point()
 {
     // Circle parameters
     nav_msgs::msg::Path waypoints;
     geometry_msgs::msg::PoseStamped pt;
-    pt.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
+    pt.pose.orientation = createQuaternionMsgFromYaw(0.0);
     
     double h = 1.0;
     double scale = 7.0;
@@ -65,7 +74,7 @@ nav_msgs::msg::Path circle()
     double scale = 5.0;
     nav_msgs::msg::Path waypoints;
     geometry_msgs::msg::PoseStamped pt;
-    pt.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
+    pt.pose.orientation = createQuaternionMsgFromYaw(0.0);
     
     pt.pose.position.y = -1.2 * scale;
     pt.pose.position.x =  2.5 * scale;
@@ -137,7 +146,7 @@ nav_msgs::msg::Path eight()
     double h = 2.0;
     nav_msgs::msg::Path waypoints;
     geometry_msgs::msg::PoseStamped pt;
-    pt.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);    
+    pt.pose.orientation = createQuaternionMsgFromYaw(0.0);
 
     for(int i=0; i< 1; ++i)
     {
