@@ -3,6 +3,7 @@ project(rviz_plugins)
 
 set(CMAKE_CXX_STANDARD 14)
 
+find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rviz_common REQUIRED)
 find_package(multi_map_server REQUIRED)
@@ -11,6 +12,7 @@ find_package(multi_map_server REQUIRED)
 ## Build ##
 ###########
 
+message(">>> rviz_QT_VERSION: ${rviz_QT_VERSION}")
 if (rviz_QT_VERSION VERSION_LESS "5")
     message(STATUS "Using Qt4 based on the rviz_QT_VERSION: ${rviz_QT_VERSION}")
     find_package(Qt4 ${rviz_QT_VERSION} EXACT REQUIRED QtCore QtGui)
@@ -22,7 +24,6 @@ if (rviz_QT_VERSION VERSION_LESS "5")
             src/aerialmap_display.h
             src/multi_probmap_display.h
             )
-
 else ()
     message(STATUS "Using Qt5 based on the rviz_QT_VERSION: ${rviz_QT_VERSION}")
     find_package(Qt5 ${rviz_QT_VERSION} EXACT REQUIRED Core Widgets)

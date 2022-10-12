@@ -17,7 +17,6 @@
     <depend>rclcpp</depend>
     <depend>multi_map_server</depend>
     <depend>qtbase5-dev</depend>
-    <depend>message_runtime</depend>
 
     <export>
         <rviz plugin="${prefix}/plugin_description.xml"/>
