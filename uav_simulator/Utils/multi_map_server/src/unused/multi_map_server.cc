@@ -3,7 +3,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/PointCloud.h>
 #include <geometry_msgs/PoseArray.h>
-#include <laser_geometry/laser_geometry.h>
+#include <laser_geometry/msg/laser_geometry.h>
 #include <pose_utils.h>
 #include <multi_map_server/MultiOccupancyGrid.h>
 #include <multi_map_server/MultiSparseMap3D.h>
