@@ -7,6 +7,7 @@ find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(tf2 REQUIRED)
@@ -32,7 +33,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
         )
 
 add_executable(multi_map_visualization src/multi_map_visualization.cc)
-ament_target_dependencies(multi_map_visualization rclcpp geometry_msgs nav_msgs)
+ament_target_dependencies(multi_map_visualization rclcpp geometry_msgs nav_msgs sensor_msgs pose_utils)
 rosidl_target_interfaces(multi_map_visualization ${PROJECT_NAME} "rosidl_typesupport_cpp")
 # this is rolling version
 #rosidl_get_typesupport_target(cpp_typesupport_target multi_map_visualization "rosidl_typesupport_cpp")

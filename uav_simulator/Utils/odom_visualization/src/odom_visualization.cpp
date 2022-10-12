@@ -326,7 +326,7 @@ void odom_callback(nav_msgs::msg::Odometry::SharedPtr msg) {
   q(3) = msg->pose.pose.orientation.z;
   if (cross_config) {
     colvec ypr = R_to_ypr(quaternion_to_R(q));
-    ypr(0) += 45.0 * PI / 180.0;
+    ypr(0) += 45.0 * M_PI / 180.0;
     q = R_to_quaternion(ypr_to_R(ypr));
   }
   meshROS.pose.orientation.w = q(0);
@@ -434,7 +434,7 @@ void cmd_callback(const quadrotor_msgs::msg::PositionCommand::SharedPtr &cmd) {
 
   if (cross_config) {
     colvec ypr = R_to_ypr(quaternion_to_R(q));
-    ypr(0) += 45.0 * PI / 180.0;
+    ypr(0) += 45.0 * M_PI / 180.0;
     q = R_to_quaternion(ypr_to_R(ypr));
   }
   meshROS.pose.orientation.w = q(0);

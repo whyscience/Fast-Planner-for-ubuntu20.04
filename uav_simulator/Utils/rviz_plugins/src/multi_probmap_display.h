@@ -38,7 +38,7 @@
 #include <ros/time.h>
 
 #include <multi_map_server/MultiOccupancyGrid.h>
-#include <nav_msgs/OccupancyGrid.h>
+#include <nav_msgs/msg/occupancy_grid.hpp>
 
 #include "rviz/display.h"
 

@@ -136,11 +136,11 @@ void rcvOdometryCallbck(const nav_msgs::msg::Odometry &odom) {
   last_pose_world(2) = odom->pose.pose.position.z;
 
   //publish tf
-  /*static tf::TransformBroadcaster br;
-  tf::Transform transform;
-  transform.setOrigin( tf::Vector3(cam2world(0,3), cam2world(1,3), cam2world(2,3) ));
-  transform.setRotation(tf::Quaternion(cam2world_quat.x(), cam2world_quat.y(), cam2world_quat.z(), cam2world_quat.w()));
-  br.sendTransform(tf::StampedTransform(transform, last_odom_stamp, "world", "camera")); //publish transform from world frame to quadrotor frame.*/
+  /*static tf2::TransformBroadcaster br;
+  tf2::Transform transform;
+  transform.setOrigin( tf2::Vector3(cam2world(0,3), cam2world(1,3), cam2world(2,3) ));
+  transform.setRotation(tf2::Quaternion(cam2world_quat.x(), cam2world_quat.y(), cam2world_quat.z(), cam2world_quat.w()));
+  br.sendTransform(tf2::StampedTransform(transform, last_odom_stamp, "world", "camera")); //publish transform from world frame to quadrotor frame.*/
 }
 
 void pubCameraPose(const rclcpp::TimerEvent &event) {

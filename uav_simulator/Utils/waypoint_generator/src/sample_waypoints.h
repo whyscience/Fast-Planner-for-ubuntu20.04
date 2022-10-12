@@ -7,7 +7,7 @@
 
 //http://wiki.ros.org/tf2/Tutorials/Quaternions#Components_of_a_quaternion
 //https://answers.ros.org/question/364561/tfcreatequaternionfromyaw-equivalent-in-ros2/
-auto createQuaternionMsgFromYaw(double yaw)
+geometry_msgs::msg::Quaternion createQuaternionMsgFromYaw(double yaw)
 {
   tf2::Quaternion q;
   q.setRPY(0, 0, yaw);

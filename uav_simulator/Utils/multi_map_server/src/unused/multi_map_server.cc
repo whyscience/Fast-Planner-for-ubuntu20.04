@@ -1,10 +1,10 @@
 #include <iostream>
 #include "rclcpp/rclcpp.hpp"
 #include <sensor_msgs/LaserScan.h>
-#include <sensor_msgs/PointCloud.h>
+#include <sensor_msgs/msg/point_cloud.hpp>
 #include <geometry_msgs/PoseArray.h>
 #include <laser_geometry/msg/laser_geometry.h>
-#include <pose_utils.h>
+#include "pose_utils/pose_utils.h"
 #include <multi_map_server/MultiOccupancyGrid.h>
 #include <multi_map_server/MultiSparseMap3D.h>
 #include <multi_map_server/Map2D.h>

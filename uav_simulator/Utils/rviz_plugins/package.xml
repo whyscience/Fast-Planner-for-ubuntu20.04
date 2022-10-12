@@ -13,7 +13,7 @@
 
     <buildtool_depend>ament_cmake</buildtool_depend>
 
-    <depend>rviz</depend>
+    <depend>rviz_common</depend>
     <depend>rclcpp</depend>
     <depend>multi_map_server</depend>
     <depend>qtbase5-dev</depend>

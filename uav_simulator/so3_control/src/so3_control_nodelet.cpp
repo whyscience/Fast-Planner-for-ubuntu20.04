@@ -114,7 +114,7 @@ SO3ControlNodelet::odom_callback(const nav_msgs::msg::Odometry::SharedPtr odom) 
                                  odom->twist.twist.linear.y,
                                  odom->twist.twist.linear.z);
 
-  current_yaw_ = tf::getYaw(odom->pose.pose.orientation);
+  current_yaw_ = tf2::getYaw(odom->pose.pose.orientation);
 
   controller_.setPosition(position);
   controller_.setVelocity(velocity);

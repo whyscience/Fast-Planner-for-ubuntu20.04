@@ -37,7 +37,7 @@
 #include <nav_msgs/MapMetaData.h>
 #include <ros/time.h>
 
-#include <nav_msgs/OccupancyGrid.h>
+#include <nav_msgs/msg/occupancy_grid.hpp>
 
 #include "rviz/display.h"
 
