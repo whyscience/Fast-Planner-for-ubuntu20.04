@@ -4,13 +4,13 @@
 #ifndef Q_MOC_RUN
 #include <QObject>
 
-#include "rviz/default_plugin/tools/selection_tool.h"
-#include "rviz/properties/float_property.h"
-#include "rviz/selection/forwards.h"
-#include "rviz/selection/selection_manager.h"
-#include "rviz/tool.h"
+#include "rviz_common/default_plugin/tools/selection_tool.hpp"
+#include "rviz_common/properties/float_property.hpp"
+#include "rviz_common/selection/forwards.hpp"
+#include "rviz_common/selection/selection_manager.hpp"
+#include "rviz_common/tool.hpp"
 
-#include "rviz/default_plugin/tools/interaction_tool.h"
+#include "rviz_common/default_plugin/tools/interaction_tool.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 

@@ -34,13 +34,13 @@
 #include <OGRE/OgreTexture.h>
 #include <OGRE/OgreVector3.h>
 
-#include <nav_msgs/MapMetaData.h>
-#include <ros/time.h>
+#include <nav_msgs/msg/map_meta_data.hpp>
+#include "rclcpp/rclcpp.hpp"
 
-#include <multi_map_server/MultiOccupancyGrid.h>
+#include <multi_map_server/msg/multi_occupancy_grid.hpp>
 #include <nav_msgs/msg/occupancy_grid.hpp>
 
-#include "rviz/display.h"
+#include "rviz_common/display.hpp"
 
 namespace Ogre
 {

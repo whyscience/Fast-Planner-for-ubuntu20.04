@@ -34,12 +34,12 @@
 #include <OGRE/OgreMaterial.h>
 #include <OGRE/OgreVector3.h>
 
-#include <nav_msgs/MapMetaData.h>
-#include <ros/time.h>
+#include <nav_msgs/msg/map_meta_data.hpp>
+#include "rclcpp/rclcpp.hpp"
 
 #include <nav_msgs/msg/occupancy_grid.hpp>
 
-#include "rviz/display.h"
+#include "rviz_common/display.hpp"
 
 namespace Ogre {
 class ManualObject;

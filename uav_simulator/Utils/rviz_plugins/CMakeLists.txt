@@ -5,15 +5,19 @@ set(CMAKE_CXX_STANDARD 14)
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(tf2_ros REQUIRED)
 find_package(rviz_common REQUIRED)
+find_package(rviz_default_plugins REQUIRED)
+find_package(rviz_rendering REQUIRED)
 find_package(multi_map_server REQUIRED)
 
 ###########
 ## Build ##
 ###########
-
-message(">>> rviz_QT_VERSION: ${rviz_QT_VERSION}")
-if (rviz_QT_VERSION VERSION_LESS "5")
+# todo eric just use qt5 for ros2
+#message(">>> rviz_QT_VERSION: ${rviz_QT_VERSION}")
+#if (rviz_QT_VERSION VERSION_LESS "5")
+if (0)
     message(STATUS "Using Qt4 based on the rviz_QT_VERSION: ${rviz_QT_VERSION}")
     find_package(Qt4 ${rviz_QT_VERSION} EXACT REQUIRED QtCore QtGui)
     ## pull in all required include dirs, define QT_LIBRARIES, etc.
@@ -26,7 +30,8 @@ if (rviz_QT_VERSION VERSION_LESS "5")
             )
 else ()
     message(STATUS "Using Qt5 based on the rviz_QT_VERSION: ${rviz_QT_VERSION}")
-    find_package(Qt5 ${rviz_QT_VERSION} EXACT REQUIRED Core Widgets)
+    #    find_package(Qt5 ${rviz_QT_VERSION} EXACT REQUIRED Core Widgets)
+    find_package(Qt5 REQUIRED Core Widgets)
     ## make target_link_libraries(${QT_LIBRARIES}) pull in all required dependencies
     set(QT_LIBRARIES Qt5::Widgets)
     qt5_wrap_cpp(MOC_FILES
@@ -60,7 +65,7 @@ set(SOURCE_FILES
 include_directories(include)
 
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
-ament_target_dependencies(${PROJECT_NAME} multi_map_server_generate_messages_cpp)
+ament_target_dependencies(${PROJECT_NAME} rclcpp tf2_ros rviz_common rviz_default_plugins rviz_rendering multi_map_server)
 target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES})
 ament_export_libraries(${PROJECT_NAME})
 

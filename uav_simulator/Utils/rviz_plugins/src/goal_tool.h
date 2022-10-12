@@ -34,6 +34,7 @@
 # include <QObject>
 
 #include "rclcpp/rclcpp.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 
 # include "pose_tool.h"
 #endif

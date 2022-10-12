@@ -36,7 +36,8 @@
 
 #include "rclcpp/rclcpp.hpp"
 
-#include "rviz/tool.h"
+//todo eric temp
+//#include "rviz_common/tool.h"
 
 namespace rviz
 {
