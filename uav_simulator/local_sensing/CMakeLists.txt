@@ -28,7 +28,7 @@ if (ENABLE_CUDA)
     find_package(Boost REQUIRED COMPONENTS system filesystem)
 
     find_package(
-            rclcpp roslib cmake_modules cv_bridge image_transport pcl_ros sensor_msgs geometry_msgs nav_msgs quadrotor_msgs dynamic_reconfigure)
+            rclcpp roslib cmake_modules cv_bridge image_transport pcl_ros sensor_msgs geometry_msgs nav_msgs quadrotor_msgs)
     generate_dynamic_reconfigure_options(
             cfg/local_sensing_node.cfg
     )

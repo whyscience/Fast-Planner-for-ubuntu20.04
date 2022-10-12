@@ -8,7 +8,6 @@ find_package(std_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(pose_utils REQUIRED)
-find_package(dynamic_reconfigure REQUIRED)
 
 find_package(Armadillo REQUIRED)
 include_directories(${ARMADILLO_INCLUDE_DIRS})
@@ -20,10 +19,10 @@ set(dependencies
         nav_msgs
         tf2_ros
         pose_utils
-        dynamic_reconfigure
         )
 
 add_executable(so3_disturbance_generator src/so3_disturbance_generator.cpp)
+#todo how to use dynamic reconfigure
 add_dependencies(so3_disturbance_generator ${PROJECT_NAME}_gencfg)
 target_link_libraries(so3_disturbance_generator
         ${ARMADILLO_LIBRARIES}

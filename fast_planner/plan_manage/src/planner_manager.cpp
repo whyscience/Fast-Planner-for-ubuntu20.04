@@ -48,7 +48,7 @@ void FastPlannerManager::initPlanModules(rclcpp::Node::SharedPtr &nh) {
   nh.param("manager/local_segment_length", pp_.local_traj_len_, -1.0);
   nh.param("manager/control_points_distance", pp_.ctrl_pt_dist, -1.0);*/
 
-  bool use_geometric_path, use_kinodynamic_path, use_topo_path, use_optimization, use_active_perception;
+  bool use_geometric_path = false, use_kinodynamic_path = false, use_topo_path = false, use_optimization = false, use_active_perception = false;
   //todo eric param
   /*nh.param("manager/use_geometric_path", use_geometric_path, false);
   nh.param("manager/use_kinodynamic_path", use_kinodynamic_path, false);
