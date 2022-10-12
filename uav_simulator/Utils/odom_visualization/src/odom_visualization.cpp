@@ -1,15 +1,15 @@
 #include <iostream>
 #include <string.h>
-#include "ros/ros.h"
-#include "tf/transform_broadcaster.h"
+#include "rclcpp/rclcpp.hpp"
+#include "tf2_ros/transform_broadcaster.h"
 #include "nav_msgs/msg/odometry.hpp"
-#include "geometry_msgs/PoseWithCovarianceStamped.h"
+#include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "nav_msgs/msg/path.hpp"
-#include "sensor_msgs/Range.h"
-#include "visualization_msgs/Marker.h"
+#include "sensor_msgs/msg/range.hpp"
+#include "visualization_msgs/msg/marker.hpp"
 #include "armadillo"
-#include "pose_utils.h"
+#include "pose_utils/pose_utils.h"
 #include "quadrotor_msgs/msg/position_command.hpp"
 
 using namespace arma;
@@ -35,7 +35,7 @@ rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr trajPub;
 rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr sensorPub;
 rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr meshPub;
 rclcpp::Publisher<sensor_msgs::msg::Range>::SharedPtr heightPub;
-tf::TransformBroadcaster *broadcaster;
+tf2_ros::TransformBroadcaster *broadcaster;
 geometry_msgs::msg::PoseStamped poseROS;
 nav_msgs::msg::Path pathROS;
 visualization_msgs::msg::Marker velROS;
@@ -342,31 +342,31 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
 
   // TF for raw sensor visualization
   if (tf45) {
-    tf::Transform transform;
-    transform.setOrigin(tf::Vector3(pose(0), pose(1), pose(2)));
-    transform.setRotation(tf::Quaternion(q(1), q(2), q(3), q(0)));
+    tf2_ros::Transform transform;
+    transform.setOrigin(tf2_ros::Vector3(pose(0), pose(1), pose(2)));
+    transform.setRotation(tf2_ros::Quaternion(q(1), q(2), q(3), q(0)));
 
-    tf::Transform transform45;
-    transform45.setOrigin(tf::Vector3(0, 0, 0));
+    tf2_ros::Transform transform45;
+    transform45.setOrigin(tf2_ros::Vector3(0, 0, 0));
     colvec y45 = zeros<colvec>(3);
     y45(0) = 45.0 * M_PI / 180;
     colvec q45 = R_to_quaternion(ypr_to_R(y45));
-    transform45.setRotation(tf::Quaternion(q45(1), q45(2), q45(3), q45(0)));
+    transform45.setRotation(tf2_ros::Quaternion(q45(1), q45(2), q45(3), q45(0)));
 
-    tf::Transform transform90;
-    transform90.setOrigin(tf::Vector3(0, 0, 0));
+    tf2_ros::Transform transform90;
+    transform90.setOrigin(tf2_ros::Vector3(0, 0, 0));
     colvec p90 = zeros<colvec>(3);
     p90(1) = 90.0 * M_PI / 180;
     colvec q90 = R_to_quaternion(ypr_to_R(p90));
-    transform90.setRotation(tf::Quaternion(q90(1), q90(2), q90(3), q90(0)));
+    transform90.setRotation(tf2_ros::Quaternion(q90(1), q90(2), q90(3), q90(0)));
 
-    broadcaster->sendTransform(tf::StampedTransform(transform, msg->header.stamp, string("world"), string("/base")));
-    broadcaster->sendTransform(tf::StampedTransform(transform45, msg->header.stamp, string("/base"), string("/laser")));
-    broadcaster->sendTransform(tf::StampedTransform(transform45,
+    broadcaster->sendTransform(tf2_ros::StampedTransform(transform, msg->header.stamp, string("world"), string("/base")));
+    broadcaster->sendTransform(tf2_ros::StampedTransform(transform45, msg->header.stamp, string("/base"), string("/laser")));
+    broadcaster->sendTransform(tf2_ros::StampedTransform(transform45,
                                                     msg->header.stamp,
                                                     string("/base"),
                                                     string("/vision")));
-    broadcaster->sendTransform(tf::StampedTransform(transform90,
+    broadcaster->sendTransform(tf2_ros::StampedTransform(transform90,
                                                     msg->header.stamp,
                                                     string("/base"),
                                                     string("/height")));
@@ -423,37 +423,52 @@ int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
   rclcpp::Node::SharedPtr n;
 
-  n.param("mesh_resource", mesh_resource, std::string("package://odom_visualization/meshes/hummingbird.mesh"));
-  n.param("color/r", color_r, 1.0);
-  n.param("color/g", color_g, 0.0);
-  n.param("color/b", color_b, 0.0);
-  n.param("color/a", color_a, 1.0);
-  n.param("origin", origin, false);
-  n.param("robot_scale", scale, 2.0);
-  n.param("frame_id", _frame_id, string("world"));
+  n->declare_parameter<std::string>("mesh_resource",
+                                    std::string("package://odom_visualization/meshes/hummingbird.mesh"));
+  n->declare_parameter<double>("color/r", 1.0);
+  n->declare_parameter<double>("color/g", 0.0);
+  n->declare_parameter<double>("color/b", 0.0);
+  n->declare_parameter<double>("color/a", 1.0);
+  n->declare_parameter<bool>("origin", false);
+  n->declare_parameter<double>("robot_scale", 2.0);
+  n->declare_parameter<std::string>("frame_id", string("world"));
+  n->declare_parameter<bool>("cross_config", false);
+  n->declare_parameter<bool>("tf45", false);
+  n->declare_parameter<double>("covariance_scale", 100.0);
+  n->declare_parameter<bool>("covariance_position", false);
+  n->declare_parameter<bool>("covariance_velocity", false);
+  n->declare_parameter<bool>("covariance_color", false);
 
-  n.param("cross_config", cross_config, false);
-  n.param("tf45", tf45, false);
-  n.param("covariance_scale", cov_scale, 100.0);
-  n.param("covariance_position", cov_pos, false);
-  n.param("covariance_velocity", cov_vel, false);
-  n.param("covariance_color", cov_color, false);
+  n->get_parameter("mesh_resource", mesh_resource);
+  n->get_parameter("color/r", color_r);
+  n->get_parameter("color/g", color_g);
+  n->get_parameter("color/b", color_b);
+  n->get_parameter("color/a", color_a);
+  n->get_parameter("origin", origin);
+  n->get_parameter("robot_scale", scale);
+  n->get_parameter("frame_id", _frame_id);
+  n->get_parameter("cross_config", cross_config);
+  n->get_parameter("tf45", tf45);
+  n->get_parameter("covariance_scale", cov_scale);
+  n->get_parameter("covariance_position", cov_pos);
+  n->get_parameter("covariance_velocity", cov_vel);
+  n->get_parameter("covariance_color", cov_color);
 
   auto sub_odom = n->create_subscription<MMSG>("odom", 100, odom_callback);
   auto sub_cmd = n->create_subscription<MMSG>("cmd", 100, cmd_callback);
-  posePub = n->create_publisher<geometry_msgs::msg::PoseStamped>("pose", 100, true);
-  pathPub = n->create_publisher<nav_msgs::msg::Path>("path", 100, true);
-  velPub = n->create_publisher<visualization_msgs::msg::Marker>("velocity", 100, true);
-  covPub = n->create_publisher<visualization_msgs::msg::Marker>("covariance", 100, true);
-  covVelPub = n->create_publisher<visualization_msgs::msg::Marker>("covariance_velocity", 100, true);
-  trajPub = n->create_publisher<visualization_msgs::msg::Marker>("trajectory", 100, true);
-  sensorPub = n->create_publisher<visualization_msgs::msg::Marker>("sensor", 100, true);
-  meshPub = n->create_publisher<visualization_msgs::msg::Marker>("robot", 100, true);
-  heightPub = n->create_publisher<sensor_msgs::msg::Range>("height", 100, true);
-  tf::TransformBroadcaster b;
+  posePub = n->create_publisher<geometry_msgs::msg::PoseStamped>("pose", 100);
+  pathPub = n->create_publisher<nav_msgs::msg::Path>("path", 100);
+  velPub = n->create_publisher<visualization_msgs::msg::Marker>("velocity", 100);
+  covPub = n->create_publisher<visualization_msgs::msg::Marker>("covariance", 100);
+  covVelPub = n->create_publisher<visualization_msgs::msg::Marker>("covariance_velocity", 100);
+  trajPub = n->create_publisher<visualization_msgs::msg::Marker>("trajectory", 100);
+  sensorPub = n->create_publisher<visualization_msgs::msg::Marker>("sensor", 100);
+  meshPub = n->create_publisher<visualization_msgs::msg::Marker>("robot", 100);
+  heightPub = n->create_publisher<sensor_msgs::msg::Range>("height", 100);
+  tf2_ros::TransformBroadcaster b;
   broadcaster = &b;
 
-  rclcpp::spin(node);
+  rclcpp::spin(n);
 
   return 0;
 }
