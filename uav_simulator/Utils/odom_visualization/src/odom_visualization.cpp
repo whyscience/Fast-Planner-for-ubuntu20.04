@@ -2,9 +2,12 @@
 #include <string.h>
 #include "rclcpp/rclcpp.hpp"
 #include "tf2_ros/transform_broadcaster.h"
+#include "tf2/LinearMath/Transform.h"
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include "nav_msgs/msg/odometry.hpp"
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
+#include "geometry_msgs/msg/transform_stamped.hpp"
 #include "nav_msgs/msg/path.hpp"
 #include "sensor_msgs/msg/range.hpp"
 #include "visualization_msgs/msg/marker.hpp"
@@ -47,7 +50,7 @@ visualization_msgs::msg::Marker meshROS;
 sensor_msgs::msg::Range heightROS;
 string _frame_id;
 
-void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
+void odom_callback(nav_msgs::msg::Odometry::SharedPtr msg) {
   if (msg->header.frame_id == string("null"))
     return;
   colvec pose(6);
@@ -119,7 +122,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
 
   // Path
   static rclcpp::Time prevt = msg->header.stamp;
-  if ((msg->header.stamp - prevt).seconds() > 0.1) {
+  if ((rclcpp::Time(msg->header.stamp).seconds() - prevt.seconds()) > 0.1) {
     prevt = msg->header.stamp;
     pathROS.header = poseROS.header;
     pathROS.poses.push_back(poseROS);
@@ -260,7 +263,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
     p.y = pose(1);
     p.z = pose(2);
     trajROS.points.push_back(p);
-    std_msgs::ColorRGBA color;
+    std_msgs::msg::ColorRGBA color;
     color.r = r;
     color.g = g;
     color.b = b;
@@ -342,45 +345,75 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
 
   // TF for raw sensor visualization
   if (tf45) {
-    tf2_ros::Transform transform;
-    transform.setOrigin(tf2_ros::Vector3(pose(0), pose(1), pose(2)));
-    transform.setRotation(tf2_ros::Quaternion(q(1), q(2), q(3), q(0)));
+    tf2::Transform transform;
+    transform.setOrigin(tf2::Vector3(pose(0), pose(1), pose(2)));
+    transform.setRotation(tf2::Quaternion(q(1), q(2), q(3), q(0)));
 
-    tf2_ros::Transform transform45;
-    transform45.setOrigin(tf2_ros::Vector3(0, 0, 0));
+    tf2::Transform transform45;
+    transform45.setOrigin(tf2::Vector3(0, 0, 0));
     colvec y45 = zeros<colvec>(3);
     y45(0) = 45.0 * M_PI / 180;
     colvec q45 = R_to_quaternion(ypr_to_R(y45));
-    transform45.setRotation(tf2_ros::Quaternion(q45(1), q45(2), q45(3), q45(0)));
+    transform45.setRotation(tf2::Quaternion(q45(1), q45(2), q45(3), q45(0)));
 
-    tf2_ros::Transform transform90;
-    transform90.setOrigin(tf2_ros::Vector3(0, 0, 0));
+    tf2::Transform transform90;
+    transform90.setOrigin(tf2::Vector3(0, 0, 0));
     colvec p90 = zeros<colvec>(3);
     p90(1) = 90.0 * M_PI / 180;
     colvec q90 = R_to_quaternion(ypr_to_R(p90));
-    transform90.setRotation(tf2_ros::Quaternion(q90(1), q90(2), q90(3), q90(0)));
+    transform90.setRotation(tf2::Quaternion(q90(1), q90(2), q90(3), q90(0)));
 
-    broadcaster->sendTransform(tf2_ros::StampedTransform(transform, msg->header.stamp, string("world"), string("/base")));
-    broadcaster->sendTransform(tf2_ros::StampedTransform(transform45, msg->header.stamp, string("/base"), string("/laser")));
+    geometry_msgs::msg::TransformStamped transformStamped;
+    transformStamped.header.stamp = msg->header.stamp;
+    transformStamped.header.frame_id = "world";
+    transformStamped.child_frame_id = "/base";
+    transformStamped.transform = tf2::toMsg(transform);
+    broadcaster->sendTransform(transformStamped);
+
+    geometry_msgs::msg::TransformStamped transformStamped45;
+    transformStamped45.header.stamp = msg->header.stamp;
+    transformStamped45.header.frame_id = "/base";
+    transformStamped45.child_frame_id = "/laser";
+    transformStamped45.transform = tf2::toMsg(transform45);
+    broadcaster->sendTransform(transformStamped45);
+
+    transformStamped45.child_frame_id = "/vision";
+    broadcaster->sendTransform(transformStamped45);
+
+    geometry_msgs::msg::TransformStamped transformStamped90;
+    transformStamped90.header.stamp = msg->header.stamp;
+    transformStamped90.header.frame_id = "/base";
+    transformStamped90.child_frame_id = "/height";
+    transformStamped90.transform = tf2::toMsg(transform90);
+    broadcaster->sendTransform(transformStamped90);
+
+    /*broadcaster->sendTransform(tf2_ros::StampedTransform(transform,
+                                                         msg->header.stamp,
+                                                         string("world"),
+                                                         string("/base")));
     broadcaster->sendTransform(tf2_ros::StampedTransform(transform45,
-                                                    msg->header.stamp,
-                                                    string("/base"),
-                                                    string("/vision")));
+                                                         msg->header.stamp,
+                                                         string("/base"),
+                                                         string("/laser")));
+    broadcaster->sendTransform(tf2_ros::StampedTransform(transform45,
+                                                         msg->header.stamp,
+                                                         string("/base"),
+                                                         string("/vision")));
     broadcaster->sendTransform(tf2_ros::StampedTransform(transform90,
-                                                    msg->header.stamp,
-                                                    string("/base"),
-                                                    string("/height")));
+                                                         msg->header.stamp,
+                                                         string("/base"),
+                                                         string("/height")));*/
   }
 }
 
-void cmd_callback(const quadrotor_msgs::msg::PositionCommand cmd) {
-  if (cmd.header.frame_id == string("null"))
+void cmd_callback(const quadrotor_msgs::msg::PositionCommand::SharedPtr &cmd) {
+  if (cmd->header.frame_id == string("null"))
     return;
 
   colvec pose(6);
-  pose(0) = cmd.position.x;
-  pose(1) = cmd.position.y;
-  pose(2) = cmd.position.z;
+  pose(0) = cmd->position.x;
+  pose(1) = cmd->position.y;
+  pose(2) = cmd->position.z;
   colvec q(4);
   q(0) = 1.0;
   q(1) = 0.0;
@@ -390,14 +423,14 @@ void cmd_callback(const quadrotor_msgs::msg::PositionCommand cmd) {
 
   // Mesh model                                                  
   meshROS.header.frame_id = _frame_id;
-  meshROS.header.stamp = cmd.header.stamp;
+  meshROS.header.stamp = cmd->header.stamp;
   meshROS.ns = "mesh";
   meshROS.id = 0;
   meshROS.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
   meshROS.action = visualization_msgs::msg::Marker::ADD;
-  meshROS.pose.position.x = cmd.position.x;
-  meshROS.pose.position.y = cmd.position.y;
-  meshROS.pose.position.z = cmd.position.z;
+  meshROS.pose.position.x = cmd->position.x;
+  meshROS.pose.position.y = cmd->position.y;
+  meshROS.pose.position.z = cmd->position.z;
 
   if (cross_config) {
     colvec ypr = R_to_ypr(quaternion_to_R(q));
@@ -454,8 +487,8 @@ int main(int argc, char **argv) {
   n->get_parameter("covariance_velocity", cov_vel);
   n->get_parameter("covariance_color", cov_color);
 
-  auto sub_odom = n->create_subscription<MMSG>("odom", 100, odom_callback);
-  auto sub_cmd = n->create_subscription<MMSG>("cmd", 100, cmd_callback);
+  auto sub_odom = n->create_subscription<nav_msgs::msg::Odometry>("odom", 100, odom_callback);
+  auto sub_cmd = n->create_subscription<quadrotor_msgs::msg::PositionCommand>("cmd", 100, cmd_callback);
   posePub = n->create_publisher<geometry_msgs::msg::PoseStamped>("pose", 100);
   pathPub = n->create_publisher<nav_msgs::msg::Path>("path", 100);
   velPub = n->create_publisher<visualization_msgs::msg::Marker>("velocity", 100);
@@ -465,7 +498,7 @@ int main(int argc, char **argv) {
   sensorPub = n->create_publisher<visualization_msgs::msg::Marker>("sensor", 100);
   meshPub = n->create_publisher<visualization_msgs::msg::Marker>("robot", 100);
   heightPub = n->create_publisher<sensor_msgs::msg::Range>("height", 100);
-  tf2_ros::TransformBroadcaster b;
+  tf2_ros::TransformBroadcaster b(n);
   broadcaster = &b;
 
   rclcpp::spin(n);
