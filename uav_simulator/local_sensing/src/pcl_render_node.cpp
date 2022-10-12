@@ -112,13 +112,13 @@ void rcvOdometryCallbck(const nav_msgs::msg::Odometry &odom) {
 
   Eigen::Vector3d request_position;
   Eigen::Quaterniond request_pose;
-  request_position.x() = odom.pose.pose.position.x;
-  request_position.y() = odom.pose.pose.position.y;
-  request_position.z() = odom.pose.pose.position.z;
-  request_pose.x() = odom.pose.pose.orientation.x;
-  request_pose.y() = odom.pose.pose.orientation.y;
-  request_pose.z() = odom.pose.pose.orientation.z;
-  request_pose.w() = odom.pose.pose.orientation.w;
+  request_position.x() = odom->pose.pose.position.x;
+  request_position.y() = odom->pose.pose.position.y;
+  request_position.z() = odom->pose.pose.position.z;
+  request_pose.x() = odom->pose.pose.orientation.x;
+  request_pose.y() = odom->pose.pose.orientation.y;
+  request_pose.z() = odom->pose.pose.orientation.z;
+  request_pose.w() = odom->pose.pose.orientation.w;
   Pose_receive.block<3, 3>(0, 0) = request_pose.toRotationMatrix();
   Pose_receive(0, 3) = request_position(0);
   Pose_receive(1, 3) = request_position(1);
@@ -129,11 +129,11 @@ void rcvOdometryCallbck(const nav_msgs::msg::Odometry &odom) {
   cam2world = body_pose * cam02body;
   cam2world_quat = cam2world.block<3, 3>(0, 0);
 
-  last_odom_stamp = odom.header.stamp;
+  last_odom_stamp = odom->header.stamp;
 
-  last_pose_world(0) = odom.pose.pose.position.x;
-  last_pose_world(1) = odom.pose.pose.position.y;
-  last_pose_world(2) = odom.pose.pose.position.z;
+  last_pose_world(0) = odom->pose.pose.position.x;
+  last_pose_world(1) = odom->pose.pose.position.y;
+  last_pose_world(2) = odom->pose.pose.position.z;
 
   //publish tf
   /*static tf::TransformBroadcaster br;

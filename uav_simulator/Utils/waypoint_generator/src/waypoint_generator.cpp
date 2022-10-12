@@ -52,7 +52,7 @@ void load_seg(rclcpp::Node::SharedPtr& nh, int segid, const rclcpp::Time& time_b
 
     path_msg.header.stamp = time_base + std::chrono::milliseconds(time_from_start*1000);
 
-    double baseyaw = tf::getYaw(odom.pose.pose.orientation);
+    double baseyaw = tf::getYaw(odom->pose.pose.orientation);
 
     for (size_t k = 0; k < ptx.size(); ++k) {
         geometry_msgs::msg::PoseStamped pt;
@@ -61,9 +61,9 @@ void load_seg(rclcpp::Node::SharedPtr& nh, int segid, const rclcpp::Time& time_b
         Eigen::Vector2d rdp;
         rdp.x() = std::cos(-baseyaw-yaw)*dp.x() + std::sin(-baseyaw-yaw)*dp.y();
         rdp.y() =-std::sin(-baseyaw-yaw)*dp.x() + std::cos(-baseyaw-yaw)*dp.y();
-        pt.pose.position.x = rdp.x() + odom.pose.pose.position.x;
-        pt.pose.position.y = rdp.y() + odom.pose.pose.position.y;
-        pt.pose.position.z = ptz.at(k) + odom.pose.pose.position.z;
+        pt.pose.position.x = rdp.x() + odom->pose.pose.position.x;
+        pt.pose.position.y = rdp.y() + odom->pose.pose.position.y;
+        pt.pose.position.z = ptz.at(k) + odom->pose.pose.position.z;
         path_msg.poses.push_back(pt);
     }
 
@@ -88,8 +88,8 @@ void publish_waypoints() {
     waypoints.header.stamp = rclcpp::Clock().now();
     pub1->publish(waypoints);
     geometry_msgs::msg::PoseStamped init_pose;
-    init_pose.header = odom.header;
-    init_pose.pose = odom.pose.pose;
+    init_pose.header = odom->header;
+    init_pose.pose = odom->pose.pose;
     waypoints.poses.insert(waypoints.poses.begin(), init_pose);
     // pub2->publish(waypoints);
     waypoints.poses.clear();
@@ -103,7 +103,7 @@ void publish_waypoints_vis() {
 
     {
         geometry_msgs::msg::Pose init_pose;
-        init_pose = odom.pose.pose;
+        init_pose = odom->pose.pose;
         poseArray.poses.push_back(init_pose);
     }
 
@@ -121,7 +121,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr  msg) {
 
     if (waypointSegments.size()) {
         rclcpp::Time expected_time = waypointSegments.front().header.stamp;
-        if (odom.header.stamp >= expected_time) {
+        if (odom->header.stamp >= expected_time) {
             waypoints = waypointSegments.front();
 
             std::stringstream ss;
@@ -149,7 +149,7 @@ void goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
         return;
     }*/
 
-    trigged_time = rclcpp::Clock().now(); //odom.header.stamp;
+    trigged_time = rclcpp::Clock().now(); //odom->header.stamp;
     //ROS_ASSERT(trigged_time > rclcpp::Time(0));
 
     rclcpp::Node::SharedPtr n;
@@ -185,7 +185,7 @@ void goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
             // if height > 0, it's a normal goal;
             geometry_msgs::msg::PoseStamped pt = *msg;
             if (waypoint_type == string("noyaw")) {
-                double yaw = tf::getYaw(odom.pose.pose.orientation);
+                double yaw = tf::getYaw(odom->pose.pose.orientation);
                 pt.pose.orientation = tf::createQuaternionMsgFromYaw(yaw);
             }
             waypoints.poses.push_back(pt);
@@ -213,7 +213,7 @@ void traj_start_trigger_callback(geometry_msgs::msg::PoseStamped::SharedPtr msg)
     }
 
     RCLCPP_WARN(node_->get_logger(), "[waypoint_generator] Trigger!");
-    trigged_time = odom.header.stamp;
+    trigged_time = odom->header.stamp;
     ROS_ASSERT(trigged_time > rclcpp::Time(0));
 
     rclcpp::Node::SharedPtr n;

@@ -19,4 +19,8 @@
     <exec_depend>pcl_ros</exec_depend>
     <exec_depend>quadrotor_msgs</exec_depend>
 
+    <export>
+        <build_type>ament_cmake</build_type>
+    </export>
+
 </package>

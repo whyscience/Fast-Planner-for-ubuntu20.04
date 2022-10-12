@@ -234,7 +234,7 @@ main(int argc, char **argv) {
 
   nav_msgs::msg::Odometry odom_msg;
   odom_msg.header.frame_id = "/simulator";
-  odom_msg.child_frame_id = "/" + quad_name;
+  odom_msg->child_frame_id = "/" + quad_name;
 
   sensor_msgs::msg::Imu imu;
   imu.header.frame_id = "/simulator";
@@ -293,23 +293,23 @@ main(int argc, char **argv) {
 void
 stateToOdomMsg(const QuadrotorSimulator::Quadrotor::State &state,
                nav_msgs::msg::Odometry &odom) {
-  odom.pose.pose.position.x = state.x(0);
-  odom.pose.pose.position.y = state.x(1);
-  odom.pose.pose.position.z = state.x(2);
+  odom->pose.pose.position.x = state.x(0);
+  odom->pose.pose.position.y = state.x(1);
+  odom->pose.pose.position.z = state.x(2);
 
   Eigen::Quaterniond q(state.R);
-  odom.pose.pose.orientation.x = q.x();
-  odom.pose.pose.orientation.y = q.y();
-  odom.pose.pose.orientation.z = q.z();
-  odom.pose.pose.orientation.w = q.w();
+  odom->pose.pose.orientation.x = q.x();
+  odom->pose.pose.orientation.y = q.y();
+  odom->pose.pose.orientation.z = q.z();
+  odom->pose.pose.orientation.w = q.w();
 
-  odom.twist.twist.linear.x = state.v(0);
-  odom.twist.twist.linear.y = state.v(1);
-  odom.twist.twist.linear.z = state.v(2);
+  odom->twist.twist.linear.x = state.v(0);
+  odom->twist.twist.linear.y = state.v(1);
+  odom->twist.twist.linear.z = state.v(2);
 
-  odom.twist.twist.angular.x = state.omega(0);
-  odom.twist.twist.angular.y = state.omega(1);
-  odom.twist.twist.angular.z = state.omega(2);
+  odom->twist.twist.angular.x = state.omega(0);
+  odom->twist.twist.angular.y = state.omega(1);
+  odom->twist.twist.angular.z = state.omega(2);
 }
 
 void
