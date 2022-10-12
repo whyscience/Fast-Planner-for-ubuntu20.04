@@ -27,11 +27,19 @@ ament_target_dependencies(SO3Control ${dependencies})
 ament_target_dependencies(so3_control_nodelet ${dependencies})
 
 ament_export_include_directories(include)
-ament_export_libraries(SO3Control so3_control_nodelet)
+ament_export_libraries(SO3Control)
+ament_export_libraries(so3_control_nodelet)
 ament_export_dependencies(${dependencies})
 
-install(TARGETS SO3Control so3_control_nodelet
-        EXPORT SO3Control so3_control_nodelet
+install(TARGETS SO3Control
+        EXPORT SO3Control
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include)
+
+install(TARGETS so3_control_nodelet
+        EXPORT so3_control_nodelet
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin
