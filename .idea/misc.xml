@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$/uav_simulator/so3_control">
+    <contentRoot DIR="$PROJECT_DIR$" />
+  </component>
+  <component name="CidrRootsConfiguration">
+    <excludeRoots>
+      <file path="$PROJECT_DIR$/fast_planner/bspline_opt/cmake-build-debug" />
+      <file path="$PROJECT_DIR$/fast_planner/path_searching/cmake-build-debug" />
+      <file path="$PROJECT_DIR$/fast_planner/plan_env/.idea" />
+      <file path="$PROJECT_DIR$/fast_planner/plan_env/cmake-build-debug" />
+      <file path="$PROJECT_DIR$/fast_planner/poly_traj/cmake-build-debug" />
+      <file path="$PROJECT_DIR$/fast_planner/traj_utils/cmake-build-debug" />
+      <file path="$PROJECT_DIR$/uav_simulator/Utils/multi_map_server/cmake-build-debug" />
+      <file path="$PROJECT_DIR$/uav_simulator/Utils/odom_visualization/cmake-build-debug" />
+      <file path="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/cmake-build-debug" />
+      <file path="$PROJECT_DIR$/uav_simulator/Utils/waypoint_generator/cmake-build-debug" />
+      <file path="$PROJECT_DIR$/uav_simulator/so3_disturbance_generator/cmake-build-debug" />
+      <file path="$PROJECT_DIR$/uav_simulator/so3_quadrotor_simulator/cmake-build-debug" />
+    </excludeRoots>
+  </component>
+</project>
