@@ -39,12 +39,12 @@
 
 #include "goal_tool.h"
 
-namespace rviz {
+namespace rviz_common {
 
 Goal3DTool::Goal3DTool() {
   shortcut_key_ = 'g';
 
-  topic_property_ = new StringProperty("Topic", "goal",
+  topic_property_ = new properties::StringProperty("Topic", "goal",
                                        "The topic on which to publish navigation goals.",
                                        getPropertyContainer(), SLOT(updateTopic()), this);
 }
@@ -60,15 +60,15 @@ void Goal3DTool::updateTopic() {
 }
 
 void Goal3DTool::onPoseSet(double x, double y, double z, double theta) {
-  RCLCPP_WARN(nh_->get_logger(), "3D Goal Set");
+  /*RCLCPP_WARN(nh_->get_logger(),*/printf( "3D Goal Set");
   std::string fixed_frame = context_->getFixedFrame().toStdString();
   tf2::Quaternion quat;
   quat.setRPY(0.0, 0.0, theta);
-  tf2::Stamped<tf2::Pose>
-      p = tf2::Stamped<tf2::Pose>(tf2::Pose(quat, tf2::Point(x, y, z)), rclcpp::Clock().now(), fixed_frame);
+//  tf2::Stamped<tf2::Pose> //todo eric
+//      p = tf2::Stamped<tf2::Pose>(tf2::Pose(quat, tf2::Point(x, y, z)), rclcpp::Clock().now(), fixed_frame);
   geometry_msgs::msg::PoseStamped goal;
-  tf2::poseStampedTFToMsg(p, goal);
-  RCLCPP_INFO(nh_->get_logger(),
+//  tf2::poseStampedTFToMsg(p, goal);//todo eric
+  /*RCLCPP_INFO(nh_->get_logger(),*/printf(
               "Setting goal: Frame:%s, Position(%.3f, %.3f, %.3f), Orientation(%.3f, %.3f, %.3f, %.3f) = Angle: %.3f\n",
               fixed_frame.c_str(),
               goal.pose.position.x,

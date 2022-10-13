@@ -20,12 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="89a9acee-acb2-453b-8224-99a10785b156" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/XCMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/Xpackage.xml" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/package.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/plugin_description.xml" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/plugin_description.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/aerialmap_display.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/aerialmap_display.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/aerialmap_display.h" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/aerialmap_display.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/gamelikeinput.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/gamelikeinput.cpp" afterDir="false" />
@@ -128,7 +123,7 @@
       <workItem from="1665638938733" duration="3626000" />
       <workItem from="1665642731681" duration="3821000" />
       <workItem from="1665656031055" duration="665000" />
-      <workItem from="1665668875825" duration="1866000" />
+      <workItem from="1665668875825" duration="5040000" />
     </task>
     <servers />
   </component>

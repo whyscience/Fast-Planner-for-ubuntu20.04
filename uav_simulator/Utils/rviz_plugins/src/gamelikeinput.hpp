@@ -16,7 +16,7 @@
 
 #endif
 
-namespace rviz {
+namespace rviz_common {
 class Arrow;
 class StringProperty;
 } // namespace rviz

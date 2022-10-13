@@ -52,7 +52,7 @@
 
 #include "probmap_display.h"
 
-namespace rviz {
+namespace rviz_common {
 
 ProbMapDisplay::ProbMapDisplay()
     : Display(),
@@ -148,12 +148,12 @@ ProbMapDisplay::subscribe() {
 
   if (!topic_property_->getTopic().isEmpty()) {
     try {
-      map_sub_ = update_nh_.subscribe(topic_property_->getTopicStd(), 1,
-                                      &ProbMapDisplay::incomingMap, this);
-      setStatus(StatusProperty::Ok, "Topic", "OK");
+      //todo eric
+      //map_sub_ = update_nh_.subscribe(topic_property_->getTopicStd(), 1, &ProbMapDisplay::incomingMap, this);
+      setStatus(properties::StatusProperty::Ok, "Topic", "OK");
     }
     catch (rclcpp::Exception &e) {
-      setStatus(StatusProperty::Error, "Topic",
+      setStatus(properties::StatusProperty::Error, "Topic",
                 QString("Error subscribing: ") + e.what());
     }
   }
@@ -161,7 +161,7 @@ ProbMapDisplay::subscribe() {
 
 void
 ProbMapDisplay::unsubscribe() {
-  map_sub_.shutdown();
+  //map_sub_.shutdown();//todo eric
 }
 
 void
@@ -214,7 +214,7 @@ ProbMapDisplay::updateTopic() {
 
 void
 ProbMapDisplay::clear() {
-  setStatus(StatusProperty::Warn, "Message", "No map received");
+  setStatus(properties::StatusProperty::Warn, "Message", "No map received");
 
   if (!loaded_) {
     return;
@@ -257,7 +257,7 @@ ProbMapDisplay::update(float wall_dt, float ros_dt) {
   new_map_ = false;
 
   if (!validateFloats(*current_map_)) {
-    setStatus(StatusProperty::Error, "Map",
+    setStatus(properties::StatusProperty::Error, "Map",
               "Message contained invalid floating point values (nans or infs)");
     return;
   }
@@ -266,15 +266,15 @@ ProbMapDisplay::update(float wall_dt, float ros_dt) {
     std::stringstream ss;
     ss << "Map is zero-sized (" << current_map_->info.width << "x"
        << current_map_->info.height << ")";
-    setStatus(StatusProperty::Error, "Map", QString::fromStdString(ss.str()));
+    setStatus(properties::StatusProperty::Error, "Map", QString::fromStdString(ss.str()));
     return;
   }
 
   clear();
 
-  setStatus(StatusProperty::Ok, "Message", "Map received");
+  setStatus(properties::StatusProperty::Ok, "Message", "Map received");
 
-  ROS_DEBUG("Received a %d X %d map @ %.3f m/pix\n", current_map_->info.width,
+  /*ROS_DEBUG*/printf("Received a %d X %d map @ %.3f m/pix\n", current_map_->info.width,
             current_map_->info.height, current_map_->info.resolution);
 
   float resolution = current_map_->info.resolution;
@@ -306,7 +306,7 @@ ProbMapDisplay::update(float wall_dt, float ros_dt) {
     ss << "Data size doesn't match width*height: width = " << width
        << ", height = " << height
        << ", data size = " << current_map_->data.size();
-    setStatus(StatusProperty::Error, "Map", QString::fromStdString(ss.str()));
+    setStatus(properties::StatusProperty::Error, "Map", QString::fromStdString(ss.str()));
     map_status_set = true;
 
     // Keep going, but don't read past the end of the data.
@@ -342,7 +342,7 @@ ProbMapDisplay::update(float wall_dt, float ros_dt) {
         pixel_stream, width, height, Ogre::PF_L8, Ogre::TEX_TYPE_2D, 0);
 
     if (!map_status_set) {
-      setStatus(StatusProperty::Ok, "Map", "Map OK");
+      setStatus(properties::StatusProperty::Ok, "Map", "Map OK");
     }
   }
   catch (Ogre::RenderingAPIException &) {
@@ -366,14 +366,14 @@ ProbMapDisplay::update(float wall_dt, float ros_dt) {
           << "Map is larger than your graphics card supports.  Downsampled from ["
           << width << "x" << height << "] to [" << fwidth << "x" << fheight
           << "]";
-      setStatus(StatusProperty::Ok, "Map", QString::fromStdString(ss.str()));
+      setStatus(properties::StatusProperty::Ok, "Map", QString::fromStdString(ss.str()));
     }
 
-    RCLCPP_WARN(node_->get_logger(), "Failed to create full-size map texture, likely because your "
+    /*RCLCPP_WARN(nh_->get_logger(),*/printf( "Failed to create full-size map texture, likely because your "
                                      "graphics card does not support textures of size > 2048.  "
                                      "Downsampling to [%d x %d]...",
                 (int) fwidth, (int) fheight);
-    // RCLCPP_INFO(node_->get_logger(), "Stream size [%d], width [%f], height [%f], w * h [%f]",
+    // RCLCPP_INFO(nh_->get_logger(), "Stream size [%d], width [%f], height [%f], w * h [%f]",
     // pixel_stream->size(), width, height, width * height);
     image.loadRawData(pixel_stream, width, height, Ogre::PF_L8);
     image.resize(fwidth, fheight, Ogre::Image::FILTER_NEAREST);
@@ -460,7 +460,7 @@ ProbMapDisplay::update(float wall_dt, float ros_dt) {
 }
 
 void
-ProbMapDisplay::incomingMap(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
+ProbMapDisplay::incomingMap(nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
 
   updated_map_ = msg;
   boost::mutex::scoped_lock lock(mutex_);
@@ -477,14 +477,14 @@ ProbMapDisplay::transformMap() {
   Ogre::Quaternion orientation;
   if (!context_->getFrameManager()->transform(
       frame_, rclcpp::Time(), current_map_->info.origin, position, orientation)) {
-    ROS_DEBUG("Error transforming map '%s' from frame '%s' to frame '%s'",
-              qPrintable(getName()), frame_.c_str(), qPrintable(fixed_frame_));
+    /*ROS_DEBUG*/printf("Error transforming map '%s' from frame '%s' to frame '%s'",
+                        qPrintable(getName()), frame_.c_str(), qPrintable(fixed_frame_));
 
-    setStatus(StatusProperty::Error, "Transform",
+    setStatus(properties::StatusProperty::Error, "Transform",
               "No transform from [" + QString::fromStdString(frame_) +
                   "] to [" + fixed_frame_ + "]");
   } else {
-    setStatus(StatusProperty::Ok, "Transform", "Transform OK");
+    setStatus(properties::StatusProperty::Ok, "Transform", "Transform OK");
   }
 
   scene_node_->setPosition(position);

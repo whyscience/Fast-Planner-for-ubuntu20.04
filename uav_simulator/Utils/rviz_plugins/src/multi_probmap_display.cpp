@@ -36,8 +36,9 @@
 #include <OGRE/OgreTextureManager.h>
 
 #include "rclcpp/rclcpp.hpp"
-
 #include <tf2_ros/transform_listener.h>
+#include <tf2/transform_datatypes.h>
+#include <tf2/utils.h>
 
 #include "rviz_common/frame_manager_iface.hpp"
 #include "rviz_rendering/objects/grid.hpp"
@@ -52,7 +53,7 @@
 
 #include "multi_probmap_display.h"
 
-namespace rviz {
+namespace rviz_common {
 
 MultiProbMapDisplay::MultiProbMapDisplay()
     : Display(), loaded_(false), new_map_(false) {
@@ -91,17 +92,18 @@ void MultiProbMapDisplay::subscribe() {
 
   if (!topic_property_->getTopic().isEmpty()) {
     try {
-      map_sub_ = update_nh_.subscribe(topic_property_->getTopicStd(), 1, &MultiProbMapDisplay::incomingMap, this);
-      setStatus(StatusProperty::Ok, "Topic", "OK");
+      //todo eric update_nh_
+      //map_sub_ = update_nh_.subscribe(topic_property_->getTopicStd(), 1, &MultiProbMapDisplay::incomingMap, this);
+      setStatus(properties::StatusProperty::Ok, "Topic", "OK");
     }
-    catch (rclcpp::Exception &e) {
-      setStatus(StatusProperty::Error, "Topic", QString("Error subscribing: ") + e.what());
+    catch (rclcpp::exceptions::RCLError &e) {
+      setStatus(properties::StatusProperty::Error, "Topic", QString("Error subscribing: ") + e.what());
     }
   }
 }
 
 void MultiProbMapDisplay::unsubscribe() {
-  map_sub_.shutdown();
+  //map_sub_.shutdown();//todo eric
 }
 
 void MultiProbMapDisplay::updateDrawUnder() {
@@ -125,7 +127,7 @@ void MultiProbMapDisplay::updateTopic() {
 }
 
 void MultiProbMapDisplay::clear() {
-  setStatus(StatusProperty::Warn, "Message", "No map received");
+  setStatus(properties::StatusProperty::Warn, "Message", "No map received");
 
   if (!loaded_) {
     return;
@@ -163,7 +165,7 @@ void MultiProbMapDisplay::update(float wall_dt, float ros_dt) {
   for (unsigned int k = 0; k < current_map_->maps.size(); k++) {
     if (current_map_->maps[k].data.empty())
       continue;
-    setStatus(StatusProperty::Ok, "Message", "Map received");
+    setStatus(properties::StatusProperty::Ok, "Message", "Map received");
 
     // Map info
     float resolution = current_map_->maps[k].info.resolution;
@@ -215,7 +217,7 @@ void MultiProbMapDisplay::update(float wall_dt, float ros_dt) {
     //t[3] = rclcpp::Clock().now();
     texture_.push_back(_texture_);
     delete[] pixels;
-    setStatus(StatusProperty::Ok, "Map", "Map OK");
+    setStatus(properties::StatusProperty::Ok, "Map", "Map OK");
     //t[4] = rclcpp::Clock().now();
 
     // Set material
@@ -323,12 +325,12 @@ void MultiProbMapDisplay::update(float wall_dt, float ros_dt) {
   }
   loaded_ = true;
   context_->queueRender();
-  //RCLCPP_ERROR(node_->get_logger(), "RVIZ MAP:  %f %f %f %f", dt[0],dt[1],dt[2],dt[3]);
+  //RCLCPP_ERROR(nh_->get_logger(), "RVIZ MAP:  %f %f %f %f", dt[0],dt[1],dt[2],dt[3]);
 }
 
 // ***********************************************************************************************************************************
 
-void MultiProbMapDisplay::incomingMap(const multi_map_server::msg::MultiOccupancyGrid::SharedPtr msg) {
+void MultiProbMapDisplay::incomingMap(multi_map_server::msg::MultiOccupancyGrid::SharedPtr msg) {
   updated_map_ = msg;
   boost::mutex::scoped_lock lock(mutex_);
   new_map_ = true;

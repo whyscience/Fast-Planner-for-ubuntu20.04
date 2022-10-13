@@ -38,9 +38,10 @@
 #include "rviz_common/render_panel.hpp"
 #include "rviz_common/viewport_mouse_event.hpp"
 
+
 #include "pose_tool.h"
 
-namespace rviz {
+namespace rviz_common {
 
 Pose3DTool::Pose3DTool()
     : Tool(), arrow_(NULL) {
@@ -52,7 +53,7 @@ Pose3DTool::~Pose3DTool() {
 
 void
 Pose3DTool::onInitialize() {
-  arrow_ = new Arrow(scene_manager_, NULL, 2.0f, 0.2f, 0.5f, 0.35f);
+  arrow_ = new rviz_rendering::Arrow(scene_manager_, NULL, 2.0f, 0.2f, 0.5f, 0.35f);
   arrow_->setColor(0.0f, 1.0f, 0.0f, 1.0f);
   arrow_->getSceneNode()->setVisible(false);
 }
@@ -81,11 +82,12 @@ Pose3DTool::processMouseEvent(ViewportMouseEvent &event) {
       Ogre::Quaternion(Ogre::Radian(Ogre::Math::HALF_PI), Ogre::Vector3::UNIT_Z);
 
   if (event.leftDown()) {
-    ROS_ASSERT(state_ == Position);
+    assert(state_ == Position);
     Ogre::Vector3 intersection;
     Ogre::Plane ground_plane(Ogre::Vector3::UNIT_Z, 0.0f);
-    if (getPointOnPlaneFromWindowXY(event.viewport, ground_plane, event.x,
-                                    event.y, intersection)) {
+    /*todo eric*/
+    if (/*getPointOnPlaneFromWindowXY(event.viewport, ground_plane, event.x,
+                                    event.y, intersection)*/1) {
       pos_ = intersection;
       arrow_->setPosition(pos_);
       state_ = Orientation;
@@ -96,8 +98,9 @@ Pose3DTool::processMouseEvent(ViewportMouseEvent &event) {
       // compute angle in x-y plane
       Ogre::Vector3 cur_pos;
       Ogre::Plane ground_plane(Ogre::Vector3::UNIT_Z, 0.0f);
-      if (getPointOnPlaneFromWindowXY(event.viewport, ground_plane, event.x,
-                                      event.y, cur_pos)) {
+      //todo eric
+      if (/*getPointOnPlaneFromWindowXY(event.viewport, ground_plane, event.x,
+                                      event.y, cur_pos)*/1) {
         double angle = atan2(cur_pos.y - pos_.y, cur_pos.x - pos_.x);
         arrow_->getSceneNode()->setVisible(true);
         arrow_->setOrientation(Ogre::Quaternion(orient_x));
@@ -121,8 +124,8 @@ Pose3DTool::processMouseEvent(ViewportMouseEvent &event) {
       arrow_array.clear();
       int cnt = ceil(fabs(initz - pos_.z) / z_interval);
       for (int k = 0; k < cnt; k++) {
-        Arrow *arrow__;
-        arrow__ = new Arrow(scene_manager_, NULL, 0.5f, 0.1f, 0.0f, 0.1f);
+        rviz_rendering::Arrow *arrow__;
+        arrow__ = new rviz_rendering::Arrow(scene_manager_, NULL, 0.5f, 0.1f, 0.0f, 0.1f);
         arrow__->setColor(0.0f, 1.0f, 0.0f, 1.0f);
         arrow__->getSceneNode()->setVisible(true);
         Ogre::Vector3 arr_pos = pos_;

@@ -40,19 +40,29 @@
 #include <nav_msgs/msg/occupancy_grid.hpp>
 
 #include "rviz_common/display.hpp"
+#include "rviz_common/display_context.hpp"
+#include "rviz_common/frame_manager_iface.hpp"
+#include "rviz_rendering/objects/grid.hpp"
+#include "rviz_common/properties/float_property.hpp"
+#include "rviz_common/properties/int_property.hpp"
+#include "rviz_common/properties/property.hpp"
+#include "rviz_common/properties/quaternion_property.hpp"
+#include "rviz_common/properties/ros_topic_property.hpp"
+#include "rviz_common/properties/vector_property.hpp"
+#include "rviz_common/validate_floats.hpp"
 
 namespace Ogre {
 class ManualObject;
 }
 
-namespace rviz {
+namespace rviz_common {
 
-class FloatProperty;
-class IntProperty;
-class Property;
-class QuaternionProperty;
-class RosTopicProperty;
-class VectorProperty;
+using properties::FloatProperty;
+using properties::IntProperty;
+using properties::Property;
+using properties::QuaternionProperty;
+using properties::RosTopicProperty;
+using properties::VectorProperty;
 
 /**
  * \class ProbMapDisplay
@@ -90,7 +100,7 @@ class ProbMapDisplay : public Display {
   virtual void subscribe();
   virtual void unsubscribe();
 
-  void incomingMap(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
+  void incomingMap(nav_msgs::msg::OccupancyGrid::SharedPtr msg);
 
   void clear();
 
@@ -111,14 +121,14 @@ class ProbMapDisplay : public Display {
 
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
 
-  RosTopicProperty *topic_property_;
-  FloatProperty *resolution_property_;
-  IntProperty *width_property_;
-  IntProperty *height_property_;
-  VectorProperty *position_property_;
-  QuaternionProperty *orientation_property_;
-  FloatProperty *alpha_property_;
-  Property *draw_under_property_;
+  properties::RosTopicProperty *topic_property_;
+  properties::FloatProperty *resolution_property_;
+  properties::IntProperty *width_property_;
+  properties::IntProperty *height_property_;
+  properties::VectorProperty *position_property_;
+  properties::QuaternionProperty *orientation_property_;
+  properties::FloatProperty *alpha_property_;
+  properties::Property *draw_under_property_;
 
   nav_msgs::msg::OccupancyGrid::ConstPtr updated_map_;
   nav_msgs::msg::OccupancyGrid::ConstPtr current_map_;

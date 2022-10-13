@@ -35,10 +35,14 @@
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreTextureManager.h>
 
+#include <OgreVector.h>
+#include <OgreQuaternion.h>
+
 #include "rclcpp/rclcpp.hpp"
 
 #include <tf2_ros/transform_listener.h>
 
+#include "rviz_common/display.hpp"
 #include "rviz_common/display_context.hpp"
 #include "rviz_common/frame_manager_iface.hpp"
 #include "rviz_rendering/objects/grid.hpp"
@@ -52,7 +56,9 @@
 
 #include "aerialmap_display.h"
 
-namespace rviz {
+namespace rviz_common {
+using properties::BoolProperty;
+using properties::FloatProperty;
 
 AerialMapDisplay::AerialMapDisplay()
     : Display(),
@@ -148,13 +154,12 @@ AerialMapDisplay::subscribe() {
 
   if (!topic_property_->getTopic().isEmpty()) {
     try {
-      map_sub_ =
-          update_nh_.subscribe(topic_property_->getTopicStd(), 1,
-                               &AerialMapDisplay::incomingAerialMap, this);
-      setStatus(StatusProperty::Ok, "Topic", "OK");
+      //todo eric
+      //map_sub_ = update_nh_.subscribe(topic_property_->getTopicStd(), 1, &AerialMapDisplay::incomingAerialMap, this);
+      setStatus(properties::StatusProperty::Ok, "Topic", "OK");
     }
     catch (rclcpp::Exception &e) {
-      setStatus(StatusProperty::Error, "Topic",
+      setStatus(properties::StatusProperty::Error, "Topic",
                 QString("Error subscribing: ") + e.what());
     }
   }
@@ -162,7 +167,7 @@ AerialMapDisplay::subscribe() {
 
 void
 AerialMapDisplay::unsubscribe() {
-  map_sub_.shutdown();
+  //map_sub_.shutdown();//todo eric
 }
 
 void
@@ -215,7 +220,7 @@ AerialMapDisplay::updateTopic() {
 
 void
 AerialMapDisplay::clear() {
-  setStatus(StatusProperty::Warn, "Message", "No map received");
+  setStatus(properties::StatusProperty::Warn, "Message", "No map received");
 
   if (!loaded_) {
     return;
@@ -259,7 +264,7 @@ AerialMapDisplay::update(float wall_dt, float ros_dt) {
   /*
     if( !validateFloats( *current_map_ ))
     {
-      setStatus( StatusProperty::Error, "Map", "Message contained invalid
+      setStatus( properties::StatusProperty::Error, "Map", "Message contained invalid
     floating point values (nans or infs)" );
       return;
     }
@@ -268,16 +273,16 @@ AerialMapDisplay::update(float wall_dt, float ros_dt) {
     std::stringstream ss;
     ss << "AerialMap is zero-sized (" << current_map_->info.width << "x"
        << current_map_->info.height << ")";
-    setStatus(StatusProperty::Error, "AerialMap",
+    setStatus(properties::StatusProperty::Error, "AerialMap",
               QString::fromStdString(ss.str()));
     return;
   }
 
   clear();
 
-  setStatus(StatusProperty::Ok, "Message", "AerialMap received");
+  setStatus(properties::StatusProperty::Ok, "Message", "AerialMap received");
 
-  ROS_DEBUG("Received a %d X %d map @ %.3f m/pix\n", current_map_->info.width,
+  /*ROS_DEBUG*/printf("Received a %d X %d map @ %.3f m/pix\n", current_map_->info.width,
             current_map_->info.height, current_map_->info.resolution);
 
   float resolution = current_map_->info.resolution;
@@ -309,7 +314,7 @@ AerialMapDisplay::update(float wall_dt, float ros_dt) {
     ss << "Data size doesn't match width*height: width = " << width
        << ", height = " << height
        << ", data size = " << current_map_->data.size();
-    setStatus(StatusProperty::Error, "AerialMap",
+    setStatus(properties::StatusProperty::Error, "AerialMap",
               QString::fromStdString(ss.str()));
     map_status_set = true;
 
@@ -349,7 +354,7 @@ AerialMapDisplay::update(float wall_dt, float ros_dt) {
         pixel_stream, width, height, Ogre::PF_R8G8B8, Ogre::TEX_TYPE_2D, 0);
 
     if (!map_status_set) {
-      setStatus(StatusProperty::Ok, "AerialMap", "AerialMap OK");
+      setStatus(properties::StatusProperty::Ok, "AerialMap", "AerialMap OK");
     }
   }
   catch (Ogre::RenderingAPIException &) {
@@ -373,15 +378,15 @@ AerialMapDisplay::update(float wall_dt, float ros_dt) {
             "Downsampled from ["
          << width << "x" << height << "] to [" << fwidth << "x" << fheight
          << "]";
-      setStatus(StatusProperty::Ok, "AerialMap",
+      setStatus(properties::StatusProperty::Ok, "AerialMap",
                 QString::fromStdString(ss.str()));
     }
 
-    RCLCPP_WARN(node_->get_logger(), "Failed to create full-size map texture, likely because your "
+    /*RCLCPP_WARN(nh_->get_logger(),*/printf( "Failed to create full-size map texture, likely because your "
                                      "graphics card does not support textures of size > 2048.  "
                                      "Downsampling to [%d x %d]...",
                 (int) fwidth, (int) fheight);
-    // RCLCPP_INFO(node_->get_logger(), "Stream size [%d], width [%f], height [%f], w * h [%f]",
+    // RCLCPP_INFO(nh_->get_logger(), "Stream size [%d], width [%f], height [%f], w * h [%f]",
     // pixel_stream->size(), width, height, width * height);
     image.loadRawData(pixel_stream, width, height, Ogre::PF_R8G8B8);
     image.resize(fwidth, fheight, Ogre::Image::FILTER_NEAREST);
@@ -469,7 +474,7 @@ AerialMapDisplay::update(float wall_dt, float ros_dt) {
 
 void
 AerialMapDisplay::incomingAerialMap(
-    const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
+    nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
 
   updated_map_ = msg;
   boost::mutex::scoped_lock lock(mutex_);
@@ -486,14 +491,14 @@ AerialMapDisplay::transformAerialMap() {
   Ogre::Quaternion orientation;
   if (!context_->getFrameManager()->transform(
       frame_, rclcpp::Time(), current_map_->info.origin, position, orientation)) {
-    ROS_DEBUG("Error transforming map '%s' from frame '%s' to frame '%s'",
+    /*ROS_DEBUG*/printf("Error transforming map '%s' from frame '%s' to frame '%s'",
               qPrintable(getName()), frame_.c_str(), qPrintable(fixed_frame_));
 
-    setStatus(StatusProperty::Error, "Transform",
+    setStatus(properties::StatusProperty::Error, "Transform",
               "No transform from [" + QString::fromStdString(frame_) +
                   "] to [" + fixed_frame_ + "]");
   } else {
-    setStatus(StatusProperty::Ok, "Transform", "Transform OK");
+    setStatus(properties::StatusProperty::Ok, "Transform", "Transform OK");
   }
 
   scene_node_->setPosition(position);

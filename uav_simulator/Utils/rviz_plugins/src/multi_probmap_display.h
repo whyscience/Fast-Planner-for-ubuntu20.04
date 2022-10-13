@@ -41,19 +41,29 @@
 #include <nav_msgs/msg/occupancy_grid.hpp>
 
 #include "rviz_common/display.hpp"
+#include "rviz_common/display_context.hpp"
+#include "rviz_common/frame_manager_iface.hpp"
+#include "rviz_rendering/objects/grid.hpp"
+#include "rviz_common/properties/float_property.hpp"
+#include "rviz_common/properties/int_property.hpp"
+#include "rviz_common/properties/property.hpp"
+#include "rviz_common/properties/quaternion_property.hpp"
+#include "rviz_common/properties/ros_topic_property.hpp"
+#include "rviz_common/properties/vector_property.hpp"
+#include "rviz_common/validate_floats.hpp"
 
 namespace Ogre {
 class ManualObject;
 }
 
-namespace rviz {
+namespace rviz_common {
 
-class FloatProperty;
-class IntProperty;
-class Property;
-class QuaternionProperty;
-class RosTopicProperty;
-class VectorProperty;
+using properties::FloatProperty;
+using properties::IntProperty;
+using properties::Property;
+using properties::QuaternionProperty;
+using properties::RosTopicProperty;
+using properties::VectorProperty;
 
 /**
  * \class MultiProbMapDisplay
@@ -82,7 +92,7 @@ class MultiProbMapDisplay : public Display {
   virtual void subscribe();
   virtual void unsubscribe();
 
-  void incomingMap(const multi_map_server::msg::MultiOccupancyGrid::SharedPtr msg);
+  void incomingMap(multi_map_server::msg::MultiOccupancyGrid::SharedPtr msg);
 
   void clear();
 
@@ -99,8 +109,8 @@ class MultiProbMapDisplay : public Display {
   RosTopicProperty *topic_property_;
   Property *draw_under_property_;
 
-  multi_map_server::msg::MultiOccupancyGrid::ConstPtr updated_map_;
-  multi_map_server::msg::MultiOccupancyGrid::ConstPtr current_map_;
+  multi_map_server::msg::MultiOccupancyGrid updated_map_;
+  multi_map_server::msg::MultiOccupancyGrid current_map_;
   boost::mutex mutex_;
   bool new_map_;
 };

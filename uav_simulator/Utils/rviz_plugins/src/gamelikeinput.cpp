@@ -218,7 +218,7 @@ GameLikeInput::sendMessage() {
 
 void
 GameLikeInput::onPoseSet(double x, double y, double z, double theta) {
-  RCLCPP_WARN(node_->get_logger(), "3D Goal Set");
+  /*RCLCPP_WARN(nh_->get_logger(),*/printf( "3D Goal Set");
   std::string fixed_frame = context_->getFixedFrame().toStdString();
   tf2::Quaternion quat;
   quat.setRPY(0.0, 0.0, theta);
@@ -226,7 +226,7 @@ GameLikeInput::onPoseSet(double x, double y, double z, double theta) {
       tf2::Pose(quat, tf2::Point(x, y, z)), rclcpp::Clock().now(), fixed_frame);
   geometry_msgs::msg::PoseStamped goal;
   tf2::poseStampedTFToMsg(p, goal);
-  RCLCPP_INFO(node_->get_logger(), "Setting goal: Frame:%s, Position(%.3f, %.3f, %.3f), "
+  RCLCPP_INFO(nh_->get_logger(), "Setting goal: Frame:%s, Position(%.3f, %.3f, %.3f), "
                                    "Orientation(%.3f, %.3f, %.3f, %.3f) = Angle: %.3f\n",
               fixed_frame.c_str(), goal.pose.position.x, goal.pose.position.y,
               goal.pose.position.z, goal.pose.orientation.x,

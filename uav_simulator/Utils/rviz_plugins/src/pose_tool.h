@@ -35,15 +35,21 @@
 #include <QCursor>
 
 #include "rclcpp/rclcpp.hpp"
+#include "rviz_common/tool.hpp"
+#include "rviz_common/interaction/forwards.hpp"
+#include "rviz_common/interactive_object.hpp"
+#include "rviz_common/properties/property.hpp"
+#include "rviz_common/viewport_mouse_event.hpp"
+#include "rviz_common/visibility_control.hpp"
+#include "rviz_common/properties/string_property.hpp"
+#include "rviz_rendering/objects/arrow.hpp"
 
-//todo eric temp
-//#include "rviz_common/tool.h"
 
-namespace rviz {
-class Arrow;
-class DisplayContext;
+namespace rviz_common {
+//class Arrow;
+//class DisplayContext;
 
-class Pose3DTool : public Tool {
+ class Pose3DTool : public rviz_common::Tool {
  public:
   Pose3DTool();
   virtual ~Pose3DTool();
@@ -58,8 +64,8 @@ class Pose3DTool : public Tool {
  protected:
   virtual void onPoseSet(double x, double y, double z, double theta) = 0;
 
-  Arrow *arrow_;
-  std::vector<Arrow *> arrow_array;
+   rviz_rendering::Arrow *arrow_;
+  std::vector<rviz_rendering::Arrow *> arrow_array;
 
   enum State {
     Position,

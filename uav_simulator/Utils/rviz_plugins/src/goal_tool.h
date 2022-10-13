@@ -39,10 +39,10 @@
 # include "pose_tool.h"
 #endif
 
-namespace rviz {
-class Arrow;
-class DisplayContext;
-class StringProperty;
+namespace rviz_common {
+//class Arrow;
+//class DisplayContext;
+//class StringProperty;
 
 class Goal3DTool : public Pose3DTool {
  Q_OBJECT
@@ -62,7 +62,7 @@ class Goal3DTool : public Pose3DTool {
   rclcpp::Node::SharedPtr nh_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pub_;
 
-  StringProperty *topic_property_;
+  properties::StringProperty *topic_property_;
 };
 
 }
