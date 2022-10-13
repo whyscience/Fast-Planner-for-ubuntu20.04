@@ -47,13 +47,13 @@
 #ifndef __so3_disturbance_generator__DISTURBANCEUICONFIG_H__
 #define __so3_disturbance_generator__DISTURBANCEUICONFIG_H__
 
-#include <dynamic_reconfigure/config_tools.h>
+//#include <dynamic_reconfigure/config_tools.h>//no need for ROS2
 #include <limits>
-#include <ros/node_handle.h>
-#include <dynamic_reconfigure/ConfigDescription.h>
-#include <dynamic_reconfigure/ParamDescription.h>
-#include <dynamic_reconfigure/Group.h>
-#include <dynamic_reconfigure/config_init_mutex.h>
+#include "rclcpp/rclcpp.hpp"
+//#include <dynamic_reconfigure/ConfigDescription.h>
+//#include <dynamic_reconfigure/ParamDescription.h>
+//#include <dynamic_reconfigure/Group.h>
+//#include <dynamic_reconfigure/config_init_mutex.h>
 #include <boost/any.hpp>
 
 namespace so3_disturbance_generator

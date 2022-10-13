@@ -23,10 +23,9 @@ set(dependencies
 
 add_executable(so3_disturbance_generator src/so3_disturbance_generator.cpp)
 #todo how to use dynamic reconfigure
-add_dependencies(so3_disturbance_generator ${PROJECT_NAME}_gencfg)
+#add_dependencies(so3_disturbance_generator ${PROJECT_NAME}_gencfg)
 target_link_libraries(so3_disturbance_generator
         ${ARMADILLO_LIBRARIES}
-        pose_utils
         )
 ament_target_dependencies(so3_disturbance_generator ${dependencies})
 ament_package()

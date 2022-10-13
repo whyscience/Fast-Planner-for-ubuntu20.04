@@ -4,7 +4,7 @@
 #include <geometry_msgs/msg/vector3.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
-#include <dynamic_reconfigure/server.h>
+//#include <dynamic_reconfigure/server.h>
 #include <so3_disturbance_generator/DisturbanceUIConfig.h>
 #include "pose_utils.h"
 

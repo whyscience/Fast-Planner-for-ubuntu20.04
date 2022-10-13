@@ -49,7 +49,7 @@
 
 #include <dynamic_reconfigure/config_tools.h>
 #include <limits>
-#include <ros/node_handle.h>
+#include "rclcpp/rclcpp.hpp"
 #include <dynamic_reconfigure/ConfigDescription.h>
 #include <dynamic_reconfigure/ParamDescription.h>
 #include <dynamic_reconfigure/Group.h>
