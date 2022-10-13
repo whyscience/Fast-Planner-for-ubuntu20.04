@@ -42,13 +42,11 @@
 
 #include "rviz_common/display.hpp"
 
-namespace Ogre
-{
+namespace Ogre {
 class ManualObject;
 }
 
-namespace rviz
-{
+namespace rviz {
 
 class FloatProperty;
 class IntProperty;
@@ -61,10 +59,9 @@ class VectorProperty;
  * \class MultiProbMapDisplay
  * \brief Displays a map along the XY plane.
  */
-class MultiProbMapDisplay : public Display
-{
-  Q_OBJECT
-public:
+class MultiProbMapDisplay : public Display {
+ Q_OBJECT
+ public:
   MultiProbMapDisplay();
   virtual ~MultiProbMapDisplay();
 
@@ -73,11 +70,11 @@ public:
   virtual void reset();
   virtual void update(float wall_dt, float ros_dt);
 
-protected Q_SLOTS:
+ protected Q_SLOTS:
   void updateTopic();
   void updateDrawUnder();
 
-protected:
+ protected:
   // overrides from Display
   virtual void onEnable();
   virtual void onDisable();
@@ -85,27 +82,27 @@ protected:
   virtual void subscribe();
   virtual void unsubscribe();
 
-  void incomingMap(const multi_map_server::msg::MultiOccupancyGrid::SharedPtr  msg);
+  void incomingMap(const multi_map_server::msg::MultiOccupancyGrid::SharedPtr msg);
 
   void clear();
 
-  std::vector<Ogre::ManualObject*> manual_object_;
-  std::vector<Ogre::TexturePtr>    texture_;
-  std::vector<Ogre::MaterialPtr>   material_;
+  std::vector<Ogre::ManualObject *> manual_object_;
+  std::vector<Ogre::TexturePtr> texture_;
+  std::vector<Ogre::MaterialPtr> material_;
 
   bool loaded_;
 
   std::string topic_;
 
-  rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr  map_sub_;
+  rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
 
-  RosTopicProperty* topic_property_;
-  Property*         draw_under_property_;
+  RosTopicProperty *topic_property_;
+  Property *draw_under_property_;
 
   multi_map_server::msg::MultiOccupancyGrid::ConstPtr updated_map_;
   multi_map_server::msg::MultiOccupancyGrid::ConstPtr current_map_;
-  boost::mutex                                   mutex_;
-  bool                                           new_map_;
+  boost::mutex mutex_;
+  bool new_map_;
 };
 
 } // namespace rviz

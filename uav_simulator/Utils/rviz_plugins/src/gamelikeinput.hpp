@@ -16,48 +16,46 @@
 
 #endif
 
-namespace rviz
-{
+namespace rviz {
 class Arrow;
 class StringProperty;
 } // namespace rviz
 
-class GameLikeInput : public rviz::SelectionTool
-{
-  Q_OBJECT
+class GameLikeInput : public rviz_common::SelectionTool {
+ Q_OBJECT
 
-protected Q_SLOTS:
+ protected Q_SLOTS:
   void updateTopic();
 
-public:
+ public:
   GameLikeInput();
   virtual ~GameLikeInput();
 
   virtual void onInitialize();
 
-  virtual int processMouseEvent(rviz::ViewportMouseEvent& event);
-  virtual int processKeyEvent(QKeyEvent* event, rviz::RenderPanel* panel);
+  virtual int processMouseEvent(rviz_common::ViewportMouseEvent &event);
+  virtual int processKeyEvent(QKeyEvent *event, rviz_common::RenderPanel *panel);
 
   void sendMessage();
 
-protected:
+ protected:
   virtual void onPoseSet(double x, double y, double z_vector, double theta);
 
-private:
-  rviz::InteractionTool* move_tool_;
+ private:
+  rviz_common::InteractionTool *move_tool_;
 
   bool selecting_;
-  int  sel_start_x_;
-  int  sel_start_y_;
+  int sel_start_x_;
+  int sel_start_y_;
 
-  rviz::M_Picked selection_;
+  rviz_common::M_Picked selection_;
 
   bool moving_;
 
   rclcpp::Node::SharedPtr nh_;
-  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr  pub_pointlist;
-  rclcpp::Publisher<std_msgs::msg::Int32MultiArray>::SharedPtr  pub_selection;
-  rclcpp::Publisher<quadrotor_msgs::msg::SwarmCommand>::SharedPtr  pub_swarm;
+  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr pub_pointlist;
+  rclcpp::Publisher<std_msgs::msg::Int32MultiArray>::SharedPtr pub_selection;
+  rclcpp::Publisher<quadrotor_msgs::msg::SwarmCommand>::SharedPtr pub_swarm;
 
   double z_max;
   double z_min;
@@ -66,24 +64,23 @@ private:
   double y_max;
   double y_min;
 
-  rviz::FloatProperty* property_z_max;
-  rviz::FloatProperty* property_z_min;
-  rviz::FloatProperty* property_x_max;
-  rviz::FloatProperty* property_x_min;
-  rviz::FloatProperty* property_y_max;
-  rviz::FloatProperty* property_y_min;
+  rviz_common::FloatProperty *property_z_max;
+  rviz_common::FloatProperty *property_z_min;
+  rviz_common::FloatProperty *property_x_max;
+  rviz_common::FloatProperty *property_x_min;
+  rviz_common::FloatProperty *property_y_max;
+  rviz_common::FloatProperty *property_y_min;
 
-  rviz::StringProperty* topic_property_wp_;
-  rviz::StringProperty* topic_property_drone_;
-  rviz::StringProperty* topic_property_swarm_;
+  rviz_common::StringProperty *topic_property_wp_;
+  rviz_common::StringProperty *topic_property_drone_;
+  rviz_common::StringProperty *topic_property_swarm_;
 
-private:
-  rviz::Arrow*              arrow_;
-  std::vector<rviz::Arrow*> arrow_array;
-  std::vector<double>       z_vector;
+ private:
+  rviz_common::Arrow *arrow_;
+  std::vector<rviz_common::Arrow *> arrow_array;
+  std::vector<double> z_vector;
 
-  enum State
-  {
+  enum State {
     None,
     Position,
     Height

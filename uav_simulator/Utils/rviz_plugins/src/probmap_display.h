@@ -59,7 +59,7 @@ class VectorProperty;
  * \brief Displays a map along the XY plane.
  */
 class ProbMapDisplay : public Display {
-  Q_OBJECT
+ Q_OBJECT
  public:
   ProbMapDisplay();
   virtual ~ProbMapDisplay();
@@ -78,7 +78,7 @@ class ProbMapDisplay : public Display {
 
  protected
   Q_SLOTS:
-      void updateAlpha();
+  void updateAlpha();
   void updateTopic();
   void updateDrawUnder();
 

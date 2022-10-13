@@ -43,16 +43,15 @@
 //! @todo rewrite this grabage code
 
 void
-GameLikeInput::updateTopic()
-{
+GameLikeInput::updateTopic() {
   pub_pointlist =
-    nh_->create_publisher<nav_msgs::msg::Path>(topic_property_wp_->getStdString(), 1);
+      nh_->create_publisher<nav_msgs::msg::Path>(topic_property_wp_->getStdString(), 1);
 
   pub_selection = nh_->create_publisher<std_msgs::msg::Int32MultiArray>(
-    topic_property_drone_->getStdString(), 1);
+      topic_property_drone_->getStdString(), 1);
 
   pub_swarm = nh_->create_publisher<quadrotor_msgs::msg::SwarmCommand>(
-    topic_property_swarm_->getStdString(), 1);
+      topic_property_swarm_->getStdString(), 1);
 
   z_max = property_z_max->getFloat();
   z_min = property_z_min->getFloat();
@@ -63,48 +62,46 @@ GameLikeInput::updateTopic()
 }
 
 GameLikeInput::GameLikeInput()
-  : rviz::SelectionTool()
-  , move_tool_(new rviz::InteractionTool())
-  , selecting_(false)
-  , sel_start_x_(0)
-  , sel_start_y_(0)
-  , moving_(false)
-{
-  shortcut_key_    = 'z';
+    : rviz_common::SelectionTool(),
+      move_tool_(new rviz_common::InteractionTool()),
+      selecting_(false),
+      sel_start_x_(0),
+      sel_start_y_(0),
+      moving_(false) {
+  shortcut_key_ = 'z';
   access_all_keys_ = true;
 
   topic_property_wp_ =
-    new rviz::StringProperty("TopicPoint", "point_list",
-                             "The topic on which to publish navigation goals.",
-                             getPropertyContainer(), SLOT(updateTopic()), this);
+      new rviz_common::StringProperty("TopicPoint", "point_list",
+                                      "The topic on which to publish navigation goals.",
+                                      getPropertyContainer(), SLOT(updateTopic()), this);
 
   topic_property_drone_ =
-    new rviz::StringProperty("TopicSelect", "select_list",
-                             "The topic on which to publish select drone id.",
-                             getPropertyContainer(), SLOT(updateTopic()), this);
+      new rviz_common::StringProperty("TopicSelect", "select_list",
+                                      "The topic on which to publish select drone id.",
+                                      getPropertyContainer(), SLOT(updateTopic()), this);
 
-  topic_property_swarm_ = new rviz::StringProperty(
-    "TopicSwarm", "swarm", "The topic on which to publish swarm command.",
-    getPropertyContainer(), SLOT(updateTopic()), this);
+  topic_property_swarm_ = new rviz_common::StringProperty(
+      "TopicSwarm", "swarm", "The topic on which to publish swarm command.",
+      getPropertyContainer(), SLOT(updateTopic()), this);
 
-  property_z_max = new rviz::FloatProperty(
-    "RangeZ_max", 1.7, "", getPropertyContainer(), SLOT(updateTopic()), this);
-  property_z_min = new rviz::FloatProperty(
-    "RangeZ_min", 0.8, "", getPropertyContainer(), SLOT(updateTopic()), this);
+  property_z_max = new rviz_common::FloatProperty(
+      "RangeZ_max", 1.7, "", getPropertyContainer(), SLOT(updateTopic()), this);
+  property_z_min = new rviz_common::FloatProperty(
+      "RangeZ_min", 0.8, "", getPropertyContainer(), SLOT(updateTopic()), this);
 
-  property_y_max = new rviz::FloatProperty(
-    "RangeY_max", 2.5, "", getPropertyContainer(), SLOT(updateTopic()), this);
-  property_y_min = new rviz::FloatProperty(
-    "RangeY_min", -2.5, "", getPropertyContainer(), SLOT(updateTopic()), this);
+  property_y_max = new rviz_common::FloatProperty(
+      "RangeY_max", 2.5, "", getPropertyContainer(), SLOT(updateTopic()), this);
+  property_y_min = new rviz_common::FloatProperty(
+      "RangeY_min", -2.5, "", getPropertyContainer(), SLOT(updateTopic()), this);
 
-  property_x_max = new rviz::FloatProperty(
-    "RangeX_max", 4, "", getPropertyContainer(), SLOT(updateTopic()), this);
-  property_x_min = new rviz::FloatProperty(
-    "RangeX_min", -4, "", getPropertyContainer(), SLOT(updateTopic()), this);
+  property_x_max = new rviz_common::FloatProperty(
+      "RangeX_max", 4, "", getPropertyContainer(), SLOT(updateTopic()), this);
+  property_x_min = new rviz_common::FloatProperty(
+      "RangeX_min", -4, "", getPropertyContainer(), SLOT(updateTopic()), this);
 }
 
-GameLikeInput::~GameLikeInput()
-{
+GameLikeInput::~GameLikeInput() {
   delete move_tool_;
   delete topic_property_wp_;
   delete topic_property_drone_;
@@ -119,11 +116,10 @@ GameLikeInput::~GameLikeInput()
 }
 
 void
-GameLikeInput::onInitialize()
-{
+GameLikeInput::onInitialize() {
   this->move_tool_->initialize(context_);
 
-  arrow_ = new rviz::Arrow(scene_manager_, NULL, 2.0f, 0.2f, 0.5f, 0.35f);
+  arrow_ = new rviz_common::Arrow(scene_manager_, NULL, 2.0f, 0.2f, 0.5f, 0.35f);
   arrow_->setColor(0.3f, 0.35f, 0.9f, 1.0f);
   arrow_->getSceneNode()->setVisible(false);
 
@@ -132,14 +128,13 @@ GameLikeInput::onInitialize()
 }
 
 void
-GameLikeInput::sendMessage()
-{
+GameLikeInput::sendMessage() {
   std_msgs::msg::Int32MultiArray array;
-  nav_msgs::msg::Path            path;
+  nav_msgs::msg::Path path;
 
   array.data.clear();
 
-  rviz::SelectionManager* sel_manager = context_->getSelectionManager();
+  rviz_common::SelectionManager *sel_manager = context_->getSelectionManager();
 
   auto size = std::distance(selection_.begin(), selection_.end());
 
@@ -149,14 +144,12 @@ GameLikeInput::sendMessage()
   pose.pose.position.z = 0;
 
   //! @note makeup selection array
-  if (!selection_.empty())
-  {
-    for (auto it = selection_.begin(); it != selection_.end(); it++)
-    {
-      rviz::Picked                  p  = it->second;
-      rviz::SelectionHandler*       sh = sel_manager->getHandler(p.handle);
-      rviz::MarkerSelectionHandler* mh =
-        reinterpret_cast<rviz::MarkerSelectionHandler*>(sh);
+  if (!selection_.empty()) {
+    for (auto it = selection_.begin(); it != selection_.end(); it++) {
+      rviz_common::Picked p = it->second;
+      rviz_common::SelectionHandler *sh = sel_manager->getHandler(p.handle);
+      rviz_common::MarkerSelectionHandler *mh =
+          reinterpret_cast<rviz_common::MarkerSelectionHandler *>(sh);
 
       QString cpy = mh->marker_id_;
 
@@ -178,9 +171,8 @@ GameLikeInput::sendMessage()
   //! @note go through arrow_array, get the internal parameter of each array
   //! makeup each waypoint
 
-  for (int i = 0; i < arrow_array.size(); ++i)
-  {
-    rviz::Arrow*               p_a = arrow_array[i];
+  for (int i = 0; i < arrow_array.size(); ++i) {
+    rviz_common::Arrow *p_a = arrow_array[i];
     geometry_msgs::msg::PoseStamped ps;
 
     ps.pose.position.x = p_a->getPosition().x;
@@ -211,12 +203,12 @@ GameLikeInput::sendMessage()
   arrow_->getSceneNode()->setVisible(false);
 
   path.header.frame_id = "map";
-  path.header.stamp    = rclcpp::Clock().now();
+  path.header.stamp = rclcpp::Clock().now();
 
   std::sort(array.data.begin(), array.data.end());
 
   quadrotor_msgs::msg::SwarmCommand swarm;
-  swarm.plan      = path;
+  swarm.plan = path;
   swarm.selection = array.data;
 
   pub_selection->publish(array);
@@ -225,51 +217,45 @@ GameLikeInput::sendMessage()
 }
 
 void
-GameLikeInput::onPoseSet(double x, double y, double z, double theta)
-{
+GameLikeInput::onPoseSet(double x, double y, double z, double theta) {
   RCLCPP_WARN(node_->get_logger(), "3D Goal Set");
-  std::string    fixed_frame = context_->getFixedFrame().toStdString();
-  tf::Quaternion quat;
+  std::string fixed_frame = context_->getFixedFrame().toStdString();
+  tf2::Quaternion quat;
   quat.setRPY(0.0, 0.0, theta);
-  tf::Stamped<tf::Pose> p = tf::Stamped<tf::Pose>(
-    tf::Pose(quat, tf::Point(x, y, z)), rclcpp::Clock().now(), fixed_frame);
+  tf2::Stamped<tf2::Pose> p = tf2::Stamped<tf2::Pose>(
+      tf2::Pose(quat, tf2::Point(x, y, z)), rclcpp::Clock().now(), fixed_frame);
   geometry_msgs::msg::PoseStamped goal;
-  tf::poseStampedTFToMsg(p, goal);
+  tf2::poseStampedTFToMsg(p, goal);
   RCLCPP_INFO(node_->get_logger(), "Setting goal: Frame:%s, Position(%.3f, %.3f, %.3f), "
-           "Orientation(%.3f, %.3f, %.3f, %.3f) = Angle: %.3f\n",
-           fixed_frame.c_str(), goal.pose.position.x, goal.pose.position.y,
-           goal.pose.position.z, goal.pose.orientation.x,
-           goal.pose.orientation.y, goal.pose.orientation.z,
-           goal.pose.orientation.w, theta);
+                                   "Orientation(%.3f, %.3f, %.3f, %.3f) = Angle: %.3f\n",
+              fixed_frame.c_str(), goal.pose.position.x, goal.pose.position.y,
+              goal.pose.position.z, goal.pose.orientation.x,
+              goal.pose.orientation.y, goal.pose.orientation.z,
+              goal.pose.orientation.w, theta);
 }
 
 int
-GameLikeInput::processMouseEvent(rviz::ViewportMouseEvent& event)
-{
+GameLikeInput::processMouseEvent(rviz_common::ViewportMouseEvent &event) {
 
-  rviz::SelectionManager* sel_manager = context_->getSelectionManager();
+  rviz_common::SelectionManager *sel_manager = context_->getSelectionManager();
 
   int flags = 0;
 
   // wp vars
-  static double    initz;
-  static double    prevz;
-  static double    prevangle;
-  const double     z_scale = 50;
+  static double initz;
+  static double prevz;
+  static double prevangle;
+  const double z_scale = 50;
   Ogre::Quaternion orient_x =
-    Ogre::Quaternion(Ogre::Radian(-Ogre::Math::PI), Ogre::Vector3::UNIT_X);
+      Ogre::Quaternion(Ogre::Radian(-Ogre::Math::PI), Ogre::Vector3::UNIT_X);
 
-  if (event.alt())
-  {
-    moving_    = true;
+  if (event.alt()) {
+    moving_ = true;
     selecting_ = false;
-  }
-  else
-  {
+  } else {
     moving_ = false;
 
-    if (event.leftDown())
-    {
+    if (event.leftDown()) {
       this->selecting_ = true;
 
       this->sel_start_x_ = event.x;
@@ -277,24 +263,19 @@ GameLikeInput::processMouseEvent(rviz::ViewportMouseEvent& event)
     }
   }
 
-  if (selecting_)
-  {
-    rviz::M_Picked selection;
+  if (selecting_) {
+    rviz_common::M_Picked selection;
 
     sel_manager->highlight(event.viewport, sel_start_x_, sel_start_y_, event.x,
                            event.y);
 
-    if (event.leftUp())
-    {
-      rviz::SelectionManager::SelectType type = rviz::SelectionManager::Replace;
+    if (event.leftUp()) {
+      rviz_common::SelectionManager::SelectType type = rviz_common::SelectionManager::Replace;
 
-      if (event.shift())
-      {
-        type = rviz::SelectionManager::Add;
-      }
-      else if (event.control())
-      {
-        type = rviz::SelectionManager::Remove;
+      if (event.shift()) {
+        type = rviz_common::SelectionManager::Add;
+      } else if (event.control()) {
+        type = rviz_common::SelectionManager::Remove;
       }
 
       //      boost::recursive_mutex::scoped_lock lock(global_mutex_);
@@ -302,25 +283,23 @@ GameLikeInput::processMouseEvent(rviz::ViewportMouseEvent& event)
                           this->sel_start_y_, event.x, event.y, type);
       selection = sel_manager->getSelection();
 
-      rviz::MarkerSelectionHandler* cmp = new rviz::MarkerSelectionHandler(
-        nullptr, std::pair<std::string, int32_t>(), context_);
+      rviz_common::MarkerSelectionHandler *cmp = new rviz_common::MarkerSelectionHandler(
+          nullptr, std::pair<std::string, int32_t>(), context_);
 
-      for (auto it = selection.begin(); it != selection.end();)
-      {
-        rviz::Picked            p  = it->second;
-        rviz::SelectionHandler* sh = sel_manager->getHandler(p.handle);
-        void (rviz::SelectionHandler::*vptr)(const rviz::Picked& obj,
-                                             rviz::Property* parent_property) =
-          &rviz::SelectionHandler::createProperties;
+      for (auto it = selection.begin(); it != selection.end();) {
+        rviz_common::Picked p = it->second;
+        rviz_common::SelectionHandler *sh = sel_manager->getHandler(p.handle);
+        void (rviz_common::SelectionHandler::*vptr)(const rviz_common::Picked &obj,
+                                                    rviz_common::Property *parent_property) =
+        &rviz_common::SelectionHandler::createProperties;
         // black magic, must have warning
         bool e = false;
-        if (reinterpret_cast<void*>(sh->*vptr) !=
-            reinterpret_cast<void*>(cmp->*vptr))
+        if (reinterpret_cast<void *>(sh->*vptr) !=
+            reinterpret_cast<void *>(cmp->*vptr))
           e = true;
-        else
-        {
-          rviz::MarkerSelectionHandler* mh =
-            reinterpret_cast<rviz::MarkerSelectionHandler*>(sh);
+        else {
+          rviz_common::MarkerSelectionHandler *mh =
+              reinterpret_cast<rviz_common::MarkerSelectionHandler *>(sh);
           if (mh->marker_id_.startsWith("drone"))
             e = false;
           else
@@ -341,34 +320,26 @@ GameLikeInput::processMouseEvent(rviz::ViewportMouseEvent& event)
     }
 
     flags |= Render;
-  }
-  else if (moving_)
-  {
+  } else if (moving_) {
     sel_manager->removeHighlight();
     flags = move_tool_->processMouseEvent(event);
 
-    if (event.type == QEvent::MouseButtonRelease)
-    {
+    if (event.type == QEvent::MouseButtonRelease) {
       moving_ = false;
     }
-  }
-  else
-  {
+  } else {
 
-    if (event.rightDown())
-    {
-      if (state_ == None)
-      {
+    if (event.rightDown()) {
+      if (state_ == None) {
         Ogre::Vector3 intersection;
-        Ogre::Plane   ground_plane(Ogre::Vector3::UNIT_Z, 0.0f);
-        if (rviz::getPointOnPlaneFromWindowXY(event.viewport, ground_plane,
-                                              event.x, event.y, intersection))
-        {
+        Ogre::Plane ground_plane(Ogre::Vector3::UNIT_Z, 0.0f);
+        if (rviz_common::getPointOnPlaneFromWindowXY(event.viewport, ground_plane,
+                                                     event.x, event.y, intersection)) {
           pos_ = intersection;
           arrow_->setPosition(pos_);
           arrow_->setOrientation(
-            Ogre::Quaternion(Ogre::Radian(0.0), Ogre::Vector3::UNIT_Z) *
-            orient_x);
+              Ogre::Quaternion(Ogre::Radian(0.0), Ogre::Vector3::UNIT_Z) *
+                  orient_x);
           arrow_->getSceneNode()->setVisible(true);
           state_ = Height;
           flags |= Render;
@@ -376,43 +347,34 @@ GameLikeInput::processMouseEvent(rviz::ViewportMouseEvent& event)
         initz = pos_.z;
         prevz = event.y;
       }
-    }
-    else if (event.type == QEvent::MouseMove && event.right())
-    {
-      if (state_ == Height)
-      {
-        double z  = event.y;
+    } else if (event.type == QEvent::MouseMove && event.right()) {
+      if (state_ == Height) {
+        double z = event.y;
         double dz = z - prevz;
-        prevz     = z;
+        prevz = z;
         pos_.z -= dz / z_scale;
         arrow_->set(pos_.z, 0.08, 0, 0);
         flags |= Render;
       }
     }
-    if (event.rightUp())
-    {
+    if (event.rightUp()) {
       onPoseSet(pos_.x, pos_.y, pos_.z, prevangle);
 
       state_ = None;
-      if (event.shift())
-      {
+      if (event.shift()) {
         arrow_array.push_back(arrow_);
         z_vector.push_back(pos_.z);
-        arrow_ = new rviz::Arrow(scene_manager_, NULL, 2.0f, 0.2f, 0.5f, 0.35f);
+        arrow_ = new rviz_common::Arrow(scene_manager_, NULL, 2.0f, 0.2f, 0.5f, 0.35f);
         arrow_->setColor(0.3f, 0.35f, 0.9f, 1.0f);
         arrow_->getSceneNode()->setVisible(false);
-      }
-      else
-      {
+      } else {
         sendMessage();
       }
       flags |= Render;
     }
 
-    if (!event.shift())
-    {
-      if (state_ == None && arrow_array.size() != 0)
-      {
+    if (!event.shift()) {
+      if (state_ == None && arrow_array.size() != 0) {
         sendMessage();
       }
     }
@@ -424,10 +386,9 @@ GameLikeInput::processMouseEvent(rviz::ViewportMouseEvent& event)
 }
 
 int
-GameLikeInput::processKeyEvent(QKeyEvent* event, rviz::RenderPanel* panel)
-{
+GameLikeInput::processKeyEvent(QKeyEvent *event, rviz_common::RenderPanel *panel) {
   return SelectionTool::processKeyEvent(event, panel);
 }
 
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(GameLikeInput, rviz::Tool)
+PLUGINLIB_EXPORT_CLASS(GameLikeInput, rviz_common::Tool)

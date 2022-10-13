@@ -45,7 +45,7 @@ class DisplayContext;
 class StringProperty;
 
 class Goal3DTool : public Pose3DTool {
-  Q_OBJECT
+ Q_OBJECT
  public:
   Goal3DTool();
   virtual ~Goal3DTool() {}
@@ -56,7 +56,7 @@ class Goal3DTool : public Pose3DTool {
 
  private
   Q_SLOTS:
-      void updateTopic();
+  void updateTopic();
 
  private:
   rclcpp::Node::SharedPtr nh_;

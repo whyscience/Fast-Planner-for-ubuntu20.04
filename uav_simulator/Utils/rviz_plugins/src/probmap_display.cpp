@@ -52,77 +52,74 @@
 
 #include "probmap_display.h"
 
-namespace rviz
-{
+namespace rviz {
 
 ProbMapDisplay::ProbMapDisplay()
-  : Display()
-  , manual_object_(NULL)
-  //! @bug cannot compile @gcc-5 or later, material_(0)
-  , loaded_(false)
-  , resolution_(0.0f)
-  , width_(0)
-  , height_(0)
-  , position_(Ogre::Vector3::ZERO)
-  , orientation_(Ogre::Quaternion::IDENTITY)
-  , new_map_(false)
-{
+    : Display(),
+      manual_object_(NULL)
+    //! @bug cannot compile @gcc-5 or later, material_(0)
+    ,
+      loaded_(false),
+      resolution_(0.0f),
+      width_(0),
+      height_(0),
+      position_(Ogre::Vector3::ZERO),
+      orientation_(Ogre::Quaternion::IDENTITY),
+      new_map_(false) {
   topic_property_ = new RosTopicProperty(
-    "Topic", "", QString::fromStdString(
-                   rclcpp::message_traits::datatype<nav_msgs::msg::OccupancyGrid>()),
-    "nav_msgs::msg::OccupancyGrid topic to subscribe to.", this,
-    SLOT(updateTopic()));
+      "Topic", "", QString::fromStdString(
+          rclcpp::message_traits::datatype<nav_msgs::msg::OccupancyGrid>()),
+      "nav_msgs::msg::OccupancyGrid topic to subscribe to.", this,
+      SLOT(updateTopic()));
 
   alpha_property_ = new FloatProperty(
-    "Alpha", 0.7, "Amount of transparency to apply to the map.", this,
-    SLOT(updateAlpha()));
+      "Alpha", 0.7, "Amount of transparency to apply to the map.", this,
+      SLOT(updateAlpha()));
   alpha_property_->setMin(0);
   alpha_property_->setMax(1);
 
   draw_under_property_ =
-    new Property("Draw Behind", false,
-                 "Rendering option, controls whether or not the map is always"
-                 " drawn behind everything else.",
-                 this, SLOT(updateDrawUnder()));
+      new Property("Draw Behind", false,
+                   "Rendering option, controls whether or not the map is always"
+                   " drawn behind everything else.",
+                   this, SLOT(updateDrawUnder()));
 
   resolution_property_ = new FloatProperty(
-    "Resolution", 0, "Resolution of the map. (not editable)", this);
+      "Resolution", 0, "Resolution of the map. (not editable)", this);
   resolution_property_->setReadOnly(true);
 
   width_property_ = new IntProperty(
-    "Width", 0, "Width of the map, in meters. (not editable)", this);
+      "Width", 0, "Width of the map, in meters. (not editable)", this);
   width_property_->setReadOnly(true);
 
   height_property_ = new IntProperty(
-    "Height", 0, "Height of the map, in meters. (not editable)", this);
+      "Height", 0, "Height of the map, in meters. (not editable)", this);
   height_property_->setReadOnly(true);
 
   position_property_ = new VectorProperty(
-    "Position", Ogre::Vector3::ZERO,
-    "Position of the bottom left corner of the map, in meters. (not editable)",
-    this);
+      "Position", Ogre::Vector3::ZERO,
+      "Position of the bottom left corner of the map, in meters. (not editable)",
+      this);
   position_property_->setReadOnly(true);
 
   orientation_property_ =
-    new QuaternionProperty("Orientation", Ogre::Quaternion::IDENTITY,
-                           "Orientation of the map. (not editable)", this);
+      new QuaternionProperty("Orientation", Ogre::Quaternion::IDENTITY,
+                             "Orientation of the map. (not editable)", this);
   orientation_property_->setReadOnly(true);
 }
 
-ProbMapDisplay::~ProbMapDisplay()
-{
+ProbMapDisplay::~ProbMapDisplay() {
   unsubscribe();
   clear();
 }
 
 void
-ProbMapDisplay::onInitialize()
-{
-  static int        count = 0;
+ProbMapDisplay::onInitialize() {
+  static int count = 0;
   std::stringstream ss;
   ss << "MapObjectMaterial" << count++;
   material_ = Ogre::MaterialManager::getSingleton().create(
-    ss.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+      ss.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
   material_->setReceiveShadows(false);
   material_->getTechnique(0)->setLightingEnabled(false);
   material_->setDepthBias(-16.0f, 0.0f);
@@ -133,36 +130,29 @@ ProbMapDisplay::onInitialize()
 }
 
 void
-ProbMapDisplay::onEnable()
-{
+ProbMapDisplay::onEnable() {
   subscribe();
 }
 
 void
-ProbMapDisplay::onDisable()
-{
+ProbMapDisplay::onDisable() {
   unsubscribe();
   clear();
 }
 
 void
-ProbMapDisplay::subscribe()
-{
-  if (!isEnabled())
-  {
+ProbMapDisplay::subscribe() {
+  if (!isEnabled()) {
     return;
   }
 
-  if (!topic_property_->getTopic().isEmpty())
-  {
-    try
-    {
+  if (!topic_property_->getTopic().isEmpty()) {
+    try {
       map_sub_ = update_nh_.subscribe(topic_property_->getTopicStd(), 1,
                                       &ProbMapDisplay::incomingMap, this);
       setStatus(StatusProperty::Ok, "Topic", "OK");
     }
-    catch (rclcpp::Exception& e)
-    {
+    catch (rclcpp::Exception &e) {
       setStatus(StatusProperty::Error, "Topic",
                 QString("Error subscribing: ") + e.what());
     }
@@ -170,80 +160,63 @@ ProbMapDisplay::subscribe()
 }
 
 void
-ProbMapDisplay::unsubscribe()
-{
+ProbMapDisplay::unsubscribe() {
   map_sub_.shutdown();
 }
 
 void
-ProbMapDisplay::updateAlpha()
-{
+ProbMapDisplay::updateAlpha() {
   float alpha = alpha_property_->getFloat();
 
-  Ogre::Pass*             pass     = material_->getTechnique(0)->getPass(0);
-  Ogre::TextureUnitState* tex_unit = NULL;
-  if (pass->getNumTextureUnitStates() > 0)
-  {
+  Ogre::Pass *pass = material_->getTechnique(0)->getPass(0);
+  Ogre::TextureUnitState *tex_unit = NULL;
+  if (pass->getNumTextureUnitStates() > 0) {
     tex_unit = pass->getTextureUnitState(0);
-  }
-  else
-  {
+  } else {
     tex_unit = pass->createTextureUnitState();
   }
 
   tex_unit->setAlphaOperation(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
                               Ogre::LBS_CURRENT, alpha);
 
-  if (alpha < 0.9998)
-  {
+  if (alpha < 0.9998) {
     material_->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
     material_->setDepthWriteEnabled(false);
-  }
-  else
-  {
+  } else {
     material_->setSceneBlending(Ogre::SBT_REPLACE);
     material_->setDepthWriteEnabled(!draw_under_property_->getValue().toBool());
   }
 }
 
 void
-ProbMapDisplay::updateDrawUnder()
-{
+ProbMapDisplay::updateDrawUnder() {
   bool draw_under = draw_under_property_->getValue().toBool();
 
-  if (alpha_property_->getFloat() >= 0.9998)
-  {
+  if (alpha_property_->getFloat() >= 0.9998) {
     material_->setDepthWriteEnabled(!draw_under);
   }
 
-  if (manual_object_)
-  {
-    if (draw_under)
-    {
+  if (manual_object_) {
+    if (draw_under) {
       manual_object_->setRenderQueueGroup(Ogre::RENDER_QUEUE_4);
-    }
-    else
-    {
+    } else {
       manual_object_->setRenderQueueGroup(Ogre::RENDER_QUEUE_MAIN);
     }
   }
 }
 
 void
-ProbMapDisplay::updateTopic()
-{
+ProbMapDisplay::updateTopic() {
   unsubscribe();
   subscribe();
   clear();
 }
 
 void
-ProbMapDisplay::clear()
-{
+ProbMapDisplay::clear() {
   setStatus(StatusProperty::Warn, "Message", "No map received");
 
-  if (!loaded_)
-  {
+  if (!loaded_) {
     return;
   }
 
@@ -258,44 +231,38 @@ ProbMapDisplay::clear()
 }
 
 bool
-validateFloats(const nav_msgs::msg::OccupancyGrid& msg)
-{
+validateFloats(const nav_msgs::msg::OccupancyGrid &msg) {
   bool valid = true;
-  valid      = valid && validateFloats(msg->info.resolution);
-  valid      = valid && validateFloats(msg->info.origin);
+  valid = valid && validateFloats(msg->info.resolution);
+  valid = valid && validateFloats(msg->info.origin);
   return valid;
 }
 
 void
-ProbMapDisplay::update(float wall_dt, float ros_dt)
-{
+ProbMapDisplay::update(float wall_dt, float ros_dt) {
   {
     boost::mutex::scoped_lock lock(mutex_);
 
     current_map_ = updated_map_;
   }
 
-  if (!current_map_ || !new_map_)
-  {
+  if (!current_map_ || !new_map_) {
     return;
   }
 
-  if (current_map_->data.empty())
-  {
+  if (current_map_->data.empty()) {
     return;
   }
 
   new_map_ = false;
 
-  if (!validateFloats(*current_map_))
-  {
+  if (!validateFloats(*current_map_)) {
     setStatus(StatusProperty::Error, "Map",
               "Message contained invalid floating point values (nans or infs)");
     return;
   }
 
-  if (current_map_->info.width * current_map_->info.height == 0)
-  {
+  if (current_map_->info.width * current_map_->info.height == 0) {
     std::stringstream ss;
     ss << "Map is zero-sized (" << current_map_->info.width << "x"
        << current_map_->info.height << ")";
@@ -312,7 +279,7 @@ ProbMapDisplay::update(float wall_dt, float ros_dt)
 
   float resolution = current_map_->info.resolution;
 
-  int width  = current_map_->info.width;
+  int width = current_map_->info.width;
   int height = current_map_->info.height;
 
   Ogre::Vector3 position(current_map_->info.origin.position.x,
@@ -323,20 +290,18 @@ ProbMapDisplay::update(float wall_dt, float ros_dt)
                                current_map_->info.origin.orientation.y,
                                current_map_->info.origin.orientation.z);
   frame_ = current_map_->header.frame_id;
-  if (frame_.empty())
-  {
+  if (frame_.empty()) {
     frame_ = "/map";
   }
 
   // Expand it to be RGB data
-  unsigned int   pixels_size = width * height;
-  unsigned char* pixels      = new unsigned char[pixels_size];
+  unsigned int pixels_size = width * height;
+  unsigned char *pixels = new unsigned char[pixels_size];
   memset(pixels, 255, pixels_size);
 
-  bool         map_status_set     = false;
+  bool map_status_set = false;
   unsigned int num_pixels_to_copy = pixels_size;
-  if (pixels_size != current_map_->data.size())
-  {
+  if (pixels_size != current_map_->data.size()) {
     std::stringstream ss;
     ss << "Data size doesn't match width*height: width = " << width
        << ", height = " << height
@@ -345,8 +310,7 @@ ProbMapDisplay::update(float wall_dt, float ros_dt)
     map_status_set = true;
 
     // Keep going, but don't read past the end of the data.
-    if (current_map_->data.size() < pixels_size)
-    {
+    if (current_map_->data.size() < pixels_size) {
       num_pixels_to_copy = current_map_->data.size();
     }
   }
@@ -355,93 +319,83 @@ ProbMapDisplay::update(float wall_dt, float ros_dt)
   // would allow a non-grayscale color to mark the out-of-range
   // values.
   for (unsigned int pixel_index = 0; pixel_index < num_pixels_to_copy;
-       pixel_index++)
-  {
+       pixel_index++) {
     unsigned char val;
-    int8_t        data = current_map_->data[pixel_index];
+    int8_t data = current_map_->data[pixel_index];
     if (data > 0)
       val = 0;
     else if (data < 0)
       val = 255;
     else
-      val               = 127;
+      val = 127;
     pixels[pixel_index] = val;
   }
 
   Ogre::DataStreamPtr pixel_stream;
   pixel_stream.bind(new Ogre::MemoryDataStream(pixels, pixels_size));
-  static int        tex_count = 0;
+  static int tex_count = 0;
   std::stringstream ss;
   ss << "MapTexture" << tex_count++;
-  try
-  {
+  try {
     texture_ = Ogre::TextureManager::getSingleton().loadRawData(
-      ss.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-      pixel_stream, width, height, Ogre::PF_L8, Ogre::TEX_TYPE_2D, 0);
+        ss.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        pixel_stream, width, height, Ogre::PF_L8, Ogre::TEX_TYPE_2D, 0);
 
-    if (!map_status_set)
-    {
+    if (!map_status_set) {
       setStatus(StatusProperty::Ok, "Map", "Map OK");
     }
   }
-  catch (Ogre::RenderingAPIException&)
-  {
+  catch (Ogre::RenderingAPIException &) {
     Ogre::Image image;
     pixel_stream->seek(0);
-    float fwidth  = width;
+    float fwidth = width;
     float fheight = height;
-    if (width > height)
-    {
+    if (width > height) {
       float aspect = fheight / fwidth;
-      fwidth       = 2048;
-      fheight      = fwidth * aspect;
-    }
-    else
-    {
+      fwidth = 2048;
+      fheight = fwidth * aspect;
+    } else {
       float aspect = fwidth / fheight;
-      fheight      = 2048;
-      fwidth       = fheight * aspect;
+      fheight = 2048;
+      fwidth = fheight * aspect;
     }
 
     {
       std::stringstream ss;
       ss
-        << "Map is larger than your graphics card supports.  Downsampled from ["
-        << width << "x" << height << "] to [" << fwidth << "x" << fheight
-        << "]";
+          << "Map is larger than your graphics card supports.  Downsampled from ["
+          << width << "x" << height << "] to [" << fwidth << "x" << fheight
+          << "]";
       setStatus(StatusProperty::Ok, "Map", QString::fromStdString(ss.str()));
     }
 
     RCLCPP_WARN(node_->get_logger(), "Failed to create full-size map texture, likely because your "
-             "graphics card does not support textures of size > 2048.  "
-             "Downsampling to [%d x %d]...",
-             (int)fwidth, (int)fheight);
+                                     "graphics card does not support textures of size > 2048.  "
+                                     "Downsampling to [%d x %d]...",
+                (int) fwidth, (int) fheight);
     // RCLCPP_INFO(node_->get_logger(), "Stream size [%d], width [%f], height [%f], w * h [%f]",
     // pixel_stream->size(), width, height, width * height);
     image.loadRawData(pixel_stream, width, height, Ogre::PF_L8);
     image.resize(fwidth, fheight, Ogre::Image::FILTER_NEAREST);
     ss << "Downsampled";
     texture_ = Ogre::TextureManager::getSingleton().loadImage(
-      ss.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, image);
+        ss.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, image);
   }
 
   delete[] pixels;
 
-  Ogre::Pass*             pass     = material_->getTechnique(0)->getPass(0);
-  Ogre::TextureUnitState* tex_unit = NULL;
-  if (pass->getNumTextureUnitStates() > 0)
-  {
+  Ogre::Pass *pass = material_->getTechnique(0)->getPass(0);
+  Ogre::TextureUnitState *tex_unit = NULL;
+  if (pass->getNumTextureUnitStates() > 0) {
     tex_unit = pass->getTextureUnitState(0);
-  }
-  else
-  {
+  } else {
     tex_unit = pass->createTextureUnitState();
   }
 
   tex_unit->setTextureName(texture_->getName());
   tex_unit->setTextureFiltering(Ogre::TFO_NONE);
 
-  static int        map_count = 0;
+  static int map_count = 0;
   std::stringstream ss2;
   ss2 << "MapObject" << map_count++;
   manual_object_ = scene_manager_->createManualObject(ss2.str());
@@ -488,8 +442,7 @@ ProbMapDisplay::update(float wall_dt, float ros_dt)
   }
   manual_object_->end();
 
-  if (draw_under_property_->getValue().toBool())
-  {
+  if (draw_under_property_->getValue().toBool()) {
     manual_object_->setRenderQueueGroup(Ogre::RENDER_QUEUE_4);
   }
 
@@ -507,8 +460,7 @@ ProbMapDisplay::update(float wall_dt, float ros_dt)
 }
 
 void
-ProbMapDisplay::incomingMap(const nav_msgs::msg::OccupancyGrid::SharedPtr  msg)
-{
+ProbMapDisplay::incomingMap(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
 
   updated_map_ = msg;
   boost::mutex::scoped_lock lock(mutex_);
@@ -516,27 +468,22 @@ ProbMapDisplay::incomingMap(const nav_msgs::msg::OccupancyGrid::SharedPtr  msg)
 }
 
 void
-ProbMapDisplay::transformMap()
-{
-  if (!current_map_)
-  {
+ProbMapDisplay::transformMap() {
+  if (!current_map_) {
     return;
   }
 
-  Ogre::Vector3    position;
+  Ogre::Vector3 position;
   Ogre::Quaternion orientation;
   if (!context_->getFrameManager()->transform(
-        frame_, rclcpp::Time(), current_map_->info.origin, position, orientation))
-  {
+      frame_, rclcpp::Time(), current_map_->info.origin, position, orientation)) {
     ROS_DEBUG("Error transforming map '%s' from frame '%s' to frame '%s'",
               qPrintable(getName()), frame_.c_str(), qPrintable(fixed_frame_));
 
     setStatus(StatusProperty::Error, "Transform",
               "No transform from [" + QString::fromStdString(frame_) +
-                "] to [" + fixed_frame_ + "]");
-  }
-  else
-  {
+                  "] to [" + fixed_frame_ + "]");
+  } else {
     setStatus(StatusProperty::Ok, "Transform", "Transform OK");
   }
 
@@ -545,14 +492,12 @@ ProbMapDisplay::transformMap()
 }
 
 void
-ProbMapDisplay::fixedFrameChanged()
-{
+ProbMapDisplay::fixedFrameChanged() {
   transformMap();
 }
 
 void
-ProbMapDisplay::reset()
-{
+ProbMapDisplay::reset() {
   Display::reset();
 
   clear();
@@ -563,4 +508,4 @@ ProbMapDisplay::reset()
 } // namespace rviz
 
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(rviz::ProbMapDisplay, rviz::Display)
+PLUGINLIB_EXPORT_CLASS(rviz_common::ProbMapDisplay, rviz_common::Display)

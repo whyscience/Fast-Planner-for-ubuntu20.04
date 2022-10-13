@@ -59,7 +59,7 @@ class VectorProperty;
  * \brief Displays a map along the XY plane.
  */
 class AerialMapDisplay : public Display {
-  Q_OBJECT
+ Q_OBJECT
  public:
   AerialMapDisplay();
   virtual ~AerialMapDisplay();
@@ -78,7 +78,7 @@ class AerialMapDisplay : public Display {
 
  protected
   Q_SLOTS:
-      void updateAlpha();
+  void updateAlpha();
   void updateTopic();
   void updateDrawUnder();
 

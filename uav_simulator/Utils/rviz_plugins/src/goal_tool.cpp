@@ -28,11 +28,14 @@
  */
 
 #include <tf2_ros/transform_listener.h>
-
 #include <geometry_msgs/msg/pose_stamped.hpp>
 
 #include "rviz_common/display_context.hpp"
 #include "rviz_common/properties/string_property.hpp"
+#include "rviz_common/config.hpp"
+#include "rviz_common/visibility_control.hpp"
+#include "rviz_common/visibility_control.hpp"
+#include "rviz_default_plugins/tools/interaction/interaction_tool.hpp"
 
 #include "goal_tool.h"
 
@@ -59,12 +62,12 @@ void Goal3DTool::updateTopic() {
 void Goal3DTool::onPoseSet(double x, double y, double z, double theta) {
   RCLCPP_WARN(nh_->get_logger(), "3D Goal Set");
   std::string fixed_frame = context_->getFixedFrame().toStdString();
-  tf::Quaternion quat;
+  tf2::Quaternion quat;
   quat.setRPY(0.0, 0.0, theta);
-  tf::Stamped<tf::Pose>
-      p = tf::Stamped<tf::Pose>(tf::Pose(quat, tf::Point(x, y, z)), rclcpp::Clock().now(), fixed_frame);
+  tf2::Stamped<tf2::Pose>
+      p = tf2::Stamped<tf2::Pose>(tf2::Pose(quat, tf2::Point(x, y, z)), rclcpp::Clock().now(), fixed_frame);
   geometry_msgs::msg::PoseStamped goal;
-  tf::poseStampedTFToMsg(p, goal);
+  tf2::poseStampedTFToMsg(p, goal);
   RCLCPP_INFO(nh_->get_logger(),
               "Setting goal: Frame:%s, Position(%.3f, %.3f, %.3f), Orientation(%.3f, %.3f, %.3f, %.3f) = Angle: %.3f\n",
               fixed_frame.c_str(),
@@ -82,4 +85,4 @@ void Goal3DTool::onPoseSet(double x, double y, double z, double theta) {
 } // end namespace rviz
 
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(rviz::Goal3DTool, rviz::Tool)
+PLUGINLIB_EXPORT_CLASS(rviz_common::Goal3DTool, rviz_common::Tool)
