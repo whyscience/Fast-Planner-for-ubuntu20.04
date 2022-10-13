@@ -15,6 +15,7 @@
       <file path="$PROJECT_DIR$/uav_simulator/Utils/odom_visualization/cmake-build-debug" />
       <file path="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/cmake-build-debug" />
       <file path="$PROJECT_DIR$/uav_simulator/Utils/waypoint_generator/cmake-build-debug" />
+      <file path="$PROJECT_DIR$/uav_simulator/so3_control/cmake-build-debug" />
       <file path="$PROJECT_DIR$/uav_simulator/so3_disturbance_generator/cmake-build-debug" />
       <file path="$PROJECT_DIR$/uav_simulator/so3_quadrotor_simulator/cmake-build-debug" />
     </excludeRoots>

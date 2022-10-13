@@ -5,7 +5,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 //#include <dynamic_reconfigure/server.h>
-#include <so3_disturbance_generator/DisturbanceUIConfig.h>
+//#include <so3_disturbance_generator/DisturbanceUIConfig.h>
 #include "pose_utils.h"
 
 using namespace arma;
@@ -17,11 +17,38 @@ rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr pubo;
 rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pubc;
 rclcpp::Publisher<geometry_msgs::msg::Vector3>::SharedPtr pubf;
 rclcpp::Publisher<geometry_msgs::msg::Vector3>::SharedPtr pubm;
-so3_disturbance_generator::DisturbanceUIConfig config;
+//so3_disturbance_generator::DisturbanceUIConfig config;
 nav_msgs::msg::Odometry noisy_odom;
 geometry_msgs::msg::PoseStamped correction;
 
-void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
+struct DynamicConfig {
+  double fxy;
+  double stdfxy;
+  double fz;
+  double stdfz;
+  double mrp;
+  double stdmrp;
+  double myaw;
+  double stdmyaw;
+  bool enable_noisy_odom;
+  double stdxyz;
+  double stdvxyz;
+  double stdrp;
+  double stdyaw;
+  bool enable_drift_odom;
+  double stdvdriftxyz;
+  double stdvdriftyaw;
+  double vdriftx;
+  double vdrifty;
+  double vdriftz;
+  double vdriftyaw;
+  bool place_holder;
+  bool state;
+  std::string name;
+};
+DynamicConfig config{};
+
+void odom_callback(nav_msgs::msg::Odometry::SharedPtr msg) {
   noisy_odom.header = msg->header;
   correction.header = msg->header;
   // Get odom
@@ -46,7 +73,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
   static colvec prev_pose = pose;
   static rclcpp::Time prev_pose_t = msg->header.stamp;
   if (config.enable_drift_odom) {
-    double dt = (msg->header.stamp - prev_pose_t).seconds();
+    double dt = rclcpp::Time(msg->header.stamp).seconds() - prev_pose_t.seconds();
     prev_pose_t = msg->header.stamp;
     colvec d = pose_update(pose_inverse(prev_pose), pose);
     prev_pose = pose;
@@ -116,7 +143,7 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
   pubo->publish(noisy_odom);
   // Check time interval and publish correction
   static rclcpp::Time prev_correction_t = msg->header.stamp;
-  if ((msg->header.stamp - prev_correction_t).seconds() > 1.0 / CORRECTION_RATE) {
+  if (rclcpp::Time(msg->header.stamp).seconds() - prev_correction_t.seconds() > 1.0 / CORRECTION_RATE) {
     prev_correction_t = msg->header.stamp;
     correction.pose.position.x = correction_pose(0);
     correction.pose.position.y = correction_pose(1);
@@ -130,9 +157,9 @@ void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
   }
 }
 
-void config_callback(so3_disturbance_generator::DisturbanceUIConfig &_config, uint32_t level) {
+/*void config_callback(so3_disturbance_generator::DisturbanceUIConfig &_config, uint32_t level) {
   config = _config;
-}
+}*/
 
 void set_disturbance() {
   geometry_msgs::msg::Vector3 f;
@@ -151,20 +178,68 @@ int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
   rclcpp::Node::SharedPtr n;
 
-  auto sub1 = n->create_subscription<MMSG>("odom", 10, odom_callback);
+  auto sub1 = n->create_subscription<nav_msgs::msg::Odometry>("odom", 10, odom_callback);
   pubo = n->create_publisher<nav_msgs::msg::Odometry>("noisy_odom", 10);
   pubc = n->create_publisher<geometry_msgs::msg::PoseStamped>("correction", 10);
   pubf = n->create_publisher<geometry_msgs::msg::Vector3>("force_disturbance", 10);
   pubm = n->create_publisher<geometry_msgs::msg::Vector3>("moment_disturbance", 10);
 
+  n->declare_parameter<double>("fxy", 0.0);
+  n->declare_parameter<double>("stdfxy", 0.0);
+  n->declare_parameter<double>("fz", 0.0);
+  n->declare_parameter<double>("stdfz", 0.0);
+  n->declare_parameter<double>("mrp", 0.0);
+  n->declare_parameter<double>("stdmrp", 0.0);
+  n->declare_parameter<double>("myaw", 0.0);
+  n->declare_parameter<double>("stdmyaw", 0.0);
+  n->declare_parameter<double>("stdxyz", 0.0);
+  n->declare_parameter<double>("stdvxyz", 0.0);
+  n->declare_parameter<double>("stdrp", 0.0);
+  n->declare_parameter<double>("stdyaw", 0.0);
+  n->declare_parameter<double>("stdvdriftxyz", 0.0);
+  n->declare_parameter<double>("stdvdriftyaw", 0.0);
+  n->declare_parameter<double>("vdriftx", 0.0);
+  n->declare_parameter<double>("vdrifty", 0.0);
+  n->declare_parameter<double>("vdriftz", 0.0);
+  n->declare_parameter<double>("vdriftyaw", 0.0);
+  n->declare_parameter<bool>("enable_noisy_odom", false);
+  n->declare_parameter<bool>("enable_drift_odom", true);
+  n->declare_parameter<bool>("place_holder", true);
+  n->declare_parameter<bool>("state", true);
+  n->declare_parameter<std::string>("name", "");
+
+  n->get_parameter("fxy", config.fxy);
+  n->get_parameter("stdfxy", config.stdfxy);
+  n->get_parameter("fz", config.fz);
+  n->get_parameter("stdfz", config.stdfz);
+  n->get_parameter("mrp", config.mrp);
+  n->get_parameter("stdmrp", config.stdmrp);
+  n->get_parameter("myaw", config.myaw);
+  n->get_parameter("stdmyaw", config.stdmyaw);
+  n->get_parameter("stdxyz", config.stdxyz);
+  n->get_parameter("stdvxyz", config.stdvxyz);
+  n->get_parameter("stdrp", config.stdrp);
+  n->get_parameter("stdyaw", config.stdyaw);
+  n->get_parameter("stdvdriftxyz", config.stdvdriftxyz);
+  n->get_parameter("stdvdriftyaw", config.stdvdriftyaw);
+  n->get_parameter("vdriftx", config.vdriftx);
+  n->get_parameter("vdrifty", config.vdrifty);
+  n->get_parameter("vdriftz", config.vdriftz);
+  n->get_parameter("vdriftyaw", config.vdriftyaw);
+  n->get_parameter("enable_noisy_odom", config.enable_noisy_odom);
+  n->get_parameter("enable_drift_odom", config.enable_drift_odom);
+  n->get_parameter("place_holder", config.place_holder);
+  n->get_parameter("state", config.state);
+  n->get_parameter("name", config.name);
+
   // Dynamic Reconfig
-  dynamic_reconfigure::Server<so3_disturbance_generator::DisturbanceUIConfig> server;
-  dynamic_reconfigure::Server<so3_disturbance_generator::DisturbanceUIConfig>::CallbackType ff;
-  ff = std::bind(&config_callback, _1, _2);
-  server.setCallback(ff);
+  //  dynamic_reconfigure::Server<so3_disturbance_generator::DisturbanceUIConfig> server;
+  //  dynamic_reconfigure::Server<so3_disturbance_generator::DisturbanceUIConfig>::CallbackType ff;
+  // ff = std::bind(&config_callback, _1, _2);
+  // server.setCallback(ff);
 
   rclcpp::Rate r(100.0);
-  while (n.ok()) {
+  while (rclcpp::ok()) {
     rclcpp::spin_some(n);
     set_disturbance();
     r.sleep();
