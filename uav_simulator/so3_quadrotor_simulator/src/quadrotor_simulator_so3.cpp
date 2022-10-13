@@ -13,8 +13,8 @@ typedef struct _Control {
 typedef struct _Command {
   float force[3];
   float qx, qy, qz, qw;
-  float kR[3];
-  float kOm[3];
+  float kr[3];
+  float kom[3];
   float corrections[3];
   float current_yaw;
   bool use_external_yaw;
@@ -132,9 +132,9 @@ getControl(const QuadrotorSimulator::Quadrotor &quad, const Command &cmd) {
     float muR3 = -deltaR*deltaR * eA3 / (deltaR * neA + epsilonR);
     // Robust Control --------------------------------------------
   */
-  float M1 = -cmd.kR[0] * eR1 - cmd.kOm[0] * eOm1 + in1; // - I[0][0]*muR1;
-  float M2 = -cmd.kR[1] * eR2 - cmd.kOm[1] * eOm2 + in2; // - I[1][1]*muR2;
-  float M3 = -cmd.kR[2] * eR3 - cmd.kOm[2] * eOm3 + in3; // - I[2][2]*muR3;
+  float M1 = -cmd.kr[0] * eR1 - cmd.kom[0] * eOm1 + in1; // - I[0][0]*muR1;
+  float M2 = -cmd.kr[1] * eR2 - cmd.kom[1] * eOm2 + in2; // - I[1][1]*muR2;
+  float M3 = -cmd.kr[2] * eR3 - cmd.kom[2] * eOm3 + in3; // - I[2][2]*muR3;
 
   float w_sq[4];
   w_sq[0] = force / (4 * kf) - M2 / (2 * d * kf) + M3 / (4 * km);
@@ -161,12 +161,12 @@ cmd_callback(const quadrotor_msgs::msg::SO3Command::SharedPtr &cmd) {
   command.qy = cmd->orientation.y;
   command.qz = cmd->orientation.z;
   command.qw = cmd->orientation.w;
-  command.kR[0] = cmd->kr[0];
-  command.kR[1] = cmd->kr[1];
-  command.kR[2] = cmd->kr[2];
-  command.kOm[0] = cmd->kom[0];
-  command.kOm[1] = cmd->kom[1];
-  command.kOm[2] = cmd->kom[2];
+  command.kr[0] = cmd->kr[0];
+  command.kr[1] = cmd->kr[1];
+  command.kr[2] = cmd->kr[2];
+  command.kom[0] = cmd->kom[0];
+  command.kom[1] = cmd->kom[1];
+  command.kom[2] = cmd->kom[2];
   command.corrections[0] = cmd->aux.kf_correction;
   command.corrections[1] = cmd->aux.angle_corrections[0];
   command.corrections[2] = cmd->aux.angle_corrections[1];
@@ -258,12 +258,12 @@ main(int argc, char **argv) {
   command.qy = 0;
   command.qz = 0;
   command.qw = 1;
-  command.kR[0] = 2;
-  command.kR[1] = 2;
-  command.kR[2] = 2;
-  command.kOm[0] = 0.15;
-  command.kOm[1] = 0.15;
-  command.kOm[2] = 0.15;
+  command.kr[0] = 2;
+  command.kr[1] = 2;
+  command.kr[2] = 2;
+  command.kom[0] = 0.15;
+  command.kom[1] = 0.15;
+  command.kom[2] = 0.15;
   */
 
   rclcpp::Time next_odom_pub_time = rclcpp::Clock().now();

@@ -15,7 +15,7 @@
     <depend>tf2_ros</depend>
 
     <export>
-        <nodelet plugin="${prefix}/nodelet_plugin.xml"/>
+        <build_type>ament_cmake</build_type>
     </export>
 </package>
 

@@ -10,7 +10,7 @@ namespace odeint = boost::numeric::odeint;
 namespace QuadrotorSimulator
 {
 
-Quadrotor::Quadrotor(void)
+Quadrotor::Quadrotor()
 {
   alpha0     = 48; // degree
   g_         = 9.81;
@@ -229,7 +229,7 @@ Quadrotor::setInput(double u1, double u2, double u3, double u4)
 }
 
 const Quadrotor::State&
-Quadrotor::getState(void) const
+Quadrotor::getState() const
 {
   return state_;
 }
@@ -254,7 +254,7 @@ Quadrotor::setStatePos(const Eigen::Vector3d& Pos)
 }
 
 double
-Quadrotor::getMass(void) const
+Quadrotor::getMass() const
 {
   return mass_;
 }
@@ -265,7 +265,7 @@ Quadrotor::setMass(double mass)
 }
 
 double
-Quadrotor::getGravity(void) const
+Quadrotor::getGravity() const
 {
   return g_;
 }
@@ -276,7 +276,7 @@ Quadrotor::setGravity(double g)
 }
 
 const Eigen::Matrix3d&
-Quadrotor::getInertia(void) const
+Quadrotor::getInertia() const
 {
   return J_;
 }
@@ -292,7 +292,7 @@ Quadrotor::setInertia(const Eigen::Matrix3d& inertia)
 }
 
 double
-Quadrotor::getArmLength(void) const
+Quadrotor::getArmLength() const
 {
   return arm_length_;
 }
@@ -309,7 +309,7 @@ Quadrotor::setArmLength(double d)
 }
 
 double
-Quadrotor::getPropRadius(void) const
+Quadrotor::getPropRadius() const
 {
   return prop_radius_;
 }
@@ -325,7 +325,7 @@ Quadrotor::setPropRadius(double r)
 }
 
 double
-Quadrotor::getPropellerThrustCoefficient(void) const
+Quadrotor::getPropellerThrustCoefficient() const
 {
   return kf_;
 }
@@ -342,7 +342,7 @@ Quadrotor::setPropellerThrustCoefficient(double kf)
 }
 
 double
-Quadrotor::getPropellerMomentCoefficient(void) const
+Quadrotor::getPropellerMomentCoefficient() const
 {
   return km_;
 }
@@ -359,7 +359,7 @@ Quadrotor::setPropellerMomentCoefficient(double km)
 }
 
 double
-Quadrotor::getMotorTimeConstant(void) const
+Quadrotor::getMotorTimeConstant() const
 {
   return motor_time_constant_;
 }
@@ -376,7 +376,7 @@ Quadrotor::setMotorTimeConstant(double k)
 }
 
 const Eigen::Vector3d&
-Quadrotor::getExternalForce(void) const
+Quadrotor::getExternalForce() const
 {
   return external_force_;
 }
@@ -387,7 +387,7 @@ Quadrotor::setExternalForce(const Eigen::Vector3d& force)
 }
 
 const Eigen::Vector3d&
-Quadrotor::getExternalMoment(void) const
+Quadrotor::getExternalMoment() const
 {
   return external_moment_;
 }
@@ -398,7 +398,7 @@ Quadrotor::setExternalMoment(const Eigen::Vector3d& moment)
 }
 
 double
-Quadrotor::getMaxRPM(void) const
+Quadrotor::getMaxRPM() const
 {
   return max_rpm_;
 }
@@ -414,7 +414,7 @@ Quadrotor::setMaxRPM(double max_rpm)
 }
 
 double
-Quadrotor::getMinRPM(void) const
+Quadrotor::getMinRPM() const
 {
   return min_rpm_;
 }
@@ -430,7 +430,7 @@ Quadrotor::setMinRPM(double min_rpm)
 }
 
 void
-Quadrotor::updateInternalState(void)
+Quadrotor::updateInternalState()
 {
   for (int i = 0; i < 3; i++)
   {

@@ -29,5 +29,4 @@ target_link_libraries(so3_disturbance_generator
         pose_utils
         )
 ament_target_dependencies(so3_disturbance_generator ${dependencies})
-
 ament_package()

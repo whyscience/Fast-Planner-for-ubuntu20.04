@@ -20,8 +20,8 @@ public:
                         const double des_yaw_dot, const Eigen::Vector3d& kx,
                         const Eigen::Vector3d& kv);
 
-  const Eigen::Vector3d&    getComputedForce(void);
-  const Eigen::Quaterniond& getComputedOrientation(void);
+  const Eigen::Vector3d&    getComputedForce();
+  const Eigen::Quaterniond& getComputedOrientation();
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

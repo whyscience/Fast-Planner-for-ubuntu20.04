@@ -30,4 +30,4 @@ target_link_libraries(quadrotor_simulator_so3
         )
 
 ament_target_dependencies(quadrotor_simulator_so3 ${dependencies})
-
+ament_package()

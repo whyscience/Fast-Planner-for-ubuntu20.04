@@ -87,12 +87,12 @@ SO3Control::calculateControl(const Eigen::Vector3d &des_pos,
 }
 
 const Eigen::Vector3d &
-SO3Control::getComputedForce(void) {
+SO3Control::getComputedForce() {
   return force_;
 }
 
 const Eigen::Quaterniond &
-SO3Control::getComputedOrientation(void) {
+SO3Control::getComputedOrientation() {
   return orientation_;
 }
 
