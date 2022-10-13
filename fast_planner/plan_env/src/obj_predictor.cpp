@@ -197,7 +197,7 @@ void ObjPredictor::markerCallback(const visualization_msgs::msg::Marker::SharedP
 
   if (finish_num == obj_num_) {
     //marker_sub_.shutdown();//todo eric find replacement
-    marker_sub_.reset();//todo eric test
+    marker_sub_.reset();
   }
 }
 

@@ -39,21 +39,34 @@ void FastPlannerManager::initPlanModules(rclcpp::Node::SharedPtr &nh) {
   node_ = nh;
   /* read algorithm parameters */
 
-  //todo eric param
-  /*nh.param("manager/max_vel", pp_.max_vel_, -1.0);
-  nh.param("manager/max_acc", pp_.max_acc_, -1.0);
-  nh.param("manager/max_jerk", pp_.max_jerk_, -1.0);
-  nh.param("manager/dynamic_environment", pp_.dynamic_, -1);
-  nh.param("manager/clearance_threshold", pp_.clearance_, -1.0);
-  nh.param("manager/local_segment_length", pp_.local_traj_len_, -1.0);
-  nh.param("manager/control_points_distance", pp_.ctrl_pt_dist, -1.0);*/
+  nh->declare_parameter<double>("manager/max_vel", -1.0);
+  nh->declare_parameter<double>("manager/max_acc", -1.0);
+  nh->declare_parameter<double>("manager/max_jerk", -1.0);
+  nh->declare_parameter<int>("manager/dynamic_environment", -1);
+  nh->declare_parameter<double>("manager/clearance_threshold", -1.0);
+  nh->declare_parameter<double>("manager/local_segment_length", -1.0);
+  nh->declare_parameter<double>("manager/control_points_distance", -1.0);
 
-  bool use_geometric_path = false, use_kinodynamic_path = false, use_topo_path = false, use_optimization = false, use_active_perception = false;
-  //todo eric param
-  /*nh.param("manager/use_geometric_path", use_geometric_path, false);
-  nh.param("manager/use_kinodynamic_path", use_kinodynamic_path, false);
-  nh.param("manager/use_topo_path", use_topo_path, false);
-  nh.param("manager/use_optimization", use_optimization, false);*/
+  nh->get_parameter("manager/max_vel", pp_.max_vel_);
+  nh->get_parameter("manager/max_acc", pp_.max_acc_);
+  nh->get_parameter("manager/max_jerk", pp_.max_jerk_);
+  nh->get_parameter("manager/dynamic_environment", pp_.dynamic_);
+  nh->get_parameter("manager/clearance_threshold", pp_.clearance_);
+  nh->get_parameter("manager/local_segment_length", pp_.local_traj_len_);
+  nh->get_parameter("manager/control_points_distance", pp_.ctrl_pt_dist);
+
+  bool use_geometric_path = false, use_kinodynamic_path = false, use_topo_path = false, use_optimization = false,
+      use_active_perception = false;
+
+  nh->declare_parameter<bool>("manager/use_geometric_path", false);
+  nh->declare_parameter<bool>("manager/use_kinodynamic_path", false);
+  nh->declare_parameter<bool>("manager/use_topo_path", false);
+  nh->declare_parameter<bool>("manager/use_optimization", false);
+
+  nh->get_parameter("manager/use_geometric_path", use_geometric_path);
+  nh->get_parameter("manager/use_kinodynamic_path", use_kinodynamic_path);
+  nh->get_parameter("manager/use_topo_path", use_topo_path);
+  nh->get_parameter("manager/use_optimization", use_optimization);
 
   local_data_.traj_id_ = 0;
   sdf_map_.reset(new SDFMap);
@@ -426,7 +439,7 @@ void FastPlannerManager::refineTraj(NonUniformBspline &best_traj, double &time_i
   ctrl_pts = bspline_optimizers_[0]->BsplineOptimizeTraj(ctrl_pts, dt, cost_function, 1, 1);
   best_traj = NonUniformBspline(ctrl_pts, 3, dt);
   RCLCPP_WARN_STREAM(node_->get_logger(), "[Refine]: cost " << (rclcpp::Clock().now() - t1).seconds()
-                                       << " seconds, time change is: " << time_inc);
+                                                            << " seconds, time change is: " << time_inc);
 }
 
 void FastPlannerManager::updateTrajInfo() {

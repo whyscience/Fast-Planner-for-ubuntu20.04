@@ -1,6 +1,6 @@
 #include <Eigen/Geometry>
 #include <nav_msgs/msg/odometry.hpp>
-//todo eric nodelet for ROS2
+//todo nodelet for ROS2
 //#include <nodelet/nodelet.h>
 #include <quadrotor_msgs/msg/so3_command.hpp>
 #include <quadrotor_msgs/msg/position_command.hpp>
