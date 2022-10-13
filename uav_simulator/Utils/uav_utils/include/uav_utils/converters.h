@@ -41,17 +41,17 @@ inline void extract_odometry(nav_msgs::msg::Odometry::SharedPtr msg, Eigen::Vect
 
 
 template <typename Scalar_t = double>
-Eigen::Matrix<Scalar_t, 3, 1> from_vector3_msg(const geometry_msgs::Vector3& msg) {
+Eigen::Matrix<Scalar_t, 3, 1> from_vector3_msg(const geometry_msgs::msg::Vector3& msg) {
     return Eigen::Matrix<Scalar_t, 3, 1>(msg->x, msg->y, msg->z);
 }
 
 template <typename Derived>
-geometry_msgs::Vector3 to_vector3_msg(const Eigen::DenseBase<Derived>& v) {
+geometry_msgs::msg::Vector3 to_vector3_msg(const Eigen::DenseBase<Derived>& v) {
 	EIGEN_STATIC_ASSERT_FIXED_SIZE(Derived);
     EIGEN_STATIC_ASSERT(Derived::RowsAtCompileTime == 3, THIS_METHOD_IS_ONLY_FOR_MATRICES_OF_A_SPECIFIC_SIZE);
     EIGEN_STATIC_ASSERT(Derived::ColsAtCompileTime == 1, THIS_METHOD_IS_ONLY_FOR_MATRICES_OF_A_SPECIFIC_SIZE);
 
-    geometry_msgs::Vector3 msg;
+    geometry_msgs::msg::Vector3 msg;
     msg->x = v.x();
     msg->y = v.y();
     msg->z = v.z();

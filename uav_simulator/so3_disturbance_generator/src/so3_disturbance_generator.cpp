@@ -15,8 +15,8 @@ using namespace std;
 
 rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr pubo;
 rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pubc;
-rclcpp::Publisher<geometry_msgs::Vector3>::SharedPtr pubf;
-rclcpp::Publisher<geometry_msgs::Vector3>::SharedPtr pubm;
+rclcpp::Publisher<geometry_msgs::msg::Vector3>::SharedPtr pubf;
+rclcpp::Publisher<geometry_msgs::msg::Vector3>::SharedPtr pubm;
 so3_disturbance_generator::DisturbanceUIConfig config;
 nav_msgs::msg::Odometry noisy_odom;
 geometry_msgs::msg::PoseStamped correction;
@@ -135,8 +135,8 @@ void config_callback(so3_disturbance_generator::DisturbanceUIConfig &_config, ui
 }
 
 void set_disturbance() {
-  geometry_msgs::Vector3 f;
-  geometry_msgs::Vector3 m;
+  geometry_msgs::msg::Vector3 f;
+  geometry_msgs::msg::Vector3 m;
   f.x = config.fxy + config.stdfxy * as_scalar(randn(1));
   f.y = config.fxy + config.stdfxy * as_scalar(randn(1));
   f.z = config.fz + config.stdfz * as_scalar(randn(1));
@@ -154,8 +154,8 @@ int main(int argc, char **argv) {
   auto sub1 = n->create_subscription<MMSG>("odom", 10, odom_callback);
   pubo = n->create_publisher<nav_msgs::msg::Odometry>("noisy_odom", 10);
   pubc = n->create_publisher<geometry_msgs::msg::PoseStamped>("correction", 10);
-  pubf = n->create_publisher<geometry_msgs::Vector3>("force_disturbance", 10);
-  pubm = n->create_publisher<geometry_msgs::Vector3>("moment_disturbance", 10);
+  pubf = n->create_publisher<geometry_msgs::msg::Vector3>("force_disturbance", 10);
+  pubm = n->create_publisher<geometry_msgs::msg::Vector3>("moment_disturbance", 10);
 
   // Dynamic Reconfig
   dynamic_reconfigure::Server<so3_disturbance_generator::DisturbanceUIConfig> server;

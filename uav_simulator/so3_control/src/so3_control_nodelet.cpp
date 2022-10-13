@@ -2,9 +2,9 @@
 #include <nav_msgs/msg/odometry.hpp>
 //todo eric nodelet for ROS2
 #include <nodelet/nodelet.h>
-#include <quadrotor_msgs/Corrections.h>
+#include <quadrotor_msgs/msg/so3_command.hpp>
 #include <quadrotor_msgs/msg/position_command.hpp>
-#include <quadrotor_msgs/SO3Command.h>
+#include <quadrotor_msgs/msg/so3_command.hpp>
 #include "rclcpp/rclcpp.hpp"
 #include <sensor_msgs/msg/imu.hpp>
 #include <so3_control/SO3Control.h>

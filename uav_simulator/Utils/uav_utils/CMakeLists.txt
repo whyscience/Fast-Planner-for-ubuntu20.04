@@ -28,8 +28,19 @@ include_directories(
 #        DESTINATION lib/${PROJECT_NAME}
 #        )
 
-install(
-        DIRECTORY include/${PROJECT_NAME}
+install(DIRECTORY include/${PROJECT_NAME}
         DESTINATION include
-)
+        )
+
+#install(TARGETS ${PROJECT_NAME}
+#        EXPORT ${PROJECT_NAME}
+#        ARCHIVE DESTINATION lib
+#        LIBRARY DESTINATION lib
+#        RUNTIME DESTINATION bin
+#        INCLUDES DESTINATION include)
+
+ament_export_include_directories(include)
+#ament_export_libraries(${PROJECT_NAME})
+ament_export_dependencies(rclcpp rclpy)
+
 ament_package()

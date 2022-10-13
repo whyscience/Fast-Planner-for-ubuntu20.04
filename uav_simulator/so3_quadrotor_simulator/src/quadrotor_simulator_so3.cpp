@@ -1,6 +1,6 @@
 #include <Eigen/Geometry>
 #include <nav_msgs/msg/odometry.hpp>
-#include <quadrotor_msgs/SO3Command.h>
+#include <quadrotor_msgs/msg/so3_command.hpp>
 #include <quadrotor_simulator/Quadrotor.h>
 #include "rclcpp/rclcpp.hpp"
 #include <sensor_msgs/msg/imu.hpp>
@@ -153,7 +153,7 @@ getControl(const QuadrotorSimulator::Quadrotor &quad, const Command &cmd) {
 }
 
 static void
-cmd_callback(const quadrotor_msgs::msg::SO3Command::SharedPtr cmd) {
+cmd_callback(const quadrotor_msgs::msg::SO3Command::SharedPtr &cmd) {
   command.force[0] = cmd->force.x;
   command.force[1] = cmd->force.y;
   command.force[2] = cmd->force.z;
@@ -161,12 +161,12 @@ cmd_callback(const quadrotor_msgs::msg::SO3Command::SharedPtr cmd) {
   command.qy = cmd->orientation.y;
   command.qz = cmd->orientation.z;
   command.qw = cmd->orientation.w;
-  command.kR[0] = cmd->kR[0];
-  command.kR[1] = cmd->kR[1];
-  command.kR[2] = cmd->kR[2];
-  command.kOm[0] = cmd->kOm[0];
-  command.kOm[1] = cmd->kOm[1];
-  command.kOm[2] = cmd->kOm[2];
+  command.kR[0] = cmd->kr[0];
+  command.kR[1] = cmd->kr[1];
+  command.kR[2] = cmd->kr[2];
+  command.kOm[0] = cmd->kom[0];
+  command.kOm[1] = cmd->kom[1];
+  command.kOm[2] = cmd->kom[2];
   command.corrections[0] = cmd->aux.kf_correction;
   command.corrections[1] = cmd->aux.angle_corrections[0];
   command.corrections[2] = cmd->aux.angle_corrections[1];
@@ -175,14 +175,14 @@ cmd_callback(const quadrotor_msgs::msg::SO3Command::SharedPtr cmd) {
 }
 
 static void
-force_disturbance_callback(const geometry_msgs::Vector3::SharedPtr f) {
+force_disturbance_callback(const geometry_msgs::msg::Vector3::SharedPtr &f) {
   disturbance.f(0) = f->x;
   disturbance.f(1) = f->y;
   disturbance.f(2) = f->z;
 }
 
 static void
-moment_disturbance_callback(const geometry_msgs::Vector3::SharedPtr m) {
+moment_disturbance_callback(const geometry_msgs::msg::Vector3::SharedPtr &m) {
   disturbance.m(0) = m->x;
   disturbance.m(1) = m->y;
   disturbance.m(2) = m->z;
@@ -196,34 +196,45 @@ main(int argc, char **argv) {
 
   auto odom_pub = n->create_publisher<nav_msgs::msg::Odometry>("odom", 100);
   auto imu_pub = n->create_publisher<sensor_msgs::msg::Imu>("imu", 10);
-  auto cmd_sub =
-      n->create_subscription<MMSG>("cmd", 100, &cmd_callback, rclcpp::TransportHints().tcpNoDelay());
+  auto cmd_sub = n->create_subscription<quadrotor_msgs::msg::SO3Command>("cmd",
+                                                                         100,
+                                                                         &cmd_callback/*,
+                                                                         rclcpp::TransportHints().tcpNoDelay()*/);
   auto f_sub =
-      n->create_subscription<MMSG>("force_disturbance", 100, &force_disturbance_callback,
-                                   rclcpp::TransportHints().tcpNoDelay());
+      n->create_subscription<geometry_msgs::msg::Vector3>("force_disturbance", 100, &force_disturbance_callback/*,
+                                                          rclcpp::TransportHints().tcpNoDelay()*/);
   auto m_sub =
-      n->create_subscription<MMSG>("moment_disturbance", 100, &moment_disturbance_callback,
-                                   rclcpp::TransportHints().tcpNoDelay());
+      n->create_subscription<geometry_msgs::msg::Vector3>("moment_disturbance", 100, &moment_disturbance_callback/*,
+                                                          rclcpp::TransportHints().tcpNoDelay()*/);
 
   QuadrotorSimulator::Quadrotor quad;
   double _init_x, _init_y, _init_z;
-  n.param("simulator/init_state_x", _init_x, 0.0);
-  n.param("simulator/init_state_y", _init_y, 0.0);
-  n.param("simulator/init_state_z", _init_z, 1.0);
+  n->declare_parameter<double>("simulator/init_state_x", 0.0);
+  n->declare_parameter<double>("simulator/init_state_y", 0.0);
+  n->declare_parameter<double>("simulator/init_state_z", 1.0);
+
+  n->get_parameter("simulator/init_state_x", _init_x);
+  n->get_parameter("simulator/init_state_y", _init_y);
+  n->get_parameter("simulator/init_state_z", _init_z);
 
   Eigen::Vector3d position = Eigen::Vector3d(_init_x, _init_y, _init_z);
   quad.setStatePos(position);
 
   double simulation_rate;
-  n.param("rate/simulation", simulation_rate, 1000.0);
-  ROS_ASSERT(simulation_rate > 0);
+  n->declare_parameter<double>("rate/simulation", 1000.0);
+  n->get_parameter("rate/simulation", simulation_rate);
+
+  assert(simulation_rate > 0);
 
   double odom_rate;
-  n.param("rate/odom", odom_rate, 100.0);
-  const rclcpp::Duration odom_pub_duration(1 / odom_rate);
+  n->declare_parameter<double>("rate/odom", 100.0);
+  n->get_parameter("rate/odom", odom_rate);
+  //const rclcpp::Duration odom_pub_duration(1 / odom_rate);
+  auto odom_pub_duration = std::chrono::milliseconds(int(1000/ odom_rate));
 
   std::string quad_name;
-  n.param("quadrotor_name", quad_name, std::string("quadrotor"));
+  n->declare_parameter<std::string>("rate/odom", std::string("quadrotor"));
+  n->get_parameter("quadrotor_name", quad_name);
 
   QuadrotorSimulator::Quadrotor::State state = quad.getState();
 
@@ -234,7 +245,7 @@ main(int argc, char **argv) {
 
   nav_msgs::msg::Odometry odom_msg;
   odom_msg.header.frame_id = "/simulator";
-  odom_msg->child_frame_id = "/" + quad_name;
+  odom_msg.child_frame_id = "/" + quad_name;
 
   sensor_msgs::msg::Imu imu;
   imu.header.frame_id = "/simulator";
@@ -256,7 +267,7 @@ main(int argc, char **argv) {
   */
 
   rclcpp::Time next_odom_pub_time = rclcpp::Clock().now();
-  while (n.ok()) {
+  while (rclcpp::ok()) {
     rclcpp::spin_some(n);
 
     auto last = control;
@@ -293,23 +304,23 @@ main(int argc, char **argv) {
 void
 stateToOdomMsg(const QuadrotorSimulator::Quadrotor::State &state,
                nav_msgs::msg::Odometry &odom) {
-  odom->pose.pose.position.x = state.x(0);
-  odom->pose.pose.position.y = state.x(1);
-  odom->pose.pose.position.z = state.x(2);
+  odom.pose.pose.position.x = state.x(0);
+  odom.pose.pose.position.y = state.x(1);
+  odom.pose.pose.position.z = state.x(2);
 
   Eigen::Quaterniond q(state.R);
-  odom->pose.pose.orientation.x = q.x();
-  odom->pose.pose.orientation.y = q.y();
-  odom->pose.pose.orientation.z = q.z();
-  odom->pose.pose.orientation.w = q.w();
+  odom.pose.pose.orientation.x = q.x();
+  odom.pose.pose.orientation.y = q.y();
+  odom.pose.pose.orientation.z = q.z();
+  odom.pose.pose.orientation.w = q.w();
 
-  odom->twist.twist.linear.x = state.v(0);
-  odom->twist.twist.linear.y = state.v(1);
-  odom->twist.twist.linear.z = state.v(2);
+  odom.twist.twist.linear.x = state.v(0);
+  odom.twist.twist.linear.y = state.v(1);
+  odom.twist.twist.linear.z = state.v(2);
 
-  odom->twist.twist.angular.x = state.omega(0);
-  odom->twist.twist.angular.y = state.omega(1);
-  odom->twist.twist.angular.z = state.omega(2);
+  odom.twist.twist.angular.x = state.omega(0);
+  odom.twist.twist.angular.y = state.omega(1);
+  odom.twist.twist.angular.z = state.omega(2);
 }
 
 void
