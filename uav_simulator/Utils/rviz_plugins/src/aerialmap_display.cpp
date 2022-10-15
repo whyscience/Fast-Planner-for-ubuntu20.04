@@ -29,30 +29,27 @@
 
 #include <boost/bind.hpp>
 
-#include <OGRE/OgreManualObject.h>
-#include <OGRE/OgreMaterialManager.h>
-#include <OGRE/OgreSceneManager.h>
-#include <OGRE/OgreSceneNode.h>
-#include <OGRE/OgreTextureManager.h>
+#include <iomanip>
 
-#include <OgreVector.h>
-#include <OgreQuaternion.h>
+#include <OgreManualObject.h>
+#include <OgreMaterialManager.h>
+#include <OgreSceneManager.h>
+#include <OgreSceneNode.h>
+#include <OgreTextureManager.h>
+#include <OgreTechnique.h>
 
-#include "rclcpp/rclcpp.hpp"
-
-#include <tf2_ros/transform_listener.h>
-
-#include "rviz_common/display.hpp"
-#include "rviz_common/display_context.hpp"
-#include "rviz_common/frame_manager_iface.hpp"
-#include "rviz_rendering/objects/grid.hpp"
 #include "rviz_common/properties/float_property.hpp"
 #include "rviz_common/properties/int_property.hpp"
+#include "rviz_common/properties/status_property.hpp"
 #include "rviz_common/properties/property.hpp"
 #include "rviz_common/properties/quaternion_property.hpp"
 #include "rviz_common/properties/ros_topic_property.hpp"
 #include "rviz_common/properties/vector_property.hpp"
 #include "rviz_common/validate_floats.hpp"
+#include "rviz_common/display_context.hpp"
+#include "rviz_common/logging.hpp"
+
+#include "rviz_default_plugins/transformation/tf_wrapper.hpp"
 
 #include "aerialmap_display.h"
 
@@ -123,6 +120,7 @@ void
 AerialMapDisplay::onInitialize() {
   static int count = 0;
   std::stringstream ss;
+  rviz_ros_node_ = context_->getRosNodeAbstraction();
   ss << "AerialMapObjectMaterial" << count++;
   material_ = Ogre::MaterialManager::getSingleton().create(
       ss.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);

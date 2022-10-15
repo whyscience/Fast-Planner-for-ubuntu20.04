@@ -7,11 +7,7 @@
     <option name="reloaded" value="true" />
   </component>
   <component name="CMakeRunConfigurationManager">
-    <generated>
-      <config projectName="rviz_plugins" targetName="uninstall" />
-      <config projectName="rviz_plugins" targetName="rviz_plugins_uninstall" />
-      <config projectName="rviz_plugins" targetName="rviz_plugins" />
-    </generated>
+    <generated />
   </component>
   <component name="CMakeSettings">
     <configurations>
@@ -21,18 +17,9 @@
   <component name="ChangeListManager">
     <list default="true" id="89a9acee-acb2-453b-8224-99a10785b156" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/XCMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/aerialmap_display.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/aerialmap_display.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/aerialmap_display.h" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/aerialmap_display.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/gamelikeinput.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/gamelikeinput.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/gamelikeinput.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/gamelikeinput.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/goal_tool.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/goal_tool.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/goal_tool.h" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/goal_tool.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/multi_probmap_display.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/multi_probmap_display.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/multi_probmap_display.h" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/multi_probmap_display.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/pose_tool.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/pose_tool.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/pose_tool.h" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/pose_tool.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/probmap_display.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/probmap_display.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/probmap_display.h" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/Utils/rviz_plugins/src/probmap_display.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uav_simulator/local_sensing/CMakeModules/FindEigen.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/uav_simulator/local_sensing/CMakeModules/FindEigen.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,27 +68,12 @@
       <recent name="$PROJECT_DIR$/uav_simulator/Utils/quadrotor_msgs/msg" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.rviz_plugins">
-    <configuration name="rviz_plugins" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="rviz_plugins" TARGET_NAME="rviz_plugins" CONFIG_NAME="Debug">
+  <component name="RunManager">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
     </configuration>
-    <configuration name="rviz_plugins_uninstall" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="rviz_plugins" TARGET_NAME="rviz_plugins_uninstall" CONFIG_NAME="Debug">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="uninstall" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="rviz_plugins" TARGET_NAME="uninstall" CONFIG_NAME="Debug">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="CMake Application.rviz_plugins" />
-      <item itemvalue="CMake Application.rviz_plugins_uninstall" />
-      <item itemvalue="CMake Application.uninstall" />
-    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -123,7 +95,8 @@
       <workItem from="1665638938733" duration="3626000" />
       <workItem from="1665642731681" duration="3821000" />
       <workItem from="1665656031055" duration="665000" />
-      <workItem from="1665668875825" duration="5040000" />
+      <workItem from="1665668875825" duration="5502000" />
+      <workItem from="1665819283122" duration="94000" />
     </task>
     <servers />
   </component>

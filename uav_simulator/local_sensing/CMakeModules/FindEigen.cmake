@@ -22,7 +22,7 @@
 #   Use this variable for finding packages installed in a nonstandard location,
 #   or for enforcing that one of multiple package installations is picked up.
 # 
-# Cache variables (not intended to be used in CMakeLists.txt files)
+# Cache variables (not intended to be used in XCMakeLists.txt files)
 # 
 # - Eigen_INCLUDE_DIR: Absolute path to package headers.
 # 
